@@ -267,6 +267,103 @@ img,svg{max-width:100%}
 @media(max-width:860px){.ftr-in{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.ftr-in{grid-template-columns:1fr}}
 
+
+/* ================= architecture de page =================
+   barre de progression, navigation qui suit le défilement,
+   bande de chiffres, comparatif, parcours, questions. */
+.prog{position:fixed;top:0;left:0;height:2px;width:100%;z-index:70;transform-origin:0 50%;
+  transform:scaleX(0);background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+@supports (animation-timeline: scroll()){
+  .prog{animation:progress linear;animation-timeline:scroll(root block)}
+}
+@keyframes progress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+.nav{position:relative}
+.nav a{position:relative}
+.nav a[aria-current="true"]{color:var(--fg)}
+.nav-ink{position:absolute;bottom:0;height:2px;background:var(--accent);border-radius:2px;
+  transition:transform .42s cubic-bezier(.16,1,.3,1),width .42s cubic-bezier(.16,1,.3,1),opacity .3s;
+  opacity:0;pointer-events:none;left:0;width:0}
+.nav-ink.on{opacity:1}
+
+/* bande de chiffres */
+.stats{background:var(--surface);border-block:1px solid var(--line)}
+.stats-in{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line)}
+.stat{background:var(--surface);padding:26px 20px;text-align:center}
+.stat .n{font-family:var(--fd);font-size:clamp(1.9rem,4vw,2.9rem);letter-spacing:-.03em;
+  color:var(--accent-text);font-variant-numeric:tabular-nums;line-height:1}
+.stat .l{font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--fg-soft);
+  font-weight:600;margin-top:9px}
+@media(max-width:640px){.stats-in{grid-template-columns:repeat(2,1fr)}}
+
+/* comparatif */
+.cmp{width:100%;border-collapse:collapse;font-size:.88rem;background:var(--surface);min-width:720px}
+.cmp th{text-align:left;font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-soft);
+  font-weight:600;padding:13px 14px;border-bottom:1px solid var(--line-2);background:var(--surface-2);white-space:nowrap}
+.cmp td{padding:14px;border-bottom:1px solid var(--line);vertical-align:middle}
+.cmp tbody tr{transition:background .2s}
+.cmp tbody tr:hover{background:var(--accent-wash);cursor:pointer}
+.cmp .mdl{display:flex;align-items:center;gap:12px;white-space:nowrap}
+.cmp .mdl svg{height:44px;width:auto;flex:0 0 auto}
+.cmp .mdl b{font-weight:600}
+.cmp .mdl span{display:block;font-size:.72rem;color:var(--fg-soft);font-weight:400}
+.meter{display:flex;gap:3px;align-items:center}
+.meter i{width:15px;height:5px;border-radius:2px;background:var(--line-2);display:block;
+  transform:scaleX(0);transform-origin:0 50%;animation:barIn .5s cubic-bezier(.16,1,.3,1) forwards}
+.meter i.on{background:var(--accent)}
+.meter i:nth-child(2){animation-delay:.05s}.meter i:nth-child(3){animation-delay:.1s}
+.meter i:nth-child(4){animation-delay:.15s}.meter i:nth-child(5){animation-delay:.2s}
+@keyframes barIn{to{transform:scaleX(1)}}
+.cmp .prix{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* parcours de commande */
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);
+  border:1px solid var(--line)}
+.step{background:var(--surface);padding:26px 22px;position:relative;overflow:hidden;transition:background .25s}
+.step:hover{background:var(--accent-wash)}
+.step .no{font-family:var(--fd);font-size:2.6rem;line-height:1;color:var(--line-2);
+  letter-spacing:-.04em;transition:color .3s}
+.step:hover .no{color:var(--accent)}
+.step h4{font-size:1.02rem;margin-block:14px 8px}
+.step p{font-family:var(--fb);font-size:.95rem;line-height:1.55;color:var(--fg-soft)}
+@media(max-width:900px){.steps-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.steps-grid{grid-template-columns:1fr}}
+
+/* questions */
+.faq{border:1px solid var(--line);background:var(--surface)}
+.qa{border-bottom:1px solid var(--line)}
+.qa:last-child{border-bottom:0}
+.qa-q{display:flex;align-items:center;gap:16px;width:100%;text-align:left;padding:19px 22px;
+  font-size:1rem;font-weight:600;transition:background .2s,color .2s}
+.qa-q:hover{background:var(--accent-wash);color:var(--accent-text)}
+.qa-q .pm{margin-left:auto;flex:0 0 auto;width:22px;height:22px;position:relative}
+.qa-q .pm::before,.qa-q .pm::after{content:"";position:absolute;inset:50% 0 auto 0;height:2px;
+  background:var(--accent);transition:transform .35s cubic-bezier(.16,1,.3,1)}
+.qa-q .pm::after{transform:rotate(90deg)}
+.qa[data-open="1"] .pm::after{transform:rotate(0)}
+.qa-a{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s cubic-bezier(.16,1,.3,1)}
+.qa[data-open="1"] .qa-a{grid-template-rows:1fr}
+.qa-a>div{overflow:hidden}
+.qa-a p{font-family:var(--fb);font-size:1rem;line-height:1.62;color:var(--fg-soft);
+  padding:0 22px 22px;max-width:68ch}
+
+/* onglets de la fiche produit */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-top:22px;position:relative}
+.tabs button{padding:11px 14px;font-size:.78rem;font-weight:600;color:var(--fg-soft);
+  border-bottom:2px solid transparent;transition:color .2s,border-color .2s}
+.tabs button[aria-selected="true"]{color:var(--accent-text);border-color:var(--accent)}
+.tabpane{animation:fadeUp .35s cubic-bezier(.16,1,.3,1)}
+
+/* titres de section : filet qui se trace */
+.sec-head{position:relative}
+.sec-head::after{content:"";position:absolute;left:0;right:0;bottom:-16px;height:1px;background:var(--line);
+  transform:scaleX(0);transform-origin:0 50%;animation:barIn .9s cubic-bezier(.16,1,.3,1) forwards}
+.eyebrow{display:inline-flex;align-items:center;gap:9px}
+.eyebrow::before{content:"";width:16px;height:1px;background:currentColor;opacity:.6}
+html{scroll-behavior:smooth;scroll-padding-top:86px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}
+  .meter i,.sec-head::after{animation:none;transform:scaleX(1)}}
+
 /* ---------- overlays ---------- */
 .scrim{position:fixed;inset:0;z-index:80;background:rgba(10,12,14,.5);backdrop-filter:blur(3px);animation:fade .18s ease}
 @keyframes fade{from{opacity:0}}
@@ -400,15 +497,19 @@ label.f.bad input{border-color:var(--bad)}
 </style>
 
 <div id="shopview">
+<div class="prog" id="prog" aria-hidden="true"></div>
 
 <header class="hdr">
   <div class="wrap hdr-in">
     <a class="brand" href="#top" style="text-decoration:none">BENKASHOES<i></i><small>Liège &amp; Cuir</small></a>
-    <nav class="nav">
+    <nav class="nav" id="nav">
       <a href="#modeles">Modèles</a>
       <a href="#liege">Le liège</a>
+      <a href="#comparatif">Comparatif</a>
       <a href="#tailles">Tailles</a>
-      <a href="#maison">La maison</a>
+      <a href="#commander">Commander</a>
+      <a href="#faq">Questions</a>
+      <span class="nav-ink" id="navink" aria-hidden="true"></span>
     </nav>
     <div class="hdr-act">
       <button class="icbtn" id="themebtn" title="Changer le thème" aria-label="Changer le thème">
@@ -439,6 +540,13 @@ label.f.bad input{border-color:var(--bad)}
   </div>
 </section>
 <div class="ticker"><div class="marquee"><div class="mq-track"><div class="mq-group"><span>Liège d'Alentejo récolté à la main</span><span>Livraison 48 h partout au Maroc</span><span>Essai 30 jours, retour offert</span><span>Ressemelage garanti à vie</span><span>Cuir pleine fleur tanné à Fès</span></div><div class="mq-group" aria-hidden="true"><span>Liège d'Alentejo récolté à la main</span><span>Livraison 48 h partout au Maroc</span><span>Essai 30 jours, retour offert</span><span>Ressemelage garanti à vie</span><span>Cuir pleine fleur tanné à Fès</span></div></div></div></div>
+
+<section class="stats" id="stats"><div class="wrap"><div class="stats-in">
+  <div class="stat"><div class="n" data-count="6">6</div><div class="l">Formes au catalogue</div></div>
+  <div class="stat"><div class="n" data-count="12">12</div><div class="l">Pointures, du 35 au 46</div></div>
+  <div class="stat"><div class="n" data-count="4">4</div><div class="l">Couches dans le lit</div></div>
+  <div class="stat"><div class="n" data-count="30" data-suffix=" j">30 j</div><div class="l">D’essai à la maison</div></div>
+</div></div></section>
 
 <main>
 <section class="sec wrap" id="modeles">
@@ -472,6 +580,14 @@ label.f.bad input{border-color:var(--bad)}
   </div></div>
 </section>
 
+<section class="sec wrap" id="comparatif">
+  <div class="sec-head rv">
+    <div><span class="eyebrow">Comparatif</span><h2 style="margin-top:12px">Laquelle est faite<br>pour votre pied ?</h2></div>
+    <p class="serif">Même lit, mêmes matières, même ressemelage. Ce qui change : la fermeté du maintien, le poids, et la saison où vous les porterez. Cliquez une ligne pour ouvrir la fiche.</p>
+  </div>
+  <div class="scroll-x rv"><table class="cmp" id="cmptable"></table></div>
+</section>
+
 <section class="sec wrap" id="tailles">
   <div class="sec-head rv">
     <div>
@@ -498,6 +614,27 @@ label.f.bad input{border-color:var(--bad)}
       <h4>Ressemelage à vie</h4><p>La semelle d'usure se remplace en atelier pour 80 DH, autant de fois qu'il le faut. Le liège, lui, reste le vôtre.</p>
     </div>
   </div>
+</section>
+
+<section class="sec wrap" id="commander">
+  <div class="sec-head rv">
+    <div><span class="eyebrow">Passer commande</span><h2 style="margin-top:12px">Quatre étapes,<br>pas une de plus.</h2></div>
+    <p class="serif">Le paiement en ligne n’est pas branché : l’atelier confirme chaque commande à la main avant de l’expédier. C’est plus lent qu’un bouton, et ça évite les ruptures de stock.</p>
+  </div>
+  <div class="steps-grid">
+    <div class="step"><div class="no">01</div><h4>Choisissez la forme</h4><p>Mesurez votre pied contre un mur avant de choisir la pointure. Entre deux tailles, prenez la plus grande : le liège se creuse, il ne s’étire pas.</p></div>
+    <div class="step"><div class="no">02</div><h4>Envoyez le panier</h4><p>Validez votre commande : le site vous donne une référence et un récapitulatif à envoyer à l’atelier, par WhatsApp ou par e-mail.</p></div>
+    <div class="step"><div class="no">03</div><h4>L’atelier confirme</h4><p>On vérifie la disponibilité dans la pointure et le coloris demandés, puis on vous rappelle sous 24 heures ouvrées pour valider l’adresse.</p></div>
+    <div class="step"><div class="no">04</div><h4>Livraison et essai</h4><p>Expédition sous 48 h partout au Maroc, paiement à la livraison. Vous avez trente jours pour changer d’avis, retour à notre charge.</p></div>
+  </div>
+</section>
+
+<section class="sec wrap" id="faq">
+  <div class="sec-head rv">
+    <div><span class="eyebrow">Questions fréquentes</span><h2 style="margin-top:12px">Ce qu’on nous<br>demande le plus.</h2></div>
+    <p class="serif">Une question qui n’est pas là ? Écrivez à l’atelier, on répond dans la journée.</p>
+  </div>
+  <div class="faq rv" id="faqlist"></div>
 </section>
 </main>
 
@@ -568,30 +705,44 @@ const COLORS={
 };
 const FAMS=[['tous','Tous les modèles'],['brides','Brides réglables'],['doigt','Entre-doigts'],['sabot','Sabot fermé'],['plateforme','Plateforme']];
 const CATALOG=[
-  {id:'deux',name:'Deux',sub:'Deux brides réglables',fam:'brides',style:'two',price:319,colors:['bordeaux','noir','marron','tabac','beige'],
+  {id:'deux',hold:4,use:'Tous les jours',name:'Deux',sub:'Deux brides réglables',fam:'brides',style:'two',price:319,colors:['bordeaux','noir','marron','tabac','beige'],
    stock:[3,8,12,15,16,14,10,7,4,2,1,0],flag:'Le classique',
    blurb:"Deux brides indépendantes, boucles en laiton brossé : on serre l'avant pour le maintien, l'arrière pour le confort. La forme sur laquelle l'atelier a commencé en 2019.",
    spec:[['Tige','Cuir pleine fleur 2,2 mm'],['Boucles','Laiton brossé, ardillon acier'],['Doublure','Daim de veau velours'],['Poids','340 g (pointure 40)']]},
-  {id:'solo',name:'Solo',sub:'Une bride large',fam:'brides',style:'one',price:249,colors:['noir','gris','marine'],
+  {id:'solo',hold:2,use:'À enfiler',name:'Solo',sub:'Une bride large',fam:'brides',style:'one',price:249,colors:['noir','gris','marine'],
    stock:[5,9,13,14,12,11,8,5,3,2,0,0],flag:'Entrée de collection',
    blurb:"Une seule bride de 38 mm posée sur l'avant-pied. Rien à régler le matin, le pied entre d'un geste. C'est le modèle qu'on enfile pour descendre chercher le pain.",
    spec:[['Tige','Cuir pleine fleur 2,4 mm'],['Boucle','Laiton brossé'],['Doublure','Daim de veau velours'],['Poids','315 g (pointure 40)']]},
-  {id:'noor',name:'Noor',sub:'Entre-doigts',fam:'doigt',style:'thong',price:279,colors:['tabac','beige','noir'],
+  {id:'noor',hold:2,use:'Chaleur, plage',name:'Noor',sub:'Entre-doigts',fam:'doigt',style:'thong',price:279,colors:['tabac','beige','noir'],
    stock:[6,10,14,16,15,12,9,6,3,1,0,0],flag:null,
    blurb:"Bride haute cambrée et séparateur d'orteils gainé de cuir doux. La bride remonte sur le pied au lieu de l'écraser, ce qui change tout après trois heures debout.",
    spec:[['Tige','Cuir pleine fleur 2,0 mm'],['Séparateur','Cuir doublé, bord roulé'],['Doublure','Daim de veau velours'],['Poids','300 g (pointure 40)']]},
-  {id:'atlas',name:'Atlas',sub:'Sabot fermé',fam:'sabot',style:'clog',price:389,colors:['marron','noir','taupe'],
+  {id:'atlas',hold:5,use:'Mi-saison',name:'Atlas',sub:'Sabot fermé',fam:'sabot',style:'clog',price:389,colors:['marron','noir','taupe'],
    stock:[2,5,9,12,13,11,8,6,4,3,2,1],flag:'Mi-saison',
    blurb:"Avant-pied entièrement couvert, talon libre. Il se porte avec une chaussette épaisse jusqu'en novembre. Bride arrière réglable pour rattraper le volume du pied.",
    spec:[['Tige','Cuir pleine fleur 2,6 mm'],['Boucle','Laiton brossé, bride arrière'],['Doublure','Daim de veau velours'],['Poids','410 g (pointure 40)']]},
-  {id:'oasis',name:'Oasis',sub:'Brides croisées',fam:'brides',style:'cross',price:349,colors:['marine','beige','noir'],
+  {id:'oasis',hold:4,use:'Marche longue',name:'Oasis',sub:'Brides croisées',fam:'brides',style:'cross',price:349,colors:['marine','beige','noir'],
    stock:[4,7,10,13,14,12,9,5,3,1,1,0],flag:null,
    blurb:"Deux brides qui se croisent sur le dessus du pied et tirent dans deux directions. Le maintien est plus ferme que sur la Deux, sans pression sur l'os du cou-de-pied.",
    spec:[['Tige','Cuir pleine fleur 2,2 mm'],['Boucles','Deux boucles latérales'],['Doublure','Daim de veau velours'],['Poids','355 g (pointure 40)']]},
-  {id:'haut',name:'Haut',sub:'Plateforme 35 mm',fam:'plateforme',style:'two',platform:true,price:399,colors:['noir','bordeaux','tabac'],
+  {id:'haut',hold:4,use:'Ville, soirée',name:'Haut',sub:'Plateforme 35 mm',fam:'plateforme',style:'two',platform:true,price:399,colors:['noir','bordeaux','tabac'],
    stock:[3,6,11,13,15,13,8,4,2,1,0,0],flag:'Nouveauté',
    blurb:"Le même lit anatomique posé sur un bloc de liège de 35 mm, chanfreiné à l'avant pour que la marche reste souple. Deux brides, boucles doubles.",
    spec:[['Tige','Cuir pleine fleur 2,2 mm'],['Plateforme','Liège-latex 35 mm chanfreiné'],['Doublure','Daim de veau velours'],['Poids','470 g (pointure 40)']]}
+];
+const FAQ=[
+ ['Comment choisir ma pointure ?',
+  "Posez le talon contre un mur, marquez le bout du gros orteil, mesurez en millimètres et comparez au guide des pointures. Si vous tombez entre deux tailles, prenez la plus grande : le lit de liège se creuse avec le port, il ne s\u2019étire jamais. Une sandale trop juste ne se rattrape pas."],
+ ['Le liège fait-il mal les premiers jours ?',
+  "Il surprend. Le lit est ferme et la voûte est haute, ce qui change de n\u2019importe quelle semelle plate. Portez-les deux à trois heures par jour la première semaine : le liège se réchauffe, se tasse sous vos appuis et prend votre empreinte. Au bout d\u2019une quinzaine de ports, la forme est la vôtre."],
+ ['Comment entretenir le lit ?',
+  "Brosse sèche pour le daim, jamais d\u2019eau sur le lit. Si le liège du bord se dessèche et blanchit, passez une fine couche de cire incolore une à deux fois par an. Ne les laissez pas sécher au soleil ni près d\u2019un radiateur : le liège se fissure."],
+ ['Puis-je payer en ligne ?',
+  "Pas encore. Vous composez votre panier, le site vous donne une référence, et vous envoyez le récapitulatif à l\u2019atelier par WhatsApp ou par e-mail. On confirme la disponibilité, puis vous réglez à la livraison ou par virement."],
+ ['Livrez-vous en dehors du Maroc ?',
+  "Oui, sur demande. L\u2019expédition sous 48 h et la livraison offerte au-delà de 400 DH ne valent que pour le Maroc. Pour l\u2019étranger, indiquez votre pays dans le formulaire : on vous envoie un devis de port avant de confirmer."],
+ ['Que couvre le ressemelage à vie ?',
+  "La semelle d\u2019usure en EVA, la seule pièce qui part vraiment. On la remplace en atelier pour 80 DH, autant de fois qu\u2019il le faut, sans limite de durée. Le liège, le jute et la doublure restent les vôtres \u2014 c\u2019est eux qui portent votre empreinte."]
 ];
 const STATUS={nouvelle:'Nouvelle',confirmee:'Confirmée',expediee:'Expédiée',livree:'Livrée',annulee:'Annulée'};
 const SHIPFREE=400, SHIPCOST=35;
@@ -718,8 +869,31 @@ function renderStatic(){
     ${SHOP.whatsapp?`<a class="btn btn-ghost btn-sm" href="https://wa.me/${esc(SHOP.whatsapp)}" target="_blank" rel="noopener" style="width:100%;justify-content:center">Écrire sur WhatsApp</a>`:''}
     <p class="note" style="color:var(--band-soft);margin-top:9px">Atelier ouvert du lundi au vendredi, 9 h – 18 h.</p>`;
   $('#ftrcopy').textContent=`© ${new Date().getFullYear()} Benkashoes — ${SHOP.site}`;
+  renderCmp(); renderFAQ();
   $('#sizebody').innerHTML=SIZES.map(s=>{const mm=MM[s];
     return `<tr><td style="font-weight:700" class="num">${s}</td><td class="num">${mm} – ${mm+6}</td><td class="num">${mm+13} mm</td><td class="num">${Math.round(mm*.372)} mm</td><td class="num">${Math.round(mm*.405)} mm</td></tr>`;}).join('');
+}
+let _cmpSig='';
+function renderCmp(){
+  const sig=CATALOG.map(p=>p.id+priceOf(p)+totStock(p)).join('|');
+  if(sig===_cmpSig)return; _cmpSig=sig;
+  const t=$('#cmptable'); if(!t)return;
+  t.innerHTML=`<thead><tr><th>Modèle</th><th>Maintien</th><th>Usage</th><th>Poids (40)</th><th>Coloris</th><th>Stock</th><th class="r">Prix</th></tr></thead><tbody>`
+   +CATALOG.map(p=>{const st=totStock(p);
+     return `<tr data-act="open" data-id="${p.id}" data-c="${p.colors[0]}">
+       <td><span class="mdl">${sandal(p.style,p.colors[0],p.platform)}<span><b>Benkashoes ${p.name}</b><span>${p.sub}</span></span></span></td>
+       <td><span class="meter" title="${p.hold} sur 5">${[1,2,3,4,5].map(i=>`<i class="${i<=p.hold?'on':''}"></i>`).join('')}</span></td>
+       <td style="color:var(--fg-soft)">${p.use}</td>
+       <td class="num" style="color:var(--fg-soft)">${(p.spec.find(s=>s[0]==='Poids')||['','—'])[1].replace(' (pointure 40)','')}</td>
+       <td><span class="dots">${p.colors.map(k=>`<i style="background:linear-gradient(135deg,${COLORS[k].c},${COLORS[k].d})" title="${COLORS[k].n}"></i>`).join('')}</span></td>
+       <td style="color:${st?'var(--ok)':'var(--fg-soft)'};font-size:.8rem">${st?st+' paires':'épuisé'}</td>
+       <td class="r prix">${fmt(priceOf(p))}</td></tr>`;}).join('')+`</tbody>`;
+}
+function renderFAQ(){
+  const el=$('#faqlist'); if(!el)return;
+  el.innerHTML=FAQ.map((q,i)=>`<div class="qa" data-open="0">
+    <button class="qa-q" data-act="qa" data-i="${i}" aria-expanded="false">${q[0]}<span class="pm" aria-hidden="true"></span></button>
+    <div class="qa-a"><div><p>${q[1]}</p></div></div></div>`).join('');
 }
 function renderGrid(){
   const list=CATALOG.filter(p=>(S.filter==='tous'||p.fam===S.filter)&&(!S.colorFilter||p.colors.includes(S.colorFilter)));
@@ -757,14 +931,35 @@ function sheetHTML(){
         <div class="sizegrid">${SIZES.map((s,i)=>{const k=stockOf(p,i);
           return `<button class="sizebtn" data-act="setsize" data-s="${s}" aria-pressed="${si===s}" ${k?'':'disabled'}>${s}${k&&k<=3?`<small>${k} rest.</small>`:''}</button>`;}).join('')}</div>
         <p class="note" style="margin-top:9px">Entre deux pointures, prenez la plus grande : <a href="#tailles" data-act="closep" style="color:var(--accent-text)">voir le guide</a>.</p></div>
-      <ul class="spec">${p.spec.map(r=>`<li><span>${r[0]}</span><span>${r[1]}</span></li>`).join('')}
-        <li><span>Semelle</span><span>Liège-latex + jute + EVA</span></li>
-        <li><span>Entretien</span><span>Brosse sèche, cire incolore</span></li></ul>
+      <div class="tabs" role="tablist">
+        ${[['fiche','Fiche technique'],['entretien','Entretien'],['livraison','Livraison']].map(([k,l])=>
+          `<button role="tab" data-act="tab" data-k="${k}" aria-selected="${(S.tab||'fiche')===k}">${l}</button>`).join('')}
+      </div>
+      <div class="tabpane">${sheetTab(p)}</div>
     </div>
     <div class="panel-ft">
       <button class="btn btn-pri" data-act="add" ${si&&st>0?'':'disabled'} style="justify-content:center">${si?`Ajouter au panier — ${fmt(priceOf(p))}`:'Choisissez une pointure'}</button>
       <p class="note" style="text-align:center">Livraison 48 h · offerte dès ${fmt(SHIPFREE)} · essai 30 jours</p>
     </div></div>`;
+}
+
+function sheetTab(p){
+  const tab=S.tab||'fiche';
+  if(tab==='entretien') return `<p class="serif" style="padding-top:16px">Brossez le daim à sec, jamais à l\u2019eau : le lit absorbe et met des jours à sécher. Si le liège du bord blanchit, passez une fine couche de cire incolore une à deux fois par an, elle le nourrit et l\u2019empêche de se fissurer.</p>
+    <ul class="spec"><li><span>Doublure</span><span>Brosse sèche en crêpe</span></li>
+    <li><span>Bord en liège</span><span>Cire incolore, 1 à 2 fois par an</span></li>
+    <li><span>À éviter</span><span>Eau, soleil direct, radiateur</span></li>
+    <li><span>Rodage</span><span>2 à 3 h par jour la première semaine</span></li></ul>`;
+  if(tab==='livraison') return `<p class="serif" style="padding-top:16px">Expédition le jour même pour toute commande confirmée avant 14 h. Vous réglez à la livraison ou par virement : le paiement en ligne n\u2019est pas encore branché sur la boutique.</p>
+    <ul class="spec"><li><span>Délai</span><span>48 h partout au Maroc</span></li>
+    <li><span>Frais de port</span><span>${fmt(SHIPCOST)}, offerts dès ${fmt(SHIPFREE)}</span></li>
+    <li><span>Paiement</span><span>À la livraison ou par virement</span></li>
+    <li><span>Retour</span><span>30 jours, frais à notre charge</span></li>
+    <li><span>Ressemelage</span><span>80 DH, sans limite de durée</span></li></ul>`;
+  return `<ul class="spec" style="border-top:0">${p.spec.map(r=>`<li><span>${r[0]}</span><span>${r[1]}</span></li>`).join('')}
+    <li><span>Semelle</span><span>Liège-latex + jute + EVA</span></li>
+    <li><span>Maintien</span><span>${p.hold} sur 5 — ${p.use.toLowerCase()}</span></li>
+    <li><span>Pointures</span><span>35 à 46, largeur normale</span></li></ul>`;
 }
 
 /* ======================= panier & commande ======================= */
@@ -1039,13 +1234,53 @@ function initMotion(){
     document.querySelectorAll('.rv,.anat-item,.pledge').forEach(el=>io.observe(el));
   }
 }
+function initNav(){
+  const nav=$('#nav'),ink=$('#navink'); if(!nav||!ink)return;
+  const links=[...nav.querySelectorAll('a')];
+  const place=a=>{if(!a){ink.classList.remove('on');return;}
+    ink.style.width=a.offsetWidth+'px';ink.style.transform=`translateX(${a.offsetLeft}px)`;ink.classList.add('on');};
+  const secs=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  if('IntersectionObserver' in window){
+    const vus=new Map();
+    const io=new IntersectionObserver(es=>{
+      es.forEach(e=>vus.set(e.target.id,e.intersectionRatio));
+      let best=null,r=0; vus.forEach((v,k)=>{if(v>r){r=v;best=k;}});
+      links.forEach(a=>a.removeAttribute('aria-current'));
+      if(best&&r>0.04){const a=links.find(x=>x.getAttribute('href')==='#'+best);
+        if(a){a.setAttribute('aria-current','true');place(a);}}
+      else place(null);
+    },{threshold:[0,.05,.25,.5,.75,1],rootMargin:'-80px 0px -45% 0px'});
+    secs.forEach(s=>io.observe(s));
+  }
+  addEventListener('resize',()=>place(links.find(x=>x.hasAttribute('aria-current'))),{passive:true});
+}
+function initCounters(){
+  const els=[...document.querySelectorAll('[data-count]')]; if(!els.length)return;
+  const run=el=>{const to=+el.dataset.count,suf=el.dataset.suffix||'';
+    if(!MOTION){el.textContent=to+suf;return;}
+    const t0=performance.now(),d=1100;
+    const tick=t=>{const p=Math.min(1,(t-t0)/d),e=1-Math.pow(1-p,3);
+      el.textContent=Math.round(to*e)+suf; if(p<1)requestAnimationFrame(tick);};
+    requestAnimationFrame(tick);};
+  if(!('IntersectionObserver' in window)){els.forEach(run);return;}
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){run(e.target);io.unobserve(e.target);}}),{threshold:.4});
+  els.forEach(el=>io.observe(el));
+}
+function initProgress(){
+  const bar=$('#prog'); if(!bar)return;
+  if(CSS.supports&&CSS.supports('animation-timeline','scroll()'))return;
+  let raf=0;
+  const up=()=>{raf=0;const max=document.documentElement.scrollHeight-innerHeight;
+    bar.style.transform='scaleX('+(max>0?Math.min(1,scrollY/max):0).toFixed(4)+')';};
+  addEventListener('scroll',()=>{if(!raf)raf=requestAnimationFrame(up);},{passive:true});up();
+}
 function bumpCart(){const b=$('#cartbtn');if(!b||!MOTION)return;b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump');}
 
 /* ======================= rendu + interactions ======================= */
 function draw(){
   const adm=location.hash==='#admin';
   $('#shopview').hidden=adm;$('#admview').hidden=!adm;
-  if(adm)$('#admview').innerHTML=admHTML();else renderGrid();
+  if(adm)$('#admview').innerHTML=admHTML();else{renderGrid();renderCmp();}
   const o=$('#overlays');
   o.innerHTML=S.panel==='sheet'?sheetHTML():S.panel==='cart'?cartHTML():S.panel==='manual'?manualHTML():'';
   if(S.panel){o.insertAdjacentHTML('afterbegin','<div class="scrim" data-act="closep"></div>');
@@ -1097,9 +1332,13 @@ document.addEventListener('click',async e=>{
   if(cp){const ok=await copy($('#'+cp.dataset.copy).textContent.trim());toast(ok?'Copié':'Copie refusée par le navigateur');return;}
   if(e.target.closest('#cartbtn')){S.panel='cart';S.step=S.cart.length?1:1;S.lastOrder=null;draw();return;}
   const t=e.target.closest('[data-act]');if(!t)return;const a=t.dataset.act,d=t.dataset;
-  if(a==='fam'){S.filter=d.k;draw();}
+  if(a==='qa'){const qa=t.closest('.qa');const o=qa.dataset.open==='1';
+    qa.parentElement.querySelectorAll('.qa').forEach(x=>{x.dataset.open='0';x.querySelector('.qa-q').setAttribute('aria-expanded','false');});
+    if(!o){qa.dataset.open='1';t.setAttribute('aria-expanded','true');}}
+  else if(a==='tab'){S.tab=d.k;draw();}
+  else if(a==='fam'){S.filter=d.k;draw();}
   else if(a==='col'){S.colorFilter=S.colorFilter===d.k?null:d.k;draw();}
-  else if(a==='open'){const p=prod(d.id);S.sheet={id:p.id,c:d.c||p.colors[0],s:null};S.panel='sheet';draw();}
+  else if(a==='open'){const p=prod(d.id);S.sheet={id:p.id,c:d.c||p.colors[0],s:null};S.tab='fiche';S.panel='sheet';draw();}
   else if(a==='closep'){S.panel=null;S.manual=null;draw();}
   else if(a==='setcol'){S.sheet.c=d.k;draw();}
   else if(a==='setsize'){S.sheet.s=+d.s;draw();}
@@ -1202,7 +1441,7 @@ addEventListener('hashchange',()=>{S.panel=null;draw();window.scrollTo(0,0);});
 
 /* ======================= démarrage ======================= */
 renderStatic();
-initMotion();
+initMotion();initNav();initCounters();initProgress();
 const savedCart=lsGet('benkashoes.cart');if(Array.isArray(savedCart))S.cart=savedCart.filter(i=>prod(i.id)&&COLORS[i.c]&&SIZES.includes(i.s));
 draw();
 if(!HASCLAUDE){
