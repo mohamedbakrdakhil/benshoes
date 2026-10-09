@@ -437,8 +437,20 @@ const SHOP={
   whatsapp:'',                    // ex. '33612345678' indicatif SANS le +  (vide = bouton masqué)
   site:'mohamedbakrdakhil.github.io/benshoes'       // l'adresse affichée en bas de page
 };
-const HASCLAUDE=!!(window.claude&&window.claude.use); // false sur un hébergement statique
+const HASCLAUDE=!!(window.claude&&window.claude.use);
 const STATIC=!HASCLAUDE;
+// 'artifact' = base partagée Claude · 'api' = serveur Benshoes · 'local' = ce navigateur seulement
+let MODE=HASCLAUDE?'artifact':'local';
+let TOKEN='';
+async function api(route,opt={}){
+  const head=Object.assign({},opt.headers||{});
+  if(opt.body!==undefined)head['content-type']='application/json';
+  if(TOKEN)head.authorization='Bearer '+TOKEN;
+  const r=await fetch('/api/'+route,{method:opt.method||'GET',headers:head,
+    body:opt.body!==undefined?JSON.stringify(opt.body):undefined});
+  let d={};try{d=await r.json();}catch(e){}
+  if(!r.ok){const err=new Error(d.error||'Le serveur n\'a pas répondu.');err.status=r.status;throw err;}
+  return d;}
 
 /* ======================= données ======================= */
 const SIZES=[35,36,37,38,39,40,41,42,43,44,45,46];
@@ -741,6 +753,11 @@ async function placeOrder(){
     items:S.cart.map(i=>{const p=prod(i.id);return {id:p.id,name:p.name,color:COLORS[i.c].n,colorKey:i.c,size:i.s,q:i.q,unit:priceOf(p)};}),
     customer:{name:f.name,phone:f.phone,email:f.email,addr:f.addr,zip:f.zip,city:f.city,country:f.country},
     note:f.note,sub,ship,total:sub+ship,currency:'EUR'};
+  if(MODE==='api'){
+    try{const r=await api('orders',{method:'POST',body:{items:o.items,customer:o.customer,note:o.note}});
+      S.lastOrder=Object.assign({},r.order,{saved:true});S.cart=[];syncCart();S.step=3;S.form=null;
+      await refreshCatalog();draw();return;}
+    catch(e){toast(e.message);return;}}
   let saved=false;
   if(S.db){try{await S.db.doc('orders/'+o.ref).set(o);saved=true;}catch(e){saved=false;}}
   S.lastOrder={...o,saved};S.cart=[];syncCart();S.step=3;S.form=null;draw();
@@ -754,17 +771,32 @@ function admHTML(){
     <div class="adm-tabs">
       <button data-act="admtab" data-k="commandes" aria-pressed="${S.admTab==='commandes'}">Commandes</button>
       <button data-act="admtab" data-k="catalogue" aria-pressed="${S.admTab==='catalogue'}">Catalogue</button>
+      ${MODE==='api'&&S.canAdmin?'<button data-act="logout">Se déconnecter</button>':''}
       <button data-act="toshop">↩ Boutique</button>
     </div></div></div>`;
+  if(!S.canAdmin&&MODE==='api') return hd+loginHTML();
   if(!S.canAdmin) return hd+`<div class="wrap gate"><div style="text-align:center">
     <div class="okmark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
     <h2 style="font-size:1.5rem;margin-bottom:10px">Réservé à l'atelier</h2>
     <p class="serif">Cet espace affiche les commandes et le stock. Il s'ouvre uniquement pour le compte propriétaire de la boutique${S.me?` — vous êtes connecté comme ${esc(S.me)}, sans droit d'édition sur cette page.`:', connecté sur claude.ai.'}</p>
     <a class="btn btn-out" href="#top" data-act="toshop" style="margin-top:22px">Retour à la boutique</a></div></div>`;
-  const warn=STATIC?`<div class="wrap" style="padding-top:18px"><div class="callout"><b>Carnet de commandes local.</b> Sur cette version hébergée, les commandes et le stock sont enregistrés dans ce navigateur, sur cet appareil uniquement. Sauvegardez régulièrement le fichier JSON. Cet espace n'est pas protégé par mot de passe : qui connaît l'adresse peut l'ouvrir.</div></div>`:'';
+  const warn=MODE==='local'?`<div class="wrap" style="padding-top:18px"><div class="callout"><b>Carnet de commandes local.</b> Sur cette version hébergée, les commandes et le stock sont enregistrés dans ce navigateur, sur cet appareil uniquement. Sauvegardez régulièrement le fichier JSON. Cet espace n'est pas protégé par mot de passe : qui connaît l'adresse peut l'ouvrir.</div></div>`:'';
   if(S.admTab==='catalogue') return hd+warn+admCatalogue();
   return hd+warn+admOrders();
 }
+function loginHTML(){
+  return `<div class="wrap gate"><div style="text-align:center">
+    <div class="okmark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+    <h2 style="font-size:1.5rem;margin-bottom:10px">Espace atelier</h2>
+    <p class="serif">Entrez le mot de passe de la boutique pour voir les commandes et le stock.</p>
+    <div style="max-width:300px;margin:24px auto 0;display:flex;flex-direction:column;gap:10px">
+      <input id="pw" type="password" autocomplete="current-password" placeholder="Mot de passe"
+        style="height:44px;padding:0 12px;border:1px solid var(--line);border-radius:3px;background:var(--surface);font-size:.95rem;text-align:center">
+      <button class="btn btn-pri" data-act="login" style="justify-content:center">Se connecter</button>
+      <p class="note" id="loginerr" style="color:var(--bad);min-height:1.2em"></p>
+    </div>
+    <a class="btn btn-out btn-sm" href="#top" data-act="toshop">Retour à la boutique</a>
+  </div></div>`;}
 function admOrders(){
   const os=S.orders,live=os.filter(o=>o.status!=='annulee');
   const ca=live.reduce((a,o)=>a+(o.total||0),0);
@@ -774,7 +806,7 @@ function admOrders(){
     ['À traiter',todo,'nouvelles + confirmées'],['Panier moyen',live.length?fmt(avg):'—',`${live.reduce((a,o)=>a+o.items.reduce((b,i)=>b+i.q,0),0)} paires vendues`]];
   const list=S.stFilter?os.filter(o=>o.status===S.stFilter):os;
   let table;
-  if(!S.db&&!STATIC) table=`<div class="empty" style="background:var(--surface);border:1px solid var(--line)"><h4>Stockage indisponible dans cette vue</h4><p>Les commandes sont enregistrées côté serveur et ne se chargent pas ici. Ouvrez la page en étant connecté à votre compte claude.ai.</p></div>`;
+  if(MODE==='artifact'&&!S.db) table=`<div class="empty" style="background:var(--surface);border:1px solid var(--line)"><h4>Stockage indisponible dans cette vue</h4><p>Les commandes sont enregistrées côté serveur et ne se chargent pas ici. Ouvrez la page en étant connecté à votre compte claude.ai.</p></div>`;
   else if(!os.length) table=`<div class="empty" style="background:var(--surface);border:1px solid var(--line)">
     <h4>Aucune commande pour l'instant</h4><p>Les commandes passées sur la boutique arrivent ici automatiquement.<br>Celles reçues par téléphone ou WhatsApp, saisissez-les avec « Nouvelle commande ».</p>
     <button class="btn btn-pri btn-sm" data-act="manual" style="margin-top:18px">Nouvelle commande</button></div>`;
@@ -798,8 +830,8 @@ function admOrders(){
       ${Object.entries(STATUS).map(([k,l])=>`<button class="chip" data-act="stf" data-k="${k}" aria-pressed="${S.stFilter===k}">${l} (${os.filter(o=>o.status===k).length})</button>`).join('')}
       <span style="margin-left:auto;display:flex;gap:8px">
         <button class="btn btn-out btn-sm" data-act="csv" ${os.length?'':'disabled'}>Exporter CSV</button>
-        ${STATIC?`<button class="btn btn-out btn-sm" data-act="backup" ${os.length?'':'disabled'}>Sauvegarder</button>
-        <button class="btn btn-out btn-sm" data-act="restore">Restaurer</button>
+        ${MODE!=='artifact'?`<button class="btn btn-out btn-sm" data-act="backup" ${os.length?'':'disabled'}>Sauvegarder</button>`:''}
+        ${MODE==='local'?`<button class="btn btn-out btn-sm" data-act="restore">Restaurer</button>
         <input type="file" id="impfile" accept="application/json,.json" hidden>`:''}
         <button class="btn btn-pri btn-sm" data-act="manual">Nouvelle commande</button></span>
     </div>${table}</div>`;
@@ -832,7 +864,7 @@ function admCatalogue(){
   return `<div class="wrap" style="padding-block:26px 60px">
     <div class="sec-head" style="margin-bottom:20px"><div><span class="eyebrow">Catalogue</span><h2 style="font-size:1.7rem;margin-top:10px">Prix et stock par pointure</h2></div>
       <p class="serif" style="max-width:40ch">Les valeurs livrées sont des valeurs de départ, à ajuster sur votre vrai stock. Chaque modification est enregistrée dès que vous quittez la case et s'applique à la boutique pour tout le monde.</p></div>
-    ${(S.db||STATIC)?'':`<div class="callout" style="margin-bottom:18px;border-left-color:var(--bad)"><b>Enregistrement indisponible.</b> Vos modifications ne seront pas conservées dans cette vue.</div>`}
+    ${(MODE!=='artifact'||S.db)?'':`<div class="callout" style="margin-bottom:18px;border-left-color:var(--bad)"><b>Enregistrement indisponible.</b> Vos modifications ne seront pas conservées dans cette vue.</div>`}
     <div class="scroll-x"><table class="tbl"><thead><tr><th>Modèle</th><th>Prix</th>${SIZES.map(s=>`<th class="r">${s}</th>`).join('')}<th class="r">Total</th></tr></thead><tbody>
     ${CATALOG.map(p=>`<tr><td><b style="font-weight:600">Benshoes ${p.name}</b><br><span style="color:var(--fg-soft);font-size:.76rem">${p.sub}</span></td>
       <td><input class="pricei" type="number" min="0" step="1" value="${priceOf(p)}" data-ch="price" data-id="${p.id}" aria-label="Prix Benshoes ${p.name}"></td>
@@ -900,12 +932,21 @@ async function dlFile(name,text,mime){
     const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();
     setTimeout(()=>URL.revokeObjectURL(u),3000);return true;}catch(e){return await copy(text);}
 }
-async function saveCat(){if(STATIC){lsSet('benshoes.catalog',S.ov);return;}
+async function refreshCatalog(){try{const c=await api('catalog');S.ov={prices:c.prices,stock:c.stock};}catch(e){}}
+async function loadOrders(){if(MODE!=='api')return;
+  try{const r=await api('orders');S.orders=Array.isArray(r.orders)?r.orders:[];}
+  catch(e){if(e.status===401){TOKEN='';lsSet('benshoes.token','');S.canAdmin=false;}}}
+async function saveCat(){
+  if(MODE==='api'){try{const r=await api('catalog',{method:'PUT',body:{prices:S.ov.prices,stock:S.ov.stock}});
+    S.ov={prices:r.prices,stock:r.stock};}catch(e){toast(e.message);}return;}
+  if(MODE==='local'){lsSet('benshoes.catalog',S.ov);return;}
   if(!S.db)return;try{await S.db.doc('settings/catalog').set({prices:S.ov.prices,stock:S.ov.stock,at:new Date().toISOString()});}
   catch(e){toast('Enregistrement refusé');}}
 async function patchOrder(ref,patch){const o=S.orders.find(x=>x.ref===ref);if(!o)return;
   Object.assign(o,patch);draw();
-  if(STATIC){saveLocal();return;}
+  if(MODE==='api'){try{await api('orders/'+ref,{method:'PATCH',body:patch});}
+    catch(e){toast(e.message);await loadOrders();draw();}return;}
+  if(MODE==='local'){saveLocal();return;}
   if(S.db){try{await S.db.doc('orders/'+ref).update(patch);}catch(e){toast('Modification non enregistrée');}}}
 async function exportCSV(){
   const H=['Référence','Date','Statut','Client','Téléphone','E-mail','Adresse','CP','Ville','Pays','Articles','Sous-total','Livraison','Total','Note'];
@@ -949,7 +990,8 @@ document.addEventListener('click',async e=>{
     saveCat();patchOrder(d.r,{stockDeducted:true});toast('Stock mis à jour');}
   else if(a==='del'){if(t.dataset.sure!=='1'){t.dataset.sure='1';t.textContent='Confirmer ?';return;}
     S.orders=S.orders.filter(x=>x.ref!==d.r);S.openRow=null;draw();
-    if(STATIC){saveLocal();return;}
+    if(MODE==='api'){try{await api('orders/'+d.r,{method:'DELETE'});}catch(err){toast(err.message);await loadOrders();draw();}return;}
+    if(MODE==='local'){saveLocal();return;}
     if(S.db){try{await S.db.doc('orders/'+d.r).delete();}catch(err){toast('Suppression non enregistrée');}}}
   else if(a==='copyord'){const o=S.orders.find(x=>x.ref===d.r);const ok=await copy(orderText(o));toast(ok?'Commande copiée':'Copie refusée');}
   else if(a==='csv'){exportCSV();}
@@ -957,6 +999,11 @@ document.addEventListener('click',async e=>{
     JSON.stringify({version:1,exportedAt:new Date().toISOString(),orders:S.orders,catalog:S.ov},null,2),'application/json');
     toast('Sauvegarde enregistrée');}
   else if(a==='restore'){$('#impfile')?.click();}
+  else if(a==='login'){const el=$('#loginerr');if(el)el.textContent='';
+    try{const r=await api('login',{method:'POST',body:{password:$('#pw')?.value||''}});
+      TOKEN=r.token;lsSet('benshoes.token',TOKEN);S.canAdmin=true;await loadOrders();draw();toast('Bienvenue dans l\'atelier');}
+    catch(err){if(el)el.textContent=err.message;$('#pw')?.focus();}}
+  else if(a==='logout'){TOKEN='';lsSet('benshoes.token','');S.canAdmin=false;S.orders=[];draw();toast('Déconnecté');}
   else if(a==='resetcat'){S.ov={prices:{},stock:{}};saveCat();draw();toast('Valeurs de départ rétablies');}
   else if(a==='manual'){S.manual={name:'',phone:'',email:'',addr:'',zip:'',city:'',country:'France',note:'',
     lines:[{id:CATALOG[0].id,c:CATALOG[0].colors[0],s:40,q:1}]};S.panel='manual';draw();}
@@ -974,7 +1021,12 @@ async function saveManual(){readManual();const m=S.manual;
   const o={ref:newRef(),createdAt:new Date().toISOString(),status:'confirmee',source:'atelier',items,
     customer:{name:m.name,phone:m.phone,email:m.email,addr:m.addr,zip:m.zip,city:m.city,country:m.country},
     note:m.note,sub,ship,total:sub+ship,currency:'EUR'};
-  if(STATIC){S.orders=[o].concat(S.orders);saveLocal();}
+  if(MODE==='api'){
+    try{const r=await api('orders',{method:'PUT',body:{items:o.items,customer:o.customer,note:o.note}});
+      S.orders=[r.order].concat(S.orders);await refreshCatalog();
+      S.panel=null;S.manual=null;S.openRow=r.order.ref;draw();toast('Commande '+r.order.ref+' enregistrée');return;}
+    catch(e){toast(e.message);return;}}
+  if(MODE==='local'){S.orders=[o].concat(S.orders);saveLocal();}
   else if(S.db){try{await S.db.doc('orders/'+o.ref).set(o);}catch(err){toast("Commande non enregistrée — droits insuffisants");return;}}
   else{S.orders=[o].concat(S.orders);}
   S.panel=null;S.manual=null;S.openRow=o.ref;draw();toast('Commande '+o.ref+' enregistrée');
@@ -1007,17 +1059,29 @@ document.addEventListener('change',e=>{
   }catch(err){toast('Fichier de sauvegarde illisible');}};
   fr.readAsText(e.target.files[0]);e.target.value='';
 });
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&S.panel){S.panel=null;S.manual=null;draw();}});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target.id==='pw'){e.preventDefault();document.querySelector('[data-act="login"]')?.click();return;}
+  if(e.key==='Escape'&&S.panel){S.panel=null;S.manual=null;draw();}});
 addEventListener('hashchange',()=>{S.panel=null;draw();window.scrollTo(0,0);});
 
 /* ======================= démarrage ======================= */
 renderStatic();
 const savedCart=lsGet('benshoes.cart');if(Array.isArray(savedCart))S.cart=savedCart.filter(i=>prod(i.id)&&COLORS[i.c]&&SIZES.includes(i.s));
 draw();
-if(STATIC){
+if(!HASCLAUDE){
+  TOKEN=lsGet('benshoes.token')||'';
   S.canAdmin=true;loadLocal();
   const c=lsGet('benshoes.catalog');if(c&&c.prices)S.ov=c;
   draw();
+  (async function(){
+    let cat;try{cat=await api('catalog');}catch(e){return;}   // pas de serveur : on reste en carnet local
+    MODE='api';S.ov={prices:cat.prices,stock:cat.stock};S.orders=[];S.canAdmin=false;
+    if(TOKEN){try{await api('session');S.canAdmin=true;await loadOrders();}
+      catch(e){TOKEN='';lsSet('benshoes.token','');}}
+    draw();
+    setInterval(()=>{if(S.canAdmin&&location.hash==='#admin'&&!S.panel&&S.admTab==='commandes')
+      loadOrders().then(draw);},20000);
+  })();
 }
 (async function(){
   if(STATIC)return;

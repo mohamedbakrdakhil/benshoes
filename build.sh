@@ -1,10 +1,14 @@
 #!/bin/sh
-# Génère index.html (le site déployé) à partir de src/site.html (la source partagée).
-# src/site.html est aussi la source publiée telle quelle comme Artifact Claude.
+# Génère le HTML déployable à partir de src/site.html (source unique du site).
+#   index.html        -> GitHub Pages (racine du dépôt)
+#   public/index.html -> servi par server.js sur Railway
+# SITE_URL fixe l'adresse canonique ; passez-la en variable pour basculer sur Railway :
+#   SITE_URL=https://benshoes.up.railway.app/ ./build.sh
 set -e
 cd "$(dirname "$0")"
-URL="https://mohamedbakrdakhil.github.io/benshoes/"
+URL="${SITE_URL:-https://mohamedbakrdakhil.github.io/benshoes/}"
 DESC="Benshoes — sandales à lit de liège et latex naturels, cuir pleine fleur tanné en Europe. Six modèles du 35 au 46, livraison 48 h, essai 30 jours, ressemelage garanti à vie."
+mkdir -p public
 {
 cat <<HEAD
 <!doctype html>
@@ -38,4 +42,6 @@ HEAD
 grep -v '^<title>' src/site.html
 printf '</body>\n</html>\n'
 } > index.html
-echo "index.html généré ($(wc -c < index.html) octets)"
+cp index.html public/index.html
+cp -f robots.txt sitemap.xml public/ 2>/dev/null || true
+echo "index.html + public/index.html générés ($(wc -c < index.html) octets) — canonique : $URL"

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://mohamedbakrdakhil.github.io/benshoes/sitemap.xml
