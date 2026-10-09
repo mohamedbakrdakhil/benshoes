@@ -20,10 +20,10 @@ const SESSION_DAYS = 14;
 const SIZES = [35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46];
 const COLORS = ['noir', 'marron', 'tabac', 'taupe', 'beige', 'marine', 'gris', 'bordeaux'];
 const SEED = {
-  deux:  { price: 319, colors: ['noir','marron','tabac','beige'], stock: [3,8,12,15,16,14,10,7,4,2,1,0] },
+  deux:  { price: 319, colors: ['bordeaux','noir','marron','tabac','beige'], stock: [3,8,12,15,16,14,10,7,4,2,1,0] },
   solo:  { price: 249, colors: ['noir','gris','marine'],          stock: [5,9,13,14,12,11,8,5,3,2,0,0] },
   noor:  { price: 279, colors: ['tabac','beige','noir'],          stock: [6,10,14,16,15,12,9,6,3,1,0,0] },
-  atlas: { price: 389, colors: ['noir','taupe','marron'],         stock: [2,5,9,12,13,11,8,6,4,3,2,1] },
+  atlas: { price: 389, colors: ['marron','noir','taupe'],         stock: [2,5,9,12,13,11,8,6,4,3,2,1] },
   oasis: { price: 349, colors: ['marine','beige','noir'],         stock: [4,7,10,13,14,12,9,5,3,1,1,0] },
   haut:  { price: 399, colors: ['noir','bordeaux','tabac'],       stock: [3,6,11,13,15,13,8,4,2,1,0,0] },
 };

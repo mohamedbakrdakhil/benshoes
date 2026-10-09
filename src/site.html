@@ -5,33 +5,33 @@
 /* Layout: sticky rail header over a contour-mapped hero; collection on an asymmetric grid;
    product opens in a right slide-over; panier in a left drawer; admin is a separate full view. */
 :root{
-  --bg:#f3f0ea; --surface:#fbfaf7; --surface-2:#e8e3d9; --fg:#191c1f; --fg-soft:#5b6168;
-  --line:#d6d0c3; --line-2:#c2bbab;
-  --accent:#b07a33; --accent-text:#8a5c1c; --accent-wash:#f0e2cb;
-  --band-bg:#15181b; --band-fg:#f0ede6; --band-soft:#9aa0a6; --band-line:#2d3237;
-  --ok:#2f5d45; --ok-wash:#dceae1; --warn:#86631a; --warn-wash:#f3e7c9;
-  --bad:#993225; --bad-wash:#f4ddd8; --info:#2b4a66; --info-wash:#dbe6ef;
+  --bg:#ffffff; --surface:#fbf7f8; --surface-2:#f4eaed; --fg:#1b0c11; --fg-soft:#6d545b;
+  --line:#ead9dd; --line-2:#d7bfc6;
+  --accent:#6e1b32; --accent-2:#a8294b; --accent-text:#6e1b32; --accent-wash:#f9ecef;
+  --band-bg:#4a0f20; --band-fg:#fdf6f7; --band-soft:#d4a6b1; --band-line:#6d2639; --band-accent:#f0aebb;
+  --ok:#2f5d45; --ok-wash:#e0efe7; --warn:#8a5a12; --warn-wash:#f8ecd6;
+  --bad:#9c2436; --bad-wash:#f9e1e5; --info:#36455f; --info-wash:#e6e9f1;
   --fd:'Archivo Black','Archivo',system-ui,sans-serif;
   --fb:'Newsreader',Georgia,'Times New Roman',serif;
   --fu:'Archivo',system-ui,-apple-system,sans-serif;
   --r:3px; --maxw:1240px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#101214; --surface:#171a1d; --surface-2:#21252a; --fg:#eae7e0; --fg-soft:#9ba2a9;
-  --line:#2b3035; --line-2:#3a4046;
-  --accent:#cf9549; --accent-text:#dfab63; --accent-wash:#2a2318;
-  --band-bg:#1a1e21; --band-fg:#eae7e0; --band-soft:#949ba2; --band-line:#2e3338;
-  --ok:#6fb894; --ok-wash:#17261f; --warn:#d9ad53; --warn-wash:#262016;
-  --bad:#e08a7a; --bad-wash:#2a1b18; --info:#8fb6d8; --info-wash:#17222c;
+  --bg:#140a0d; --surface:#1d1115; --surface-2:#27171c; --fg:#f7eef0; --fg-soft:#b399a0;
+  --line:#332127; --line-2:#472e36;
+  --accent:#c9415f; --accent-2:#e06580; --accent-text:#e291a2; --accent-wash:#2c1419;
+  --band-bg:#210f15; --band-fg:#f7eef0; --band-soft:#b399a0; --band-line:#3d2229; --band-accent:#e8899e;
+  --ok:#74bd99; --ok-wash:#152620; --warn:#dcae57; --warn-wash:#271f14;
+  --bad:#e68a96; --bad-wash:#2d1519; --info:#93b2d6; --info-wash:#17212c;
   color-scheme:dark;
 }}
 :root[data-theme="dark"]{
-  --bg:#101214; --surface:#171a1d; --surface-2:#21252a; --fg:#eae7e0; --fg-soft:#9ba2a9;
-  --line:#2b3035; --line-2:#3a4046;
-  --accent:#cf9549; --accent-text:#dfab63; --accent-wash:#2a2318;
-  --band-bg:#1a1e21; --band-fg:#eae7e0; --band-soft:#949ba2; --band-line:#2e3338;
-  --ok:#6fb894; --ok-wash:#17261f; --warn:#d9ad53; --warn-wash:#262016;
-  --bad:#e08a7a; --bad-wash:#2a1b18; --info:#8fb6d8; --info-wash:#17222c;
+  --bg:#140a0d; --surface:#1d1115; --surface-2:#27171c; --fg:#f7eef0; --fg-soft:#b399a0;
+  --line:#332127; --line-2:#472e36;
+  --accent:#c9415f; --accent-2:#e06580; --accent-text:#e291a2; --accent-wash:#2c1419;
+  --band-bg:#210f15; --band-fg:#f7eef0; --band-soft:#b399a0; --band-line:#3d2229; --band-accent:#e8899e;
+  --ok:#74bd99; --ok-wash:#152620; --warn:#dcae57; --warn-wash:#271f14;
+  --bad:#e68a96; --bad-wash:#2d1519; --info:#93b2d6; --info-wash:#17212c;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -45,10 +45,109 @@ input,select,textarea{font:inherit;color:inherit}
 img,svg{max-width:100%}
 .wrap{width:100%;max-width:var(--maxw);margin-inline:auto;padding-inline:20px}
 .eyebrow{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:var(--accent-text)}
-.eyebrow.on-band{color:var(--accent)}
+.eyebrow.on-band{color:var(--band-accent)}
 .serif{font-family:var(--fb);font-size:1.02rem;line-height:1.62;color:var(--fg-soft)}
 .num{font-variant-numeric:tabular-nums}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+
+
+/* ================= mouvement =================
+   Trois mécaniques : une entrée orchestrée au chargement (héros),
+   des révélations pilotées par le défilement (animation-timeline: view()),
+   et des micro-interactions au survol. Tout se désactive avec
+   prefers-reduced-motion, et rien ne reste invisible si le moteur
+   d'animation n'est pas disponible. */
+@keyframes lineUp{from{transform:translateY(105%) rotate(2deg)}to{transform:translateY(0) rotate(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes artIn{from{opacity:0;transform:translateY(46px) scale(.9) rotate(-7deg)}to{opacity:1;transform:none}}
+@keyframes floatY{0%,100%{transform:translateY(0) rotate(-.6deg)}50%{transform:translateY(-16px) rotate(.6deg)}}
+@keyframes sweep{from{transform:translateX(-101%)}to{transform:translateX(101%)}}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes popIn{0%{transform:scale(.82)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+@keyframes badgePop{0%{transform:scale(1)}40%{transform:scale(1.45)}100%{transform:scale(1)}}
+@keyframes ringOut{from{opacity:.5;transform:scale(.7)}to{opacity:0;transform:scale(1.9)}}
+
+.hero h1 .ln{display:block;overflow:hidden;padding-bottom:.06em}
+.hero h1 .ln>i{display:block;font-style:inherit;animation:lineUp .95s cubic-bezier(.16,1,.3,1) backwards}
+.hero h1 .ln:nth-child(1)>i{animation-delay:.10s}
+.hero h1 .ln:nth-child(2)>i{animation-delay:.20s}
+.hero h1 .ln:nth-child(3)>i{animation-delay:.30s}
+.hero .eyebrow{animation:fadeUp .7s cubic-bezier(.16,1,.3,1) backwards}
+.hero p{animation:fadeUp .8s cubic-bezier(.16,1,.3,1) .42s backwards}
+.hero-cta{animation:fadeUp .8s cubic-bezier(.16,1,.3,1) .54s backwards}
+.hero-art #heroart{animation:artIn 1.1s cubic-bezier(.16,1,.3,1) .2s backwards}
+.hero-art #heroart svg{animation:floatY 7s ease-in-out 1.4s infinite}
+.hero-art .tag{animation:fadeIn 1s ease .9s backwards}
+.hero-topo{animation:fadeIn 1.6s ease .1s backwards;will-change:transform}
+
+/* lueur bordeaux qui suit le curseur */
+.hero-glow{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .5s ease;
+  background:radial-gradient(420px circle at var(--mx,50%) var(--my,40%),color-mix(in srgb,var(--accent-2) 42%,transparent),transparent 68%)}
+.hero:hover .hero-glow{opacity:1}
+
+/* bandeau défilant */
+.ticker{overflow:hidden}
+.marquee{display:flex;overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.mq-track{display:flex;flex:0 0 auto;animation:marquee 34s linear infinite}
+.ticker:hover .mq-track{animation-play-state:paused}
+.mq-group{display:flex;flex:0 0 auto;gap:0}
+.mq-group span{display:flex;align-items:center;gap:10px;padding-inline:26px;white-space:nowrap;
+  font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+.mq-group span::before{content:"";width:5px;height:5px;background:var(--band-accent);border-radius:50%;flex:0 0 auto}
+
+/* révélations au défilement */
+@supports (animation-timeline: view()){
+  .rv{animation:fadeUp linear both;animation-timeline:view();animation-range:entry 2% cover 26%}
+  .grid .card{animation:fadeUp .01s linear both;animation-timeline:view();animation-range:entry 0% cover 22%}
+  .anat-item{animation:fadeUp linear both;animation-timeline:view();animation-range:entry 4% cover 30%}
+  .pledge{animation:fadeUp linear both;animation-timeline:view();animation-range:entry 4% cover 30%}
+  .sizetable tbody tr{animation:fadeIn linear both;animation-timeline:view();animation-range:entry 0% cover 16%}
+}
+
+/* survol des cartes */
+.card{overflow:hidden}
+.card::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .35s ease;
+  background:radial-gradient(360px circle at 50% 18%,var(--accent-wash),transparent 70%)}
+.card:hover::after{opacity:1}
+.card>*{position:relative;z-index:1}
+.card-name h3{transition:color .25s ease}
+.card:hover .card-name h3{color:var(--accent-text)}
+.card-art svg{filter:drop-shadow(0 14px 22px rgba(74,15,32,.14))}
+.card:hover .card-art svg{transform:translateY(-10px) scale(1.05) rotate(-1.5deg)}
+
+/* boutons */
+.btn{position:relative;overflow:hidden;transition:transform .18s cubic-bezier(.2,.8,.3,1),background .2s,border-color .2s,box-shadow .25s}
+.btn-pri:hover,.btn-hero:hover{box-shadow:0 10px 26px -10px color-mix(in srgb,var(--accent-2) 70%,transparent)}
+.btn::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.3),transparent)}
+.btn:hover::before{animation:sweep .7s ease}
+.chip,.sw,.colopt,.sizebtn{transition:transform .18s cubic-bezier(.2,.8,.3,1),background .18s,border-color .18s,color .18s,box-shadow .18s}
+.chip:hover,.sw:hover{transform:translateY(-2px)}
+.sizebtn:hover:not([disabled]){transform:translateY(-2px)}
+.sizebtn[aria-pressed="true"],.colopt[aria-pressed="true"]{animation:popIn .3s cubic-bezier(.2,.8,.3,1)}
+.cartbtn{transition:transform .18s cubic-bezier(.2,.8,.3,1),box-shadow .25s}
+.cartbtn:hover{transform:translateY(-2px);box-shadow:0 10px 22px -12px rgba(0,0,0,.5)}
+.cartbtn b{transition:transform .25s}
+.cartbtn.bump b{animation:badgePop .45s cubic-bezier(.2,.8,.3,1)}
+.icbtn{transition:transform .18s,border-color .18s,color .18s}
+.icbtn:hover{transform:rotate(-14deg)}
+.nav a{transition:color .2s}
+.anat-item{transition:background .25s}
+.anat-item:hover{background:var(--accent-wash)}
+.tbl tbody tr{transition:background .18s}
+.kpi .v{animation:fadeUp .6s cubic-bezier(.16,1,.3,1) backwards}
+.kpi:nth-child(2) .v{animation-delay:.06s}.kpi:nth-child(3) .v{animation-delay:.12s}.kpi:nth-child(4) .v{animation-delay:.18s}
+.toast{animation:fadeUp .3s cubic-bezier(.16,1,.3,1)}
+.okmark{animation:popIn .5s cubic-bezier(.2,.8,.3,1)}
+.panel.right{animation:inR .42s cubic-bezier(.16,1,.3,1)}
+.panel.left{animation:inL .42s cubic-bezier(.16,1,.3,1)}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;
+    transition-duration:.001ms!important;scroll-behavior:auto!important}
+  .hero-glow{display:none}
+}
 
 /* ---------- header ---------- */
 .hdr{position:sticky;top:env(safe-area-inset-top,0px);z-index:60;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
@@ -64,7 +163,7 @@ img,svg{max-width:100%}
 .icbtn{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
 .icbtn:hover{border-color:var(--line-2)}
 .cartbtn{display:flex;align-items:center;gap:9px;height:38px;padding:0 14px;border-radius:var(--r);background:var(--fg);color:var(--bg);font-size:.8rem;font-weight:600;letter-spacing:.02em}
-.cartbtn b{min-width:19px;height:19px;display:grid;place-items:center;border-radius:999px;background:var(--accent);color:#1a1205;font-size:.68rem}
+.cartbtn b{min-width:19px;height:19px;display:grid;place-items:center;border-radius:999px;background:var(--accent);color:#fff;font-size:.68rem}
 @media(max-width:860px){.nav{display:none}}
 @media(max-width:430px){.brand{font-size:1.02rem;gap:5px;min-width:0}.brand small{font-size:.5rem;letter-spacing:.16em}.cartbtn{padding:0 11px}}
 @media(max-width:360px){.hdr-in{gap:8px}.brand small{display:none}.brand{font-size:.96rem}.cartbtn{padding:0 9px;font-size:.72rem;gap:6px}.icbtn{width:34px;height:34px}}
@@ -74,13 +173,15 @@ img,svg{max-width:100%}
 .hero-topo{position:absolute;inset:-8% -4%;opacity:.5;pointer-events:none}
 .hero-in{position:relative;display:grid;grid-template-columns:1.08fr .92fr;gap:40px;align-items:center;padding-block:66px 58px}
 .hero h1{font-size:clamp(2.7rem,6.6vw,5rem);letter-spacing:-.045em;margin-block:18px 20px}
-.hero h1 em{font-family:var(--fb);font-style:italic;font-weight:300;letter-spacing:-.01em;color:var(--accent)}
+.hero h1 em{font-family:var(--fb);font-style:italic;font-weight:300;letter-spacing:-.01em;color:var(--band-accent)}
 .hero p{font-family:var(--fb);font-size:1.12rem;line-height:1.6;color:var(--band-soft);max-width:46ch}
 .hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
 .btn{display:inline-flex;align-items:center;gap:9px;height:46px;padding:0 22px;border-radius:var(--r);font-size:.84rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;text-decoration:none;border:1px solid transparent;transition:transform .12s ease}
 .btn:active{transform:translateY(1px)}
-.btn-pri{background:var(--accent);color:#1a1205}
+.btn-pri{background:var(--accent);color:#fff}
 .btn-pri:hover{background:color-mix(in srgb,var(--accent) 86%,#fff)}
+.btn-hero{background:#fff;color:#4a0f20}
+.btn-hero:hover{background:var(--band-accent);color:#3a0a18}
 .btn-ghost{border-color:var(--band-line);color:var(--band-fg)}
 .btn-ghost:hover{border-color:var(--band-soft)}
 .btn-out{border-color:var(--line-2);color:var(--fg);background:var(--surface)}
@@ -94,7 +195,7 @@ img,svg{max-width:100%}
 .ticker-in{display:flex;flex-wrap:wrap;gap:10px 34px;padding-block:13px;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
 .ticker-in span{display:flex;align-items:center;gap:9px}
 .ticker-in span::before{content:"";width:5px;height:5px;background:var(--accent);border-radius:50%}
-@media(max-width:860px){.hero-in{grid-template-columns:1fr;padding-block:44px}.hero-art{order:-1;min-height:230px}.hero-art .tag{display:none}}
+@media(max-width:860px){.hero-in{grid-template-columns:1fr;padding-block:36px;gap:26px}.hero-art{order:-1;min-height:0}.hero-art .tag{display:none}.hero-art svg{height:34vh;width:auto;max-width:60vw}.hero h1{font-size:clamp(2.3rem,10vw,3.4rem)}}
 
 /* ---------- sections ---------- */
 .sec{padding-block:72px}
@@ -159,7 +260,7 @@ img,svg{max-width:100%}
 .ftr h5{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--band-soft);margin:0 0 13px;font-weight:600;font-family:var(--fu)}
 .ftr ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;font-size:.88rem}
 .ftr a{color:var(--band-fg);text-decoration:none;opacity:.82}
-.ftr a:hover{opacity:1;color:var(--accent)}
+.ftr a:hover{opacity:1;color:var(--band-accent)}
 .ftr .copyline{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;border-top:1px solid var(--band-line);padding-block:18px 30px;font-size:.74rem;color:var(--band-soft)}
 .copybox{display:flex;align-items:center;gap:8px;border:1px solid var(--band-line);border-radius:var(--r);padding:7px 9px;font-size:.82rem;margin-bottom:9px}
 .copybox code{font-family:var(--fu);letter-spacing:.01em}
@@ -254,7 +355,9 @@ label.f.bad input{border-color:var(--bad)}
 .adm-hd-in{display:flex;align-items:center;gap:14px;height:58px;flex-wrap:wrap}
 .adm-hd .brand{color:var(--band-fg)}
 .adm-hd .brand small{color:var(--band-soft)}
-.badge-adm{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;padding:4px 8px;border:1px solid var(--band-line);border-radius:var(--r);color:var(--accent)}
+.adm-hd .brand i{background:var(--band-accent)}
+.hero .brand i,.ftr .brand i{background:var(--band-accent)}
+.badge-adm{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;padding:4px 8px;border:1px solid var(--band-line);border-radius:var(--r);color:var(--band-accent)}
 .adm-tabs{display:flex;gap:2px;margin-left:auto}
 .adm-tabs button{height:32px;padding:0 14px;border-radius:var(--r);font-size:.78rem;font-weight:600;color:var(--band-soft)}
 .adm-tabs button[aria-pressed="true"]{background:var(--band-line);color:var(--band-fg)}
@@ -318,32 +421,28 @@ label.f.bad input{border-color:var(--bad)}
 
 <section class="hero" id="top">
   <svg class="hero-topo" id="herotopo" viewBox="0 0 1200 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+  <div class="hero-glow" id="heroglow" aria-hidden="true"></div>
   <div class="wrap hero-in">
     <div>
       <span class="eyebrow on-band">Atelier Benkashoes · Depuis 2019</span>
-      <h1>La semelle qui<br>prend l'<em>empreinte</em><br>de votre pas.</h1>
+      <h1><span class="ln"><i>La semelle qui</i></span><span class="ln"><i>prend l'<em>empreinte</em></i></span><span class="ln"><i>de votre pas.</i></span></h1>
       <p>Un lit de liège et latex naturels, moulé par la chaleur de votre pied. Cuir pleine fleur tanné à Fès, brides réglables, ressemelage à vie en atelier.</p>
       <div class="hero-cta">
-        <a class="btn btn-pri" href="#modeles">Voir les six modèles</a>
+        <a class="btn btn-hero" href="#modeles">Voir les six modèles</a>
         <a class="btn btn-ghost" href="#liege">Comment c'est fait</a>
       </div>
     </div>
     <div class="hero-art">
       <div id="heroart"></div>
-      <div class="tag">Modèle Deux · Cognac lissé<br>Pointures 35 → 46</div>
+      <div class="tag">Modèle Deux · Burgundy<br>Pointures 35 → 46</div>
     </div>
   </div>
 </section>
-<div class="ticker"><div class="wrap ticker-in">
-  <span>Liège d'Alentejo récolté à la main</span>
-  <span>Livraison 48 h partout au Maroc</span>
-  <span>Essai 30 jours, retour offert</span>
-  <span>Ressemelage garanti à vie</span>
-</div></div>
+<div class="ticker"><div class="marquee"><div class="mq-track"><div class="mq-group"><span>Liège d'Alentejo récolté à la main</span><span>Livraison 48 h partout au Maroc</span><span>Essai 30 jours, retour offert</span><span>Ressemelage garanti à vie</span><span>Cuir pleine fleur tanné à Fès</span></div><div class="mq-group" aria-hidden="true"><span>Liège d'Alentejo récolté à la main</span><span>Livraison 48 h partout au Maroc</span><span>Essai 30 jours, retour offert</span><span>Ressemelage garanti à vie</span><span>Cuir pleine fleur tanné à Fès</span></div></div></div></div>
 
 <main>
 <section class="sec wrap" id="modeles">
-  <div class="sec-head">
+  <div class="sec-head rv">
     <div>
       <span class="eyebrow">La collection</span>
       <h2 style="margin-top:12px">Six formes, une seule semelle.</h2>
@@ -355,14 +454,14 @@ label.f.bad input{border-color:var(--bad)}
 </section>
 
 <section class="sec wrap" id="liege">
-  <div class="sec-head">
+  <div class="sec-head rv">
     <div>
       <span class="eyebrow">Anatomie</span>
       <h2 style="margin-top:12px">Quatre couches,<br>de haut en bas.</h2>
     </div>
     <p class="serif">Une coupe du lit Benkashoes. Les quatre reliefs — barre d'orteils, voûte, cuvette du talon, bord extérieur — sont les mêmes depuis le premier modèle de 2019.</p>
   </div>
-  <div class="anat"><div class="anat-in">
+  <div class="anat rv"><div class="anat-in">
     <div class="anat-fig" id="anatfig"></div>
     <div class="anat-list">
       <div class="anat-item"><span class="n">01</span><div><h4>Doublure en daim velours</h4><p>Peau de veau retournée, 0,8 mm. Elle absorbe l'humidité et patine en prenant la forme du pied au bout d'une quinzaine de ports.</p></div></div>
@@ -374,14 +473,14 @@ label.f.bad input{border-color:var(--bad)}
 </section>
 
 <section class="sec wrap" id="tailles">
-  <div class="sec-head">
+  <div class="sec-head rv">
     <div>
       <span class="eyebrow">Guide des pointures</span>
       <h2 style="margin-top:12px">Mesurez, ne devinez pas.</h2>
     </div>
     <p class="serif">Posez le talon contre un mur, marquez le bout du gros orteil, mesurez en millimètres. Si vous tombez entre deux pointures, prenez la plus grande : le liège se creuse, il ne s'étire pas.</p>
   </div>
-  <div class="scroll-x"><table class="sizetable">
+  <div class="scroll-x rv"><table class="sizetable">
     <thead><tr><th>Pointure EU</th><th>Pied (mm)</th><th>Longueur semelle</th><th>Largeur normale</th><th>Largeur large</th></tr></thead>
     <tbody id="sizebody"></tbody>
   </table></div>
@@ -469,7 +568,7 @@ const COLORS={
 };
 const FAMS=[['tous','Tous les modèles'],['brides','Brides réglables'],['doigt','Entre-doigts'],['sabot','Sabot fermé'],['plateforme','Plateforme']];
 const CATALOG=[
-  {id:'deux',name:'Deux',sub:'Deux brides réglables',fam:'brides',style:'two',price:319,colors:['noir','marron','tabac','beige'],
+  {id:'deux',name:'Deux',sub:'Deux brides réglables',fam:'brides',style:'two',price:319,colors:['bordeaux','noir','marron','tabac','beige'],
    stock:[3,8,12,15,16,14,10,7,4,2,1,0],flag:'Le classique',
    blurb:"Deux brides indépendantes, boucles en laiton brossé : on serre l'avant pour le maintien, l'arrière pour le confort. La forme sur laquelle l'atelier a commencé en 2019.",
    spec:[['Tige','Cuir pleine fleur 2,2 mm'],['Boucles','Laiton brossé, ardillon acier'],['Doublure','Daim de veau velours'],['Poids','340 g (pointure 40)']]},
@@ -481,7 +580,7 @@ const CATALOG=[
    stock:[6,10,14,16,15,12,9,6,3,1,0,0],flag:null,
    blurb:"Bride haute cambrée et séparateur d'orteils gainé de cuir doux. La bride remonte sur le pied au lieu de l'écraser, ce qui change tout après trois heures debout.",
    spec:[['Tige','Cuir pleine fleur 2,0 mm'],['Séparateur','Cuir doublé, bord roulé'],['Doublure','Daim de veau velours'],['Poids','300 g (pointure 40)']]},
-  {id:'atlas',name:'Atlas',sub:'Sabot fermé',fam:'sabot',style:'clog',price:389,colors:['noir','taupe','marron'],
+  {id:'atlas',name:'Atlas',sub:'Sabot fermé',fam:'sabot',style:'clog',price:389,colors:['marron','noir','taupe'],
    stock:[2,5,9,12,13,11,8,6,4,3,2,1],flag:'Mi-saison',
    blurb:"Avant-pied entièrement couvert, talon libre. Il se porte avec une chaussette épaisse jusqu'en novembre. Bride arrière réglable pour rattraper le volume du pied.",
    spec:[['Tige','Cuir pleine fleur 2,6 mm'],['Boucle','Laiton brossé, bride arrière'],['Doublure','Daim de veau velours'],['Poids','410 g (pointure 40)']]},
@@ -606,7 +705,7 @@ function newRef(){const d=new Date();const y=String(d.getFullYear()).slice(2)+St
 function renderStatic(){
   $('#herotopo').innerHTML=[1.6,1.3,1.05,.82,.6,.4,.22].map((k,i)=>
     `<g transform="translate(600,310) scale(${k*2.1},${k*1.25}) translate(-100,-230)"><path d="${SOLE}" fill="none" stroke="rgba(207,149,73,${(.3-i*.03).toFixed(2)})" stroke-width="${(1.6/k).toFixed(2)}"/></g>`).join('');
-  $('#heroart').innerHTML=sandal('two','cognac',false);
+  $('#heroart').innerHTML=sandal('two','bordeaux',false);
   $('#anatfig').innerHTML=anatomySVG();
   $('#filters').innerHTML=FAMS.map(([k,l])=>`<button class="chip" data-act="fam" data-k="${k}" aria-pressed="${S.filter===k}">${l}</button>`).join('')
     +`<span class="fsep"></span><span class="swatches">`
@@ -909,6 +1008,39 @@ function manualHTML(){
     </div></div>`;
 }
 
+/* ======================= mouvement ======================= */
+const MOTION=!matchMedia('(prefers-reduced-motion: reduce)').matches;
+function initMotion(){
+  if(!MOTION)return;
+  // lueur bordeaux qui suit le curseur dans le héros
+  const hero=document.querySelector('.hero'),glow=$('#heroglow');
+  if(hero&&glow)hero.addEventListener('pointermove',e=>{
+    const r=hero.getBoundingClientRect();
+    glow.style.setProperty('--mx',((e.clientX-r.left)/r.width*100).toFixed(1)+'%');
+    glow.style.setProperty('--my',((e.clientY-r.top)/r.height*100).toFixed(1)+'%');
+  },{passive:true});
+  // parallaxe des courbes topographiques
+  const topo=$('#herotopo');let raf=0;
+  if(topo)addEventListener('scroll',()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;
+    const y=Math.min(scrollY,900);topo.style.transform=`translate3d(0,${(y*.22).toFixed(1)}px,0) scale(${(1+y*.00022).toFixed(4)})`;});},{passive:true});
+  // boutons magnétiques
+  document.addEventListener('pointermove',e=>{
+    const b=e.target.closest('.btn-pri,.btn-hero,.cartbtn');
+    if(!b){document.querySelectorAll('[data-mag]').forEach(x=>{x.style.transform='';x.removeAttribute('data-mag')});return;}
+    const r=b.getBoundingClientRect();
+    b.setAttribute('data-mag','1');
+    b.style.transform=`translate(${((e.clientX-r.left-r.width/2)*.14).toFixed(1)}px,${((e.clientY-r.top-r.height/2)*.22).toFixed(1)}px)`;
+  },{passive:true});
+  document.addEventListener('pointerleave',()=>document.querySelectorAll('[data-mag]').forEach(x=>{x.style.transform='';x.removeAttribute('data-mag')}),true);
+  // repli : si le navigateur ignore animation-timeline, on révèle à l'ancienne
+  if(!(CSS.supports&&CSS.supports('animation-timeline','view'))&&'IntersectionObserver' in window){
+    const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){
+      en.target.style.animation='fadeUp .7s cubic-bezier(.16,1,.3,1) both';io.unobserve(en.target);}}),{rootMargin:'0px 0px -8%'});
+    document.querySelectorAll('.rv,.anat-item,.pledge').forEach(el=>io.observe(el));
+  }
+}
+function bumpCart(){const b=$('#cartbtn');if(!b||!MOTION)return;b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump');}
+
 /* ======================= rendu + interactions ======================= */
 function draw(){
   const adm=location.hash==='#admin';
@@ -974,7 +1106,7 @@ document.addEventListener('click',async e=>{
   else if(a==='add'){const{id,c,s}=S.sheet;const ex=S.cart.find(i=>i.id===id&&i.c===c&&i.s===s);
     const max=stockOf(prod(id),SIZES.indexOf(s));
     if(ex){if(ex.q>=max){toast('Stock atteint pour cette pointure');return;}ex.q++;}else S.cart.push({id,c,s,q:1});
-    syncCart();S.panel='cart';S.step=1;draw();toast('Ajouté au panier');}
+    syncCart();S.panel='cart';S.step=1;draw();bumpCart();toast('Ajouté au panier');}
   else if(a==='qty'){const i=S.cart[+d.n];const max=stockOf(prod(i.id),SIZES.indexOf(i.s));
     i.q+=+d.d;if(i.q>max){i.q=max;toast('Stock atteint');}if(i.q<1)S.cart.splice(+d.n,1);syncCart();draw();}
   else if(a==='rm'){S.cart.splice(+d.n,1);syncCart();draw();}
@@ -1070,6 +1202,7 @@ addEventListener('hashchange',()=>{S.panel=null;draw();window.scrollTo(0,0);});
 
 /* ======================= démarrage ======================= */
 renderStatic();
+initMotion();
 const savedCart=lsGet('benkashoes.cart');if(Array.isArray(savedCart))S.cart=savedCart.filter(i=>prod(i.id)&&COLORS[i.c]&&SIZES.includes(i.s));
 draw();
 if(!HASCLAUDE){
