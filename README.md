@@ -1,9 +1,9 @@
-# Benshoes
+# Benkashoes
 
 Boutique de sandales à lit de liège. Site statique, un seul fichier, sans dépendance ni build complexe.
 
-**En ligne :** https://mohamedbakrdakhil.github.io/benshoes/
-**Espace atelier :** https://mohamedbakrdakhil.github.io/benshoes/#admin
+**En ligne :** https://www.benkashoes.ma/
+**Espace atelier :** https://www.benkashoes.ma/#admin
 
 ## Ce que contient le site
 
@@ -20,10 +20,10 @@ Tout est dans `src/site.html`.
 
 ```js
 const SHOP={
-  email:'contact@benshoes.com',   // votre vraie adresse e-mail
+  email:'contact@benkashoes.ma',   // votre vraie adresse e-mail
   phone:'',                       // ex. '+33 6 12 34 56 78'  (vide = masqué)
   whatsapp:'',                    // ex. '33612345678' indicatif SANS le +  (vide = bouton masqué)
-  site:'mohamedbakrdakhil.github.io/benshoes'
+  site:'www.benkashoes.ma'
 };
 ```
 
@@ -53,4 +53,4 @@ Pour des commandes qui arrivent toutes seules et un paiement en ligne, il faut p
 
 ## Licence
 
-Code et design : usage libre pour le projet Benshoes.
+Code et design : usage libre pour le projet Benkashoes.

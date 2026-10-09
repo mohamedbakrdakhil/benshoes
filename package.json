@@ -1,8 +1,8 @@
 {
-  "name": "benshoes",
+  "name": "benkashoes",
   "version": "1.0.0",
   "private": true,
-  "description": "Boutique Benshoes — sandales à lit de liège",
+  "description": "Boutique Benkashoes — sandales à lit de liège",
   "main": "server.js",
   "scripts": {
     "build": "sh ./build.sh",

@@ -46,10 +46,10 @@ async function load() {
     db.orders = Array.isArray(raw.orders) ? raw.orders : [];
     db.catalog = raw.catalog && raw.catalog.prices ? raw.catalog : defaultCatalog();
     db.seq = Number(raw.seq) || 0;
-    console.log(`[benshoes] base chargée : ${db.orders.length} commande(s)`);
+    console.log(`[benkashoes] base chargée : ${db.orders.length} commande(s)`);
   } catch {
     db.catalog = defaultCatalog();
-    console.log('[benshoes] nouvelle base créée');
+    console.log('[benkashoes] nouvelle base créée');
   }
 }
 function save() {
@@ -57,7 +57,7 @@ function save() {
     const tmp = DB_FILE + '.tmp';
     await fsp.writeFile(tmp, JSON.stringify(db), 'utf8');
     await fsp.rename(tmp, DB_FILE);
-  }).catch(e => console.error('[benshoes] échec écriture', e));
+  }).catch(e => console.error('[benkashoes] échec écriture', e));
   return writing;
 }
 
@@ -215,7 +215,7 @@ const server = http.createServer(async (req, res) => {
       const r = buildOrder(body, 'boutique');
       if (r.error) return json(res, 400, { error: r.error });
       db.orders.unshift(r.order); await save();
-      console.log(`[benshoes] commande ${r.order.ref} — ${r.order.total} DH`);
+      console.log(`[benkashoes] commande ${r.order.ref} — ${r.order.total} DH`);
       return json(res, 201, { order: r.order });
     }
 
@@ -277,13 +277,13 @@ const server = http.createServer(async (req, res) => {
 
     return json(res, 404, { error: 'Route inconnue.' });
   } catch (e) {
-    console.error('[benshoes]', e.message);
+    console.error('[benkashoes]', e.message);
     return json(res, 400, { error: 'Requête invalide.' });
   }
 });
 
 load().then(() => server.listen(PORT, () => {
-  console.log(`[benshoes] en écoute sur le port ${PORT}`);
-  if (!ADMIN_PASSWORD) console.warn('[benshoes] ATTENTION : ADMIN_PASSWORD non défini — espace atelier inaccessible.');
-  if (!process.env.SESSION_SECRET) console.warn('[benshoes] SESSION_SECRET non défini — les sessions seront perdues à chaque redémarrage.');
+  console.log(`[benkashoes] en écoute sur le port ${PORT}`);
+  if (!ADMIN_PASSWORD) console.warn('[benkashoes] ATTENTION : ADMIN_PASSWORD non défini — espace atelier inaccessible.');
+  if (!process.env.SESSION_SECRET) console.warn('[benkashoes] SESSION_SECRET non défini — les sessions seront perdues à chaque redémarrage.');
 }));
