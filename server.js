@@ -18,16 +18,16 @@ const SESSION_DAYS = 14;
 
 /* ---------- catalogue de référence : le serveur fait foi sur les prix ---------- */
 const SIZES = [35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46];
-const COLORS = ['noir', 'cognac', 'taupe', 'craie', 'olive', 'sable'];
+const COLORS = ['noir', 'marron', 'tabac', 'taupe', 'beige', 'marine', 'gris', 'bordeaux'];
 const SEED = {
-  deux:  { price: 118, colors: ['noir','cognac','taupe','craie'], stock: [3,8,12,15,16,14,10,7,4,2,1,0] },
-  solo:  { price: 98,  colors: ['noir','sable','olive'],          stock: [5,9,13,14,12,11,8,5,3,2,0,0] },
-  noor:  { price: 104, colors: ['cognac','craie','noir'],         stock: [6,10,14,16,15,12,9,6,3,1,0,0] },
-  atlas: { price: 142, colors: ['noir','taupe','cognac'],         stock: [2,5,9,12,13,11,8,6,4,3,2,1] },
-  oasis: { price: 126, colors: ['olive','sable','noir'],          stock: [4,7,10,13,14,12,9,5,3,1,1,0] },
-  haut:  { price: 148, colors: ['noir','craie','cognac'],         stock: [3,6,11,13,15,13,8,4,2,1,0,0] },
+  deux:  { price: 319, colors: ['noir','marron','tabac','beige'], stock: [3,8,12,15,16,14,10,7,4,2,1,0] },
+  solo:  { price: 249, colors: ['noir','gris','marine'],          stock: [5,9,13,14,12,11,8,5,3,2,0,0] },
+  noor:  { price: 279, colors: ['tabac','beige','noir'],          stock: [6,10,14,16,15,12,9,6,3,1,0,0] },
+  atlas: { price: 389, colors: ['noir','taupe','marron'],         stock: [2,5,9,12,13,11,8,6,4,3,2,1] },
+  oasis: { price: 349, colors: ['marine','beige','noir'],         stock: [4,7,10,13,14,12,9,5,3,1,1,0] },
+  haut:  { price: 399, colors: ['noir','bordeaux','tabac'],       stock: [3,6,11,13,15,13,8,4,2,1,0,0] },
 };
-const SHIP_FREE = 120, SHIP_COST = 7;
+const SHIP_FREE = 400, SHIP_COST = 35;
 const STATUSES = ['nouvelle','confirmee','expediee','livree','annulee'];
 
 /* ---------- stockage : un fichier JSON, écritures sérialisées ---------- */
@@ -145,7 +145,7 @@ function buildOrder(input, source) {
   }
   const c = input.customer || {};
   const customer = { name: str(c.name, 80), phone: str(c.phone, 40), email: str(c.email, 120),
-                     addr: str(c.addr, 200), zip: str(c.zip, 20), city: str(c.city, 80), country: str(c.country, 60) || 'France' };
+                     addr: str(c.addr, 200), zip: str(c.zip, 20), city: str(c.city, 80), country: str(c.country, 60) || 'Maroc' };
   if (!customer.name) return { error: 'Le nom du client est obligatoire.' };
   if (source === 'boutique') {
     for (const k of ['phone', 'addr', 'city']) if (!customer[k]) return { error: 'Coordonnées de livraison incomplètes.' };
@@ -163,7 +163,7 @@ function buildOrder(input, source) {
   }
   return { order: { ref: newRef(), createdAt: new Date().toISOString(),
     status: source === 'atelier' ? 'confirmee' : 'nouvelle', source, items, customer,
-    note: str(input.note, 500), sub, ship, total: sub + ship, currency: 'EUR', stockDeducted: true } };
+    note: str(input.note, 500), sub, ship, total: sub + ship, currency: 'MAD', stockDeducted: true } };
 }
 
 /* ---------- fichiers statiques ---------- */
@@ -215,7 +215,7 @@ const server = http.createServer(async (req, res) => {
       const r = buildOrder(body, 'boutique');
       if (r.error) return json(res, 400, { error: r.error });
       db.orders.unshift(r.order); await save();
-      console.log(`[benshoes] commande ${r.order.ref} — ${r.order.total} €`);
+      console.log(`[benshoes] commande ${r.order.ref} — ${r.order.total} DH`);
       return json(res, 201, { order: r.order });
     }
 

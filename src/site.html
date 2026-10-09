@@ -320,7 +320,7 @@ label.f.bad input{border-color:var(--bad)}
     <div>
       <span class="eyebrow on-band">Atelier Benshoes · Depuis 2019</span>
       <h1>La semelle qui<br>prend l'<em>empreinte</em><br>de votre pas.</h1>
-      <p>Un lit de liège et latex naturels, moulé par la chaleur de votre pied. Cuir pleine fleur tanné en Europe, brides réglables, ressemelage à vie en atelier.</p>
+      <p>Un lit de liège et latex naturels, moulé par la chaleur de votre pied. Cuir pleine fleur tanné à Fès, brides réglables, ressemelage à vie en atelier.</p>
       <div class="hero-cta">
         <a class="btn btn-pri" href="#modeles">Voir les six modèles</a>
         <a class="btn btn-ghost" href="#liege">Comment c'est fait</a>
@@ -334,7 +334,7 @@ label.f.bad input{border-color:var(--bad)}
 </section>
 <div class="ticker"><div class="wrap ticker-in">
   <span>Liège d'Alentejo récolté à la main</span>
-  <span>Livraison 48 h en Europe</span>
+  <span>Livraison 48 h partout au Maroc</span>
   <span>Essai 30 jours, retour offert</span>
   <span>Ressemelage garanti à vie</span>
 </div></div>
@@ -386,7 +386,7 @@ label.f.bad input{border-color:var(--bad)}
   <div class="pledges">
     <div class="pledge">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.6"><path d="M3 7h13v10H3zM16 10h3.5l1.5 3v4H16z"/><circle cx="7" cy="18" r="1.8"/><circle cx="18" cy="18" r="1.8"/></svg>
-      <h4>Livraison 48 h</h4><p>Expédition le jour même pour toute commande passée avant 14 h. Suivi envoyé par e-mail. Offerte au-delà de 120 €.</p>
+      <h4>Livraison 48 h</h4><p>Expédition le jour même pour toute commande passée avant 14 h. Suivi envoyé par e-mail. Offerte au-delà de 400 DH.</p>
     </div>
     <div class="pledge">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.6"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v4.5h4.5"/></svg>
@@ -394,7 +394,7 @@ label.f.bad input{border-color:var(--bad)}
     </div>
     <div class="pledge">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.6"><path d="M12 3l7 3v6c0 4.2-2.9 7.4-7 9-4.1-1.6-7-4.8-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
-      <h4>Ressemelage à vie</h4><p>La semelle d'usure se remplace en atelier pour 29 €, autant de fois qu'il le faut. Le liège, lui, reste le vôtre.</p>
+      <h4>Ressemelage à vie</h4><p>La semelle d'usure se remplace en atelier pour 80 DH, autant de fois qu'il le faut. Le liège, lui, reste le vôtre.</p>
     </div>
   </div>
 </section>
@@ -405,7 +405,7 @@ label.f.bad input{border-color:var(--bad)}
     <div class="ftr-in">
       <div>
         <div class="brand" style="margin-bottom:14px">BENSHOES<i></i><small>Liège &amp; Cuir</small></div>
-        <p class="serif" style="color:var(--band-soft);max-width:34ch">Atelier de sandales à lit de liège. Montage à la main, cuirs tannés en Europe, ressemelage garanti à vie.</p>
+        <p class="serif" style="color:var(--band-soft);max-width:34ch">Atelier de sandales à lit de liège. Montage à la main, cuirs tannés à Fès, ressemelage garanti à vie.</p>
       </div>
       <div><h5>Collection</h5><ul id="ftrmodels"></ul></div>
       <div><h5>Aide</h5><ul>
@@ -418,7 +418,7 @@ label.f.bad input{border-color:var(--bad)}
     </div>
     <div class="copyline">
       <span id="ftrcopy">© 2026 Benshoes</span>
-      <span>Prix en euros, TVA incluse · Paiement à la livraison ou par virement</span>
+      <span>Prix en dirhams, TVA incluse · Paiement à la livraison ou par virement</span>
     </div>
   </div>
 </footer>
@@ -433,8 +433,8 @@ label.f.bad input{border-color:var(--bad)}
    =================================================================== */
 const SHOP={
   email:'contact@benshoes.com',   // votre vraie adresse e-mail
-  phone:'',                       // ex. '+33 6 12 34 56 78'  (vide = masqué)
-  whatsapp:'',                    // ex. '33612345678' indicatif SANS le +  (vide = bouton masqué)
+  phone:'',                       // ex. '+212 6 12 34 56 78'  (vide = masqué)
+  whatsapp:'',                    // ex. '2126XXXXXXXX' indicatif SANS le +  (vide = bouton masqué)
   site:'mohamedbakrdakhil.github.io/benshoes'       // l'adresse affichée en bas de page
 };
 const HASCLAUDE=!!(window.claude&&window.claude.use);
@@ -456,42 +456,44 @@ async function api(route,opt={}){
 const SIZES=[35,36,37,38,39,40,41,42,43,44,45,46];
 const MM={35:225,36:232,37:238,38:245,39:251,40:258,41:264,42:271,43:277,44:284,45:290,46:297};
 const COLORS={
-  noir:{n:'Noir grainé',c:'#272421',d:'#131211'},
-  cognac:{n:'Cognac lissé',c:'#8f5527',d:'#643717'},
-  taupe:{n:'Taupe suède',c:'#8e8376',d:'#695f54'},
-  craie:{n:'Craie',c:'#ded7c6',d:'#b4ab98'},
-  olive:{n:'Olive huilé',c:'#4f5539',d:'#343a24'},
-  sable:{n:'Sable nubuck',c:'#c4a881',d:'#9a805d'}
+  noir:{n:'Noir',c:'#272421',d:'#131211'},
+  marron:{n:'Marron',c:'#6b4529',d:'#45290f'},
+  tabac:{n:'Tabac',c:'#9a6433',d:'#6c4318'},
+  taupe:{n:'Marron taupe',c:'#837567',d:'#5e5347'},
+  beige:{n:'Beige',c:'#d8c7a6',d:'#ad9a77'},
+  marine:{n:'Marine',c:'#27374f',d:'#16202f'},
+  gris:{n:'Gris',c:'#7e8389',d:'#575c61'},
+  bordeaux:{n:'Burgundy',c:'#5e2230',d:'#3b121c'}
 };
 const FAMS=[['tous','Tous les modèles'],['brides','Brides réglables'],['doigt','Entre-doigts'],['sabot','Sabot fermé'],['plateforme','Plateforme']];
 const CATALOG=[
-  {id:'deux',name:'Deux',sub:'Deux brides réglables',fam:'brides',style:'two',price:118,colors:['noir','cognac','taupe','craie'],
+  {id:'deux',name:'Deux',sub:'Deux brides réglables',fam:'brides',style:'two',price:319,colors:['noir','marron','tabac','beige'],
    stock:[3,8,12,15,16,14,10,7,4,2,1,0],flag:'Le classique',
    blurb:"Deux brides indépendantes, boucles en laiton brossé : on serre l'avant pour le maintien, l'arrière pour le confort. La forme sur laquelle l'atelier a commencé en 2019.",
    spec:[['Tige','Cuir pleine fleur 2,2 mm'],['Boucles','Laiton brossé, ardillon acier'],['Doublure','Daim de veau velours'],['Poids','340 g (pointure 40)']]},
-  {id:'solo',name:'Solo',sub:'Une bride large',fam:'brides',style:'one',price:98,colors:['noir','sable','olive'],
+  {id:'solo',name:'Solo',sub:'Une bride large',fam:'brides',style:'one',price:249,colors:['noir','gris','marine'],
    stock:[5,9,13,14,12,11,8,5,3,2,0,0],flag:'Entrée de collection',
    blurb:"Une seule bride de 38 mm posée sur l'avant-pied. Rien à régler le matin, le pied entre d'un geste. C'est le modèle qu'on enfile pour descendre chercher le pain.",
    spec:[['Tige','Cuir pleine fleur 2,4 mm'],['Boucle','Laiton brossé'],['Doublure','Daim de veau velours'],['Poids','315 g (pointure 40)']]},
-  {id:'noor',name:'Noor',sub:'Entre-doigts',fam:'doigt',style:'thong',price:104,colors:['cognac','craie','noir'],
+  {id:'noor',name:'Noor',sub:'Entre-doigts',fam:'doigt',style:'thong',price:279,colors:['tabac','beige','noir'],
    stock:[6,10,14,16,15,12,9,6,3,1,0,0],flag:null,
    blurb:"Bride haute cambrée et séparateur d'orteils gainé de cuir doux. La bride remonte sur le pied au lieu de l'écraser, ce qui change tout après trois heures debout.",
    spec:[['Tige','Cuir pleine fleur 2,0 mm'],['Séparateur','Cuir doublé, bord roulé'],['Doublure','Daim de veau velours'],['Poids','300 g (pointure 40)']]},
-  {id:'atlas',name:'Atlas',sub:'Sabot fermé',fam:'sabot',style:'clog',price:142,colors:['noir','taupe','cognac'],
+  {id:'atlas',name:'Atlas',sub:'Sabot fermé',fam:'sabot',style:'clog',price:389,colors:['noir','taupe','marron'],
    stock:[2,5,9,12,13,11,8,6,4,3,2,1],flag:'Mi-saison',
    blurb:"Avant-pied entièrement couvert, talon libre. Il se porte avec une chaussette épaisse jusqu'en novembre. Bride arrière réglable pour rattraper le volume du pied.",
    spec:[['Tige','Cuir pleine fleur 2,6 mm'],['Boucle','Laiton brossé, bride arrière'],['Doublure','Daim de veau velours'],['Poids','410 g (pointure 40)']]},
-  {id:'oasis',name:'Oasis',sub:'Brides croisées',fam:'brides',style:'cross',price:126,colors:['olive','sable','noir'],
+  {id:'oasis',name:'Oasis',sub:'Brides croisées',fam:'brides',style:'cross',price:349,colors:['marine','beige','noir'],
    stock:[4,7,10,13,14,12,9,5,3,1,1,0],flag:null,
    blurb:"Deux brides qui se croisent sur le dessus du pied et tirent dans deux directions. Le maintien est plus ferme que sur la Deux, sans pression sur l'os du cou-de-pied.",
    spec:[['Tige','Cuir pleine fleur 2,2 mm'],['Boucles','Deux boucles latérales'],['Doublure','Daim de veau velours'],['Poids','355 g (pointure 40)']]},
-  {id:'haut',name:'Haut',sub:'Plateforme 35 mm',fam:'plateforme',style:'two',platform:true,price:148,colors:['noir','craie','cognac'],
+  {id:'haut',name:'Haut',sub:'Plateforme 35 mm',fam:'plateforme',style:'two',platform:true,price:399,colors:['noir','bordeaux','tabac'],
    stock:[3,6,11,13,15,13,8,4,2,1,0,0],flag:'Nouveauté',
    blurb:"Le même lit anatomique posé sur un bloc de liège de 35 mm, chanfreiné à l'avant pour que la marche reste souple. Deux brides, boucles doubles.",
    spec:[['Tige','Cuir pleine fleur 2,2 mm'],['Plateforme','Liège-latex 35 mm chanfreiné'],['Doublure','Daim de veau velours'],['Poids','470 g (pointure 40)']]}
 ];
 const STATUS={nouvelle:'Nouvelle',confirmee:'Confirmée',expediee:'Expédiée',livree:'Livrée',annulee:'Annulée'};
-const SHIPFREE=120, SHIPCOST=7;
+const SHIPFREE=400, SHIPCOST=35;
 
 /* ======================= illustration ======================= */
 const SOLE="M100 14C136 14 168 40 172 84C176 116 166 152 156 190C148 220 142 248 142 276C142 308 146 340 146 368C146 404 128 430 100 430C72 430 54 404 54 368C54 340 58 308 58 276C58 248 52 220 44 190C34 152 24 116 28 84C32 40 64 14 100 14Z";
@@ -579,7 +581,7 @@ const S={cart:[],sheet:null,panel:null,step:1,filter:'tous',colorFilter:null,
   ov:{prices:{},stock:{}},orders:[],db:null,user:null,canAdmin:false,dbTried:false,
   admTab:'commandes',openRow:null,lastOrder:null,manual:null,me:''};
 const $=s=>document.querySelector(s);
-const fmt=n=>new Intl.NumberFormat('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:0}).format(Math.round(n))+' €';
+const fmt=n=>new Intl.NumberFormat('fr-MA',{minimumFractionDigits:0,maximumFractionDigits:0}).format(Math.round(n))+' DH';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const prod=id=>CATALOG.find(p=>p.id===id);
 const priceOf=p=>S.ov.prices[p.id]??p.price;
@@ -693,10 +695,10 @@ function cartHTML(){
       <label class="f full">Nom et prénom<input id="f_name" value="${esc(f.name)}" autocomplete="name" placeholder="Amina Benali"></label>
       <label class="f">Téléphone<input id="f_phone" value="${esc(f.phone)}" autocomplete="tel" placeholder="06 12 34 56 78"></label>
       <label class="f">E-mail<input id="f_email" type="email" value="${esc(f.email)}" autocomplete="email" placeholder="amina@exemple.fr"></label>
-      <label class="f full">Adresse<input id="f_addr" value="${esc(f.addr)}" autocomplete="street-address" placeholder="18 rue des Tanneurs"></label>
-      <label class="f">Code postal<input id="f_zip" value="${esc(f.zip)}" autocomplete="postal-code" placeholder="75011"></label>
-      <label class="f">Ville<input id="f_city" value="${esc(f.city)}" autocomplete="address-level2" placeholder="Paris"></label>
-      <label class="f full">Pays<select id="f_country">${['France','Belgique','Suisse','Luxembourg','Maroc','Algérie','Tunisie','Canada','Autre'].map(c=>`<option ${f.country===c?'selected':''}>${c}</option>`).join('')}</select></label>
+      <label class="f full">Adresse<input id="f_addr" value="${esc(f.addr)}" autocomplete="street-address" placeholder="12 rue Tahar Sebti"></label>
+      <label class="f">Code postal<input id="f_zip" value="${esc(f.zip)}" autocomplete="postal-code" placeholder="20250"></label>
+      <label class="f">Ville<input id="f_city" value="${esc(f.city)}" autocomplete="address-level2" placeholder="Casablanca"></label>
+      <label class="f full">Pays<select id="f_country">${['Maroc','France','Belgique','Espagne','Algérie','Tunisie','Canada','Autre'].map(c=>`<option ${(f.country||'Maroc')===c?'selected':''}>${c}</option>`).join('')}</select></label>
       <label class="f full">Note pour l'atelier <span style="text-transform:none;letter-spacing:0;font-weight:400">(optionnel)</span><textarea id="f_note" placeholder="Pied large, livrer après 18 h…">${esc(f.note)}</textarea></label>
       </div>
       <div class="callout" style="margin-top:18px"><b>Aucun paiement maintenant.</b> L'atelier vérifie la disponibilité, vous recevez la confirmation, puis vous réglez à la livraison ou par virement.</div>`;
@@ -739,7 +741,7 @@ function orderText(o){
 function readForm(){
   const g=id=>($('#'+id)?.value||'').trim();
   return {name:g('f_name'),phone:g('f_phone'),email:g('f_email'),addr:g('f_addr'),
-    zip:g('f_zip'),city:g('f_city'),country:$('#f_country')?.value||'France',note:g('f_note')};
+    zip:g('f_zip'),city:g('f_city'),country:$('#f_country')?.value||'Maroc',note:g('f_note')};
 }
 async function placeOrder(){
   const f=readForm();S.form=f;
@@ -752,7 +754,7 @@ async function placeOrder(){
   const o={ref:newRef(),createdAt:new Date().toISOString(),status:'nouvelle',source:'boutique',
     items:S.cart.map(i=>{const p=prod(i.id);return {id:p.id,name:p.name,color:COLORS[i.c].n,colorKey:i.c,size:i.s,q:i.q,unit:priceOf(p)};}),
     customer:{name:f.name,phone:f.phone,email:f.email,addr:f.addr,zip:f.zip,city:f.city,country:f.country},
-    note:f.note,sub,ship,total:sub+ship,currency:'EUR'};
+    note:f.note,sub,ship,total:sub+ship,currency:'MAD'};
   if(MODE==='api'){
     try{const r=await api('orders',{method:'POST',body:{items:o.items,customer:o.customer,note:o.note}});
       S.lastOrder=Object.assign({},r.order,{saved:true});S.cart=[];syncCart();S.step=3;S.form=null;
@@ -883,10 +885,10 @@ function manualHTML(){
         <label class="f full">Nom du client<input id="m_name" value="${esc(m.name)}" placeholder="Amina Benali"></label>
         <label class="f">Téléphone<input id="m_phone" value="${esc(m.phone)}" placeholder="06 12 34 56 78"></label>
         <label class="f">E-mail<input id="m_email" value="${esc(m.email)}" placeholder="amina@exemple.fr"></label>
-        <label class="f full">Adresse<input id="m_addr" value="${esc(m.addr)}" placeholder="18 rue des Tanneurs"></label>
+        <label class="f full">Adresse<input id="m_addr" value="${esc(m.addr)}" placeholder="12 rue Tahar Sebti"></label>
         <label class="f">Code postal<input id="m_zip" value="${esc(m.zip)}"></label>
         <label class="f">Ville<input id="m_city" value="${esc(m.city)}"></label>
-        <label class="f full">Pays<select id="m_country">${['France','Belgique','Suisse','Luxembourg','Maroc','Algérie','Tunisie','Canada','Autre'].map(c=>`<option ${m.country===c?'selected':''}>${c}</option>`).join('')}</select></label>
+        <label class="f full">Pays<select id="m_country">${['Maroc','France','Belgique','Espagne','Algérie','Tunisie','Canada','Autre'].map(c=>`<option ${m.country===c?'selected':''}>${c}</option>`).join('')}</select></label>
       </div>
       <div class="fld"><div class="fld-lab"><span class="t">Articles</span><button class="btn btn-out btn-sm" data-act="mline">+ Ajouter une ligne</button></div>
       ${m.lines.length?m.lines.map((l,n)=>{const p=prod(l.id);return `<div style="display:grid;grid-template-columns:1fr 1fr 70px 62px 30px;gap:7px;margin-bottom:7px;align-items:center">
@@ -1005,7 +1007,7 @@ document.addEventListener('click',async e=>{
     catch(err){if(el)el.textContent=err.message;$('#pw')?.focus();}}
   else if(a==='logout'){TOKEN='';lsSet('benshoes.token','');S.canAdmin=false;S.orders=[];draw();toast('Déconnecté');}
   else if(a==='resetcat'){S.ov={prices:{},stock:{}};saveCat();draw();toast('Valeurs de départ rétablies');}
-  else if(a==='manual'){S.manual={name:'',phone:'',email:'',addr:'',zip:'',city:'',country:'France',note:'',
+  else if(a==='manual'){S.manual={name:'',phone:'',email:'',addr:'',zip:'',city:'',country:'Maroc',note:'',
     lines:[{id:CATALOG[0].id,c:CATALOG[0].colors[0],s:40,q:1}]};S.panel='manual';draw();}
   else if(a==='mline'){readManual();S.manual.lines.push({id:CATALOG[0].id,c:CATALOG[0].colors[0],s:40,q:1});draw();}
   else if(a==='mrm'){readManual();S.manual.lines.splice(+d.n,1);draw();}
@@ -1020,7 +1022,7 @@ async function saveManual(){readManual();const m=S.manual;
   const sub=items.reduce((a,i)=>a+i.unit*i.q,0),ship=sub>=SHIPFREE?0:SHIPCOST;
   const o={ref:newRef(),createdAt:new Date().toISOString(),status:'confirmee',source:'atelier',items,
     customer:{name:m.name,phone:m.phone,email:m.email,addr:m.addr,zip:m.zip,city:m.city,country:m.country},
-    note:m.note,sub,ship,total:sub+ship,currency:'EUR'};
+    note:m.note,sub,ship,total:sub+ship,currency:'MAD'};
   if(MODE==='api'){
     try{const r=await api('orders',{method:'PUT',body:{items:o.items,customer:o.customer,note:o.note}});
       S.orders=[r.order].concat(S.orders);await refreshCatalog();
