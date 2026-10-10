@@ -527,9 +527,17 @@ html{scroll-behavior:smooth;scroll-padding-top:86px}
 .vprog{position:absolute;left:50%;transform:translateX(-50%);bottom:0;height:2px;width:min(360px,62%);
   background:rgba(240,185,166,.16);z-index:4}
 .vprog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#b5301f,#f0b9a6)}
+/* Sur téléphone, pas de 3D : Safari iOS crée un calque GPU par élément
+   transformé et finit par manquer de mémoire — la page se recharge en
+   boucle. La visite devient une suite de plans en fondu, quelques calques. */
+.mv{position:absolute;inset:0;opacity:0;overflow:hidden;will-change:opacity}
+.mv img{width:100%;height:100%;object-fit:cover;display:block;transform-origin:50% 45%}
+.mv::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(26,12,8,.2),rgba(20,9,6,.5) 52%,rgba(14,6,4,.92))}
 @media(max-width:700px){
   .visite{height:300vh}
-  .visite-stage{perspective:640px}
+  .visite-stage{perspective:none}
+  .world{transform-style:flat;will-change:auto;transform:none!important}
   .pane-sign b{font-size:38px}.pane-sign i{font-size:11px;letter-spacing:.3em;margin-top:10px}
   .niche b{font-size:11px}.niche span{font-size:9px}
 }
@@ -803,7 +811,7 @@ label.f.bad input{border-color:var(--bad)}
       <span class="eyebrow on-band">L’atelier</span>
       <h2>Sept gestes,<br>une paire.</h2>
       <p>Photographié chez nous, à Casablanca. De la pile de tiges à l’estampe sur la première.</p>
-    </div><figure class="at-ph"><div class="at-img"><img src="assets/atelier/02.jpg" alt="La coupe — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>01 — La coupe</b><span>Les tiges en daim, coupées et parées, attendent le montage. Chaque pile est un modèle et une pointure.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/atelier/01.jpg" alt="La bride — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>02 — La bride</b><span>La bride penny et sa découpe en accolade. C’est le détail qui distingue l’Opus des deux autres.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/atelier/03.jpg" alt="L’établi — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>03 — L’établi</b><span>Marteau et pince à monter. Le daim est tiré sur la forme, puis cloué point par point.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/atelier/04.jpg" alt="Le montage — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>04 — Le montage</b><span>La machine referme l’avant sur la forme. Ici, trois paires en pointure 40.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/atelier/05.jpg" alt="Les formes — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>05 — Les formes</b><span>Le casier. Du 37 au 41, chaque pointure a sa forme en bois, numérotée.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/atelier/06.jpg" alt="L’estampe — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>06 — L’estampe</b><span>La première reçoit le logo. À partir de là, la paire porte un nom.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/produits/mocassin-noir.jpg" alt="07 — Le départ — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>07 — Le départ</b><span>Les mules noires alignées, premières en liège visibles, avant la mise en boîte.</span></figcaption></figure></div>
+    </div><figure class="at-ph"><div class="at-img"><img src="assets/atelier/02.jpg" srcset="assets/atelier/02-800.jpg 800w, assets/atelier/02.jpg 1600w" sizes="(max-width:700px) 78vw, 400px" alt="La coupe — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>01 — La coupe</b><span>Les tiges en daim, coupées et parées, attendent le montage. Chaque pile est un modèle et une pointure.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/atelier/01.jpg" srcset="assets/atelier/01-800.jpg 800w, assets/atelier/01.jpg 1600w" sizes="(max-width:700px) 78vw, 400px" alt="La bride — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>02 — La bride</b><span>La bride penny et sa découpe en accolade. C’est le détail qui distingue l’Opus des deux autres.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/atelier/03.jpg" srcset="assets/atelier/03-800.jpg 800w, assets/atelier/03.jpg 1600w" sizes="(max-width:700px) 78vw, 400px" alt="L’établi — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>03 — L’établi</b><span>Marteau et pince à monter. Le daim est tiré sur la forme, puis cloué point par point.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/atelier/04.jpg" srcset="assets/atelier/04-800.jpg 800w, assets/atelier/04.jpg 1600w" sizes="(max-width:700px) 78vw, 400px" alt="Le montage — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>04 — Le montage</b><span>La machine referme l’avant sur la forme. Ici, trois paires en pointure 40.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/atelier/05.jpg" srcset="assets/atelier/05-800.jpg 800w, assets/atelier/05.jpg 1600w" sizes="(max-width:700px) 78vw, 400px" alt="Les formes — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>05 — Les formes</b><span>Le casier. Du 37 au 41, chaque pointure a sa forme en bois, numérotée.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/atelier/06.jpg" srcset="assets/atelier/06-800.jpg 800w, assets/atelier/06.jpg 1600w" sizes="(max-width:700px) 78vw, 400px" alt="L’estampe — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>06 — L’estampe</b><span>La première reçoit le logo. À partir de là, la paire porte un nom.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/produits/mocassin-noir.jpg" srcset="assets/produits/mocassin-noir-800.jpg 800w, assets/produits/mocassin-noir.jpg 1600w" sizes="(max-width:700px) 78vw, 400px" alt="07 — Le départ — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>07 — Le départ</b><span>Les mules noires alignées, premières en liège visibles, avant la mise en boîte.</span></figcaption></figure></div>
     <div class="at-bar" aria-hidden="true"><i id="atbar"></i></div>
   </div>
 </section>
@@ -1615,8 +1623,20 @@ function niche(p,left,w,ht,top,plate,col){
       <div class="nb">${corps}</div><div class="ns nl"></div><div class="ns nr"></div>
       <div class="nt"></div><div class="nf"></div></div>`;}
 
+const PLANS=[
+  ['assets/marque/logo-sur-photo-800.jpg','La vitrine benka'],
+  ['assets/atelier/02-800.jpg','Les tiges en daim, avant montage'],
+  ['assets/atelier/03-800.jpg','L\u2019établi et les formes'],
+  ['assets/atelier/04-800.jpg','Le montage sur forme'],
+  ['assets/produits/mocassin-noir-800.jpg','La collection, prête à partir']
+];
 function buildWorld(){
   const w=$('#world'); if(!w)return;
+  if(PETIT){ // pas de 3D sur téléphone
+    w.innerHTML=PLANS.map(([src,alt],i)=>
+      `<div class="mv"><img src="${src}" alt="${alt}" ${i?'loading="lazy"':''} decoding="async"></div>`).join('');
+    return;
+  }
   const V=VIS,H=850,CYm=(V.CY+V.FY)/2,o=[];
   // sol et plafonds
   o.push(pane('pane-floor',5600,7200,`translate3d(700px,${V.FY}px,-2800px) rotateX(90deg)`));
@@ -1685,6 +1705,29 @@ function initVisite(){
   if(!MOTION)return;
   const caps=[...sec.querySelectorAll('.vcap')].map(el=>({el,a:+el.dataset.a,b:+el.dataset.b}));
   const bar=$('#vprogbar'),hint=$('#vhint');
+  const bar2=bar;
+  if(PETIT){
+    const plans=[...world.querySelectorAll('.mv')];
+    const bornes=caps.map(c=>[c.a,c.b]);
+    let capPrec=-1;
+    avancer((dt,sy)=>{
+      const p=borne((sy-GEO.vTop)/GEO.vSpan,0,1);
+      const proche=sy>GEO.vTop-GEO.vh*1.2 && sy<GEO.vTop+GEO.vSpan+GEO.vh*0.5;
+      for(let i=0;i<plans.length;i++){
+        const [a,b]=bornes[i]||[0,1];
+        const dedans=p>=a-0.05&&p<b+0.05;
+        const t=borne((p-a)/((b-a)||1),0,1);
+        plans[i].style.opacity=dedans?(p<a?1-(a-p)/0.05:p>b?1-(p-b)/0.05:1).toFixed(2):'0';
+        if(dedans)plans[i].firstChild.style.transform='scale('+(1.1-t*0.1).toFixed(3)+')';
+      }
+      let vu=-1; for(let i=0;i<caps.length;i++) if(p>=caps[i].a&&p<caps[i].b) vu=i;
+      if(vu!==capPrec){capPrec=vu; for(let i=0;i<caps.length;i++) caps[i].el.style.opacity=i===vu?'1':'0';}
+      if(bar2)bar2.style.width=(p*100).toFixed(1)+'%';
+      if(hint){hint.style.opacity=p>.03?'0':'1';hint.style.visibility=p>.12?'hidden':'visible';}
+      return proche;
+    });
+    return;
+  }
   const cam=echantillon(0); let roll=0, prevYaw=cam.yaw, capPrec=-1, hintPrec=-1;
   avancer((dt,sy)=>{
     const p=borne((sy-GEO.vTop)/GEO.vSpan,0,1);
