@@ -8,8 +8,11 @@ Boutique de mocassins-mules en daim, première en liège estampée benka. Site s
 ## Ce que contient le site
 
 - Trois modèles — Opus (299 DH), Stepy (259 DH), Western (359 DH) — en huit cuirs, pointures 37 à 41, illustrés en SVG généré.
-- Une visite en 3D du show-room au défilement : l'allée, les vitrines, puis le mur des quatorze cuirs. À l'échelle réduite sur téléphone, pour la mémoire des petits appareils.
+- Une visite en 3D au défilement, en neuf chapitres : **Fès d'abord** — la porte au lever du jour, la derb et ses zelliges sous la claie de roseau, les cuves des tanneries de Chouara — puis la façade benka au bout de la rue, l'allée, et le mur des quatorze cuirs. Tout est dessiné en dégradés CSS : pas une image à télécharger.
+- Le décor est groupé par quartier (`ZONES`). Un quartier hors de portée de la caméra est retiré du document : il ne coûte plus un seul calque graphique. C'est ce qui permet de doubler le décor en divisant la mémoire par quatre — 82 Mo au plus fort contre 320 avant, 19 Mo sur téléphone contre 47.
+- Un plan sans contenu et trop grand est dessiné réduit puis agrandi par la transformation (`pane()`, facteur `--f`). Au-delà d'environ deux millions de pixels, le navigateur renonce à peindre un dégradé et n'en dessine qu'une bande : c'est ce qui tronquait les zelliges de la porte.
 - Filtres par cuir, fiche produit, choix de pointure avec stock réel, panier, commande en trois étapes.
+- Menu de sections sur téléphone : sous 860 px la barre de navigation disparaissait sans rien à la place.
 - Coupe annotée de la semelle, guide des pointures en millimètres, photos d'atelier, thème clair/sombre.
 - Espace commandes : chiffre d'affaires, commandes à traiter, panier moyen, suivi des statuts, saisie manuelle, édition des prix et du stock, export CSV, sauvegarde JSON.
 

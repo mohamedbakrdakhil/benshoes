@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; script-src 'self' 'sha256-CvbPq/7EYFj9HomN942WjvGqSDTvXtWPsUCeQlxR214=' 'sha256-D5kNCjiMEjos5xgxW3Z/+eLtYy7lPmg++BS/lNnHn2s=' 'sha256-itMQZ0ozxagVQxUlZAPpYlEMdV7ODDoTWzLj1+D8e2Y='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; script-src 'self' 'sha256-CvbPq/7EYFj9HomN942WjvGqSDTvXtWPsUCeQlxR214=' 'sha256-D5kNCjiMEjos5xgxW3Z/+eLtYy7lPmg++BS/lNnHn2s=' 'sha256-R0wNUfh2YnE0bhKO6U0NBK2Ud4btcVjznzQo0hdkUIg='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
 <meta name="benka-api" content="oui">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Benkashoes — mocassins-mules en daim</title>
@@ -209,6 +209,23 @@ img,svg{max-width:100%}
 .cartbtn{display:flex;align-items:center;gap:9px;height:38px;padding:0 14px;border-radius:var(--r);background:var(--fg);color:var(--bg);font-size:.8rem;font-weight:600;letter-spacing:.02em}
 .cartbtn b{min-width:19px;height:19px;display:grid;place-items:center;border-radius:999px;background:var(--accent);color:#fff;font-size:.68rem}
 @media(max-width:860px){.nav{display:none}}
+/* Sous 860 px le menu de section disparaissait sans rien à la place : sur un
+   téléphone, la seule façon d'atteindre une section était de tout faire
+   défiler. Ce volet rend les neuf sections accessibles en deux gestes. */
+.menubtn{display:none}
+@media(max-width:860px){.menubtn{display:grid}}
+.navmob{position:absolute;left:0;right:0;top:100%;z-index:59;display:grid;
+  background:var(--bg);border-bottom:1px solid var(--line);
+  box-shadow:0 18px 34px -22px rgba(0,0,0,.45);padding:4px 20px 12px;
+  animation:navDown .22s cubic-bezier(.16,1,.3,1)}
+@keyframes navDown{from{opacity:0;transform:translateY(-8px)}}
+.navmob a{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:13px 2px;text-decoration:none;font-size:.96rem;font-weight:500;
+  border-bottom:1px solid var(--line)}
+.navmob a:last-child{border-bottom:0}
+.navmob a span{font-size:.68rem;letter-spacing:.14em;color:var(--fg-soft);font-variant-numeric:tabular-nums}
+.navmob a:hover,.navmob a:focus-visible{color:var(--accent-text)}
+@media(prefers-reduced-motion:reduce){.navmob{animation:none}}
 @media(max-width:430px){.brand{font-size:1.02rem;gap:5px;min-width:0}.brand small{font-size:.5rem;letter-spacing:.16em}.cartbtn{padding:0 11px}}
 @media(max-width:360px){.hdr-in{gap:8px}.brand small{display:none}.brand{font-size:.96rem}.cartbtn{padding:0 9px;font-size:.72rem;gap:6px}.icbtn{width:34px;height:34px}}
 
@@ -449,20 +466,28 @@ html{scroll-behavior:smooth;scroll-padding-top:86px}
    porte, allée, virage à droite, mur des formes) pilotée par la position de
    défilement. Aucune bibliothèque. Sur demande de mouvement réduit, la
    section se replie en une simple bannière. */
-.visite{position:relative;height:640vh;background:#0c0604;isolation:isolate}
+.visite{position:relative;height:980vh;background:#0c0604;isolation:isolate}
 .visite-stage{position:sticky;top:0;height:100vh;height:100svh;min-height:420px;overflow:hidden;
   perspective:900px;perspective-origin:50% 47%;background:radial-gradient(120% 90% at 50% 55%,#1e0d08,#070403 70%)}
 .world{position:absolute;left:0;top:0;width:100%;height:100%;transform-style:preserve-3d;will-change:transform}
-.pane{position:absolute;left:50%;top:50%;transform-style:preserve-3d;backface-visibility:hidden}
+.pane{--f:1;position:absolute;left:50%;top:50%;transform-style:preserve-3d;backface-visibility:hidden}
 .pane-wall{background:linear-gradient(180deg,#3f2019,#251410 48%,#170b08);
-  box-shadow:inset 0 0 140px rgba(0,0,0,.6)}
+  box-shadow:inset 0 0 calc(140px/var(--f)) rgba(0,0,0,.6)}
 .pane-strip{background:linear-gradient(90deg,rgba(240,185,166,.1),#fbe8e0 42%,#fbe8e0 58%,rgba(240,185,166,.1));
   box-shadow:0 0 54px 16px rgba(240,185,166,.38)}
 .pane-floor{background:
-  repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 2px,transparent 2px 190px),
+  repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 calc(2px/var(--f)),transparent calc(2px/var(--f)) calc(190px/var(--f))),
   radial-gradient(60% 34% at 50% 44%,rgba(240,185,166,.16),transparent 70%),
   linear-gradient(180deg,#271710,#110806)}
-.pane-ceil{background:linear-gradient(180deg,#0a0504,#170b08)}
+/* Plafond à caissons de cèdre. L'ancien plafond était presque noir : sur un
+   téléphone, dont l'écran est haut, il occupait un quart du cadre sans rien
+   montrer. */
+.pane-ceil{background:
+  repeating-linear-gradient(90deg,rgba(0,0,0,.6) 0 calc(9px/var(--f)),transparent calc(9px/var(--f)) calc(180px/var(--f))),
+  repeating-linear-gradient(0deg,rgba(0,0,0,.6) 0 calc(9px/var(--f)),transparent calc(9px/var(--f)) calc(180px/var(--f))),
+  radial-gradient(60% 50% at 50% 50%,rgba(240,186,110,.14),transparent 72%),
+  linear-gradient(180deg,#2b1810,#150b06);
+  box-shadow:inset 0 0 calc(130px/var(--f)) rgba(0,0,0,.7)}
 .pane-sign{display:grid;place-items:center;background:linear-gradient(180deg,#6e1710,#48100a);
   border:1px solid #8c2418;box-shadow:0 0 80px rgba(209,69,44,.35),inset 0 0 50px rgba(0,0,0,.5)}
 .pane-sign b{font-family:var(--fd);color:#fdf3ee;letter-spacing:.06em;font-size:64px;line-height:1;
@@ -502,12 +527,119 @@ html{scroll-behavior:smooth;scroll-padding-top:86px}
   background:linear-gradient(180deg,rgba(240,185,166,.26),transparent 78%)}
 .pane-jamb{background:linear-gradient(180deg,#472419,#251410)}
 .pane-beam{background:linear-gradient(180deg,#1b0d09,#2b1610)}
-.pane-podium{background:linear-gradient(180deg,#4d2217,#2b1510);box-shadow:inset 0 0 60px rgba(0,0,0,.6)}
+.pane-podium{background:linear-gradient(180deg,#4d2217,#2b1510);box-shadow:inset 0 0 calc(60px/var(--f)) rgba(0,0,0,.6)}
 .pane-podtop{background:linear-gradient(180deg,#602f20,#3c1d15)}
 .pane-prop{display:grid;place-items:end center}
 .pane-prop svg{height:100%;width:auto}
 .pool{position:absolute;border-radius:50%;filter:blur(26px);
   background:radial-gradient(closest-side,rgba(240,185,166,.4),transparent)}
+
+/* ---- Fès : la médina avant la boutique ----
+   Tout est dessiné en dégradés CSS : pas une image à télécharger, pas un
+   octet de plus, et un seul calque graphique par plan quelle que soit la
+   richesse du motif. Le zellige, les tanneries et le moucharabieh sont
+   des empilements de dégradés sur un plan unique. */
+.zone{position:absolute;left:0;top:0;width:100%;height:100%;transform-style:preserve-3d}
+
+/* ciel de Fès au lever du jour */
+.pane-ciel{background:linear-gradient(180deg,#101a30 0%,#2b2242 26%,#5d3650 50%,#99584f 70%,#cf8349 88%,#eeb97c 100%)}
+.pane-ciel::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(42% 30% at 50% 88%,rgba(255,214,160,.5),transparent 70%)}
+
+/* Zellige : étoile ocre au croisement, damier vert, joints à la chaux.
+   Cinq dégradés empilés sur UN seul plan — un calque graphique, pas cinq. */
+.pane-zellige{--zv:#14584f;--zo:#b4722a;--zb:#e9dfc8;--zf:#07302c;--zt:72px;
+  --z:calc(var(--zt)/var(--f));--j:calc(2px/var(--f));
+  background:
+    repeating-linear-gradient(45deg,var(--zb) 0 var(--j),transparent var(--j) calc(var(--z)/1.414)),
+    repeating-linear-gradient(-45deg,var(--zb) 0 var(--j),transparent var(--j) calc(var(--z)/1.414)),
+    radial-gradient(circle at 0 0,var(--zo) 0 22%,transparent 23%) 0 0/var(--z) var(--z),
+    radial-gradient(circle at 100% 100%,var(--zo) 0 22%,transparent 23%) 0 0/var(--z) var(--z),
+    repeating-conic-gradient(from 45deg at 50% 50%,var(--zv) 0 25%,transparent 0 50%) 0 0/var(--z) var(--z),
+    var(--zf);
+  box-shadow:inset 0 0 calc(90px/var(--f)) rgba(0,0,0,.6)}
+.pane-zellige.fin{--zt:40px}
+/* le bandeau bas des murs : plus sobre, ocre dominant */
+.pane-zellige.bas{--zv:#6f3d18;--zo:#cf9549;--zf:#2d1a0c;--zt:44px}
+
+/* mur de médina : enduit à la chaux, ocre, patiné */
+.pane-chaux{background:
+  radial-gradient(70% 40% at 30% 10%,rgba(255,236,205,.16),transparent 70%),
+  repeating-linear-gradient(92deg,rgba(0,0,0,.07) 0 calc(3px/var(--f)),transparent calc(3px/var(--f)) calc(120px/var(--f))),
+  linear-gradient(180deg,#9a6c45,#6d4a30 55%,#442d1d);
+  box-shadow:inset 0 0 calc(120px/var(--f)) rgba(0,0,0,.5)}
+
+/* cèdre sculpté : le bandeau au-dessus des murs */
+.pane-creneaux{background:
+  repeating-linear-gradient(90deg,#3a2011 0 calc(46px/var(--f)),transparent calc(46px/var(--f)) calc(96px/var(--f)));
+  filter:drop-shadow(0 2px 0 rgba(0,0,0,.4))}
+.pane-cedre{background:
+  repeating-linear-gradient(90deg,#4a2a16 0 calc(6px/var(--f)),#6b4024 calc(6px/var(--f)) calc(13px/var(--f)),#3a2011 calc(13px/var(--f)) calc(22px/var(--f))),
+  #4a2a16;
+  box-shadow:inset 0 calc(10px/var(--f)) calc(24px/var(--f)) rgba(0,0,0,.5)}
+
+/* pavés de la ruelle */
+.pane-pave{background:
+  radial-gradient(50% 36% at 50% 42%,rgba(255,205,150,.14),transparent 72%),
+  repeating-linear-gradient(90deg,rgba(0,0,0,.34) 0 calc(3px/var(--f)),transparent calc(3px/var(--f)) calc(54px/var(--f))),
+  repeating-linear-gradient(0deg,rgba(0,0,0,.34) 0 calc(3px/var(--f)),transparent calc(3px/var(--f)) calc(54px/var(--f))),
+  linear-gradient(180deg,#6a5138,#3b2b1d)}
+
+/* l'arche en fer à cheval : un seul élément, bordure + rayon */
+.arche{position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+  border:30px solid #c08034;border-bottom:0;
+  border-radius:50% 50% 0 0/58% 58% 0 0;
+  box-shadow:0 0 60px rgba(227,168,108,.4),inset 0 0 40px rgba(0,0,0,.35)}
+.arche i{position:absolute;inset:-30px;border:9px solid #0f4b45;border-bottom:0;
+  border-radius:inherit;opacity:.9}
+
+/* les tanneries de Chouara : une nappe de cuves, un seul plan */
+.pane-cuves{background-color:#2a1d12;background-repeat:no-repeat;
+  background-image:
+    radial-gradient(circle,#d8a033 58%,#4a3317 60%),radial-gradient(circle,#b8541f 58%,#4a3317 60%),
+    radial-gradient(circle,#e6ddc4 58%,#4a3317 60%),radial-gradient(circle,#8e3418 58%,#4a3317 60%),
+    radial-gradient(circle,#c98a28 58%,#4a3317 60%),radial-gradient(circle,#ded3b4 58%,#4a3317 60%),
+    radial-gradient(circle,#6f4a16 58%,#4a3317 60%),radial-gradient(circle,#a84a1c 58%,#4a3317 60%),
+    radial-gradient(circle,#dcc48c 58%,#4a3317 60%),radial-gradient(circle,#bf7a24 58%,#4a3317 60%),
+    radial-gradient(circle,#e8e0c8 58%,#4a3317 60%),radial-gradient(circle,#93401a 58%,#4a3317 60%);
+  background-size:150px 150px;
+  background-position:40px 40px,210px 40px,380px 40px,550px 40px,
+    120px 210px,290px 210px,460px 210px,630px 210px,
+    40px 380px,210px 380px,380px 380px,550px 380px}
+
+/* lanterne de cuivre */
+.pane-lampe{background:linear-gradient(180deg,#8a5a22,#d9a44c 42%,#7a4a1c);
+  clip-path:polygon(50% 0,100% 26%,86% 100%,14% 100%,0 26%);
+  box-shadow:0 0 42px 14px rgba(240,186,110,.42)}
+.pane-lampe::after{content:"";position:absolute;inset:14% 15% 17%;
+  background:radial-gradient(closest-side,#fff3d6,#f0ba6e);filter:blur(1px)}
+/* plan sans matière : sert de support à l'arche */
+.pane-vide{background:none}
+
+/* Le toit de lattes de la derb. Les souks de Fès sont couverts de claies de
+   roseau : la lumière y tombe en lames. Cela ferme aussi le haut du cadre, qui
+   sans cela ouvrait sur le vide. */
+.pane-claie{background:
+  repeating-linear-gradient(90deg,
+    #2a1a10 0 calc(26px/var(--f)),
+    #120a06 calc(26px/var(--f)) calc(34px/var(--f)),
+    rgba(255,214,150,.5) calc(34px/var(--f)) calc(42px/var(--f)),
+    #1d1209 calc(42px/var(--f)) calc(62px/var(--f))),
+  #150c07}
+
+/* moucharabieh : claustra de cèdre tourné */
+.pane-mouchara{background:
+  repeating-linear-gradient(45deg,rgba(74,42,22,.96) 0 calc(7px/var(--f)),transparent calc(7px/var(--f)) calc(26px/var(--f))),
+  repeating-linear-gradient(-45deg,rgba(74,42,22,.96) 0 calc(7px/var(--f)),transparent calc(7px/var(--f)) calc(26px/var(--f))),
+  linear-gradient(180deg,rgba(255,214,160,.2),rgba(255,190,120,.07));
+  box-shadow:inset 0 0 36px rgba(0,0,0,.4)}
+
+/* tapis du show-room */
+.pane-tapis{background:
+  repeating-linear-gradient(90deg,transparent 0 calc(30px/var(--f)),rgba(0,0,0,.22) calc(30px/var(--f)) calc(34px/var(--f))),
+  repeating-conic-gradient(from 45deg at 50% 50%,#7d2218 0 25%,transparent 0 50%) 0 0/calc(120px/var(--f)) calc(120px/var(--f)),
+  linear-gradient(180deg,#9a3324,#5e1a12);
+  box-shadow:0 0 calc(50px/var(--f)) rgba(0,0,0,.5) inset}
 
 /* habillage 2D par-dessus la scène */
 .visite-ui{position:absolute;inset:0;pointer-events:none;z-index:3}
@@ -542,8 +674,13 @@ html{scroll-behavior:smooth;scroll-padding-top:86px}
 .mv::after{content:"";position:absolute;inset:0;
   background:linear-gradient(180deg,rgba(26,12,8,.2),rgba(20,9,6,.5) 52%,rgba(14,6,4,.92))}
 @media(max-width:700px){
-  .visite{height:300vh}
-  .visite-stage{perspective:330px}
+  .visite{height:460vh}
+  .arche{border-width:18px}
+  /* L'écran d'un téléphone est bien plus haut que large : avec la perspective
+     courte du bureau, le cadre débordait la scène par le haut et par le bas.
+     650 px resserre le champ — mesuré : la couverture passe de 57 % à 82 %
+     au point le plus défavorable, sans un octet de mémoire en plus. */
+  .visite-stage{perspective:650px}
   .pane-sign b{font-size:38px}.pane-sign i{font-size:11px;letter-spacing:.3em;margin-top:10px}
   .niche b{font-size:11px}.niche span{font-size:9px}
 }
@@ -717,12 +854,25 @@ label.f.bad input{border-color:var(--bad)}
       <span class="nav-ink" id="navink" aria-hidden="true"></span>
     </nav>
     <div class="hdr-act">
+      <button class="icbtn menubtn" id="menubtn" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="navmob">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
       <button class="icbtn" id="themebtn" title="Changer le thème" aria-label="Changer le thème">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
       </button>
       <button class="cartbtn" id="cartbtn">Panier <b id="cartcount">0</b></button>
     </div>
   </div>
+  <nav class="navmob" id="navmob" hidden>
+    <a href="#visite">La visite <span>FÈS → L’ATELIER</span></a>
+    <a href="#modeles">Modèles <span>3</span></a>
+    <a href="#liege">La semelle <span>EN COUPE</span></a>
+    <a href="#atelier">L’atelier <span>EN IMAGES</span></a>
+    <a href="#comparatif">Comparatif <span>PRIX</span></a>
+    <a href="#tailles">Tailles <span>37–41</span></a>
+    <a href="#commander">Commander <span>4 ÉTAPES</span></a>
+    <a href="#faq">Questions <span>6</span></a>
+  </nav>
 </header>
 
 <section class="hero" id="top">
@@ -748,23 +898,35 @@ label.f.bad input{border-color:var(--bad)}
   <div class="visite-stage">
     <div class="world" id="world" aria-hidden="true"></div>
     <div class="visite-ui">
-      <div class="vcap" data-a="0" data-b=".16"><span class="k">01 — La vitrine</span>
-        <h3>Vous êtes devant la boutique.</h3>
-        <p>Casablanca. L’enseigne est allumée, l’atelier tourne derrière. Faites défiler pour pousser la porte.</p></div>
-      <div class="vcap" data-a=".16" data-b=".34"><span class="k">02 — On entre</span>
+      <div class="vcap" data-a="0" data-b=".12"><span class="k">01 — Fès, avant le jour</span>
+        <h3>Tout commence<br>à Fès.</h3>
+        <p>La plus vieille médina du monde, et la capitale du cuir depuis onze siècles. C’est d’ici que part le daim. Faites défiler pour passer la porte.</p></div>
+      <div class="vcap" data-a=".12" data-b=".25"><span class="k">02 — Sous l’arche</span>
+        <h3>La derb, à peine deux bras de large.</h3>
+        <p>Zellige à hauteur d’épaule, cèdre sculpté au-dessus, et des lanternes de cuivre tous les dix pas. Le métier se transmet dans ces murs.</p></div>
+      <div class="vcap" data-a=".25" data-b=".38"><span class="k">03 — Les tanneries</span>
+        <h3>Chouara,<br>à main droite.</h3>
+        <p>Les cuves de teinture, ocre, grenat, blanc de chaux. Les peaux y passent plusieurs semaines avant de devenir du daim.</p></div>
+      <div class="vcap" data-a=".38" data-b=".47"><span class="k">04 — Au bout de la rue</span>
+        <h3>La ruelle débouche<br>sur la boutique.</h3>
+        <p>Du cuir de Fès à la paire finie : la rue n’était que le début du chemin.</p></div>
+      <div class="vcap" data-a=".47" data-b=".56"><span class="k">05 — La vitrine</span>
+        <h3>Vous êtes devant benka.</h3>
+        <p>L’enseigne est allumée, l’atelier tourne derrière. Encore un peu et la porte s’ouvre.</p></div>
+      <div class="vcap" data-a=".56" data-b=".64"><span class="k">06 — On entre</span>
         <h3>Franchissez la porte.</h3>
         <p>L’odeur du daim et de la colle chaude. Devant vous, l’allée centrale et ses vitrines éclairées.</p></div>
-      <div class="vcap" data-a=".34" data-b=".56"><span class="k">03 — L’allée</span>
+      <div class="vcap" data-a=".64" data-b=".75"><span class="k">07 — L’allée</span>
         <h3>Les formes, de part et d’autre.</h3>
         <p>À gauche l’Opus et ses huit cuirs, à droite le Stepy et le Western. Tous montés sur forme, tous sur la même première en liège.</p></div>
-      <div class="vcap" data-a=".56" data-b=".72"><span class="k">04 — Au fond, à droite</span>
-        <h3>Tournez vers le showroom.</h3>
-        <p>L’allée débouche sur la grande salle : plafond rehaussé, deux corniches lumineuses, et le mur de présentation sur toute sa longueur.</p></div>
-      <div class="vcap" data-a=".72" data-b="1.01"><span class="k">05 — Le mur de la collection</span>
+      <div class="vcap" data-a=".75" data-b=".85"><span class="k">08 — Au fond, à droite</span>
+        <h3>Tournez vers le show-room.</h3>
+        <p>La grande salle : plafond rehaussé, corniches lumineuses, claustras de cèdre et le mur de présentation sur toute sa longueur.</p></div>
+      <div class="vcap" data-a=".85" data-b="1.01"><span class="k">09 — Le mur de la collection</span>
         <h3>Quatorze cuirs,<br>un seul mur.</h3>
         <p>Chaque modèle dans chacun de ses coloris, sur deux rangées. De 259 à 359 DH, du 37 au 41.</p>
         <a class="btn btn-hero" href="#modeles" data-act="skipvisite">Voir la collection</a></div>
-      <div class="vhint" id="vhint">Faites défiler pour entrer<i></i></div>
+      <div class="vhint" id="vhint">Faites défiler pour entrer dans Fès<i></i></div>
     </div>
     <button class="vskip" data-act="skipvisite">Passer la visite</button>
     <div class="vprog" aria-hidden="true"><i id="vprogbar"></i></div>
@@ -1657,8 +1819,32 @@ const borne=(v,a,b)=>v<a?a:v>b?b:v;
    rangées, banc central, plafond rehaussé, corniche lumineuse. */
 const VIS={HW:520,FY:320,CY:-520,FZ:-1100,Z1:-4700,
            SX:2600,SZ0:-2900,SZ1:-5700,SCY:-820,SX0:520};
-const CAM=[[0,0,420,0],[.13,0,-820,0],[.28,0,-1750,0],[.44,0,-2550,0],
-           [.56,260,-2950,62],[.68,1150,-3550,88],[.84,1190,-3950,90],[1,1210,-4300,90]];
+/* Fès, avant la boutique. Le cuir vient de là : on part devant la porte au
+   lever du jour, on passe sous l'arche, on longe la derb et ses zelliges, on
+   jette un œil aux cuves des tanneries, et la ruelle débouche sur la façade
+   benka. Même monde, même caméra — la scène est simplement plus longue. */
+const FES={HW:430,SOL:320,HAUT:-820,ZP:2450,ZR0:2430,ZR1:-1060,ZT:1500};
+const CAM=[
+  [0,     0, 4500,  0],   // devant la porte, la ville dort encore
+  [.07,   0, 3900,  0],
+  [.14,   0, 3150,  0],   // l'arche grandit
+  [.21,   0, 2420,  0],   // on passe dessous
+  [.28,   0, 1950,  9],   // la derb
+  [.34,   0, 1480, 17],   // le regard glisse vers les cuves
+  [.40,   0, 1000,  6],
+  [.46,   0,  420,  0],   // la façade benka, bout de rue
+  [.53,   0, -820,  0],
+  [.61,   0,-1750,  0],
+  [.70,   0,-2550,  0],
+  [.76, 260,-2950, 62],
+  [.83,1150,-3550, 88],
+  [.91,1190,-3950, 90],
+  [1,  1210,-4300, 90]];
+/* Les plans sont groupés par quartier. Un quartier loin de la caméra est
+   démonté : son contenu ne coûte plus un seul calque graphique. C'est ce qui
+   permet de doubler le décor sans dépasser la charge d'avant. Les marges sont
+   larges pour que le montage se fasse hors champ, jamais sous les yeux. */
+const ZONES=[['fes',0,.58],['seuil',.18,.70],['allee',.42,.94],['salle',.64,1.01]];
 const PETIT=innerWidth<700, RICHE=!PETIT;
 // Safari iOS alloue un calque graphique par plan 3D, et sa mémoire suit la
 // SURFACE du plan. On garde la même scène, dessinée deux fois plus petite,
@@ -1676,9 +1862,20 @@ try{
 // toutes les combinaisons modèle × cuir, pour garnir le grand mur
 const VITRINES=CATALOG.flatMap(p=>p.colors.map(c=>[p,c]));
 
+/* Un dégradé peint sur un plan immense est tronqué par le navigateur — au-delà
+   d'environ deux millions de pixels il renonce et ne peint qu'une bande du haut
+   — et il coûte en mémoire autant qu'il couvre de surface. Un plan sans contenu
+   est donc dessiné f fois plus petit, puis agrandi d'autant par la
+   transformation : même image à l'écran, f² fois moins de pixels à peindre.
+   Les tailles de motif et les ombres se divisent par --f pour compenser.
+   Les plans qui portent des vitrines gardent leur taille : on n'agrandit pas
+   du texte au risque de le flouter. */
+const facteur=a=>a>8e6?5:a>4e6?4:a>2e6?3:a>8e5?2:1;
 function pane(cls,w,ht,tf,inner){
+  const f=inner?1:facteur(w*ht);
+  if(f!==1){w/=f;ht/=f;tf+=` scale(${f})`;}
   if(K!==1){w*=K;ht*=K;tf=tf.replace(/(-?[\d.]+)px/g,(m,v)=>(v*K).toFixed(1)+'px');}
-  return `<div class="pane ${cls}" style="width:${w}px;height:${ht}px;margin-left:${-w/2}px;margin-top:${-ht/2}px;transform:${tf}">${inner||''}</div>`;}
+  return `<div class="pane ${cls}"${f!==1?` style="--f:${f};`:' style="'}width:${w}px;height:${ht}px;margin-left:${-w/2}px;margin-top:${-ht/2}px;transform:${tf}">${inner||''}</div>`;}
 function niche(p,left,w,ht,top,plate,col){
   if(K!==1){left*=K;w*=K;ht*=K;top*=K;}
   const corps=`${visuel(p,col||p.colors[0],true)}<b>${p.name}</b><span>${(COLORS[col||p.colors[0]]||{}).n||''}</span>`;
@@ -1702,58 +1899,126 @@ function construirePlans(){
 function buildWorld(){
   const w=$('#world'); if(!w)return;
   if(MODE2D){construirePlans();return;}
-  const V=VIS,H=850,CYm=(V.CY+V.FY)/2,o=[];
-  // sol et plafonds
-  o.push(pane('pane-floor',PETIT?3400:5600,PETIT?5400:7200,`translate3d(700px,${V.FY}px,-2650px) rotateX(90deg)`));
-  o.push(pane('pane-ceil',PETIT?1400:2200,PETIT?3800:6400,`translate3d(0px,${V.CY}px,-2600px) rotateX(-90deg)`));
-  o.push(pane('pane-ceil',PETIT?1900:2100,PETIT?2600:3000,`translate3d(1560px,${V.SCY}px,-4300px) rotateX(-90deg)`));
-  // façade
-  o.push(pane('pane-wall',1880,1500,`translate3d(-1270px,-220px,${V.FZ}px)`));
-  o.push(pane('pane-wall',1880,1500,`translate3d(1270px,-220px,${V.FZ}px)`));
-  o.push(pane('pane-wall',640,700,`translate3d(0px,-550px,${V.FZ}px)`));
-  o.push(pane('pane-sign',600,200,`translate3d(0px,-560px,${V.FZ+14}px)`,'<div><b>benka</b><i>MOCASSINS · CASABLANCA</i></div>'));
-  o.push(pane('pane-glass',700,430,`translate3d(-1000px,-120px,${V.FZ+10}px)`));
-  o.push(pane('pane-glass',700,430,`translate3d(1000px,-120px,${V.FZ+10}px)`));
-  o.push(pane('pane-jamb',140,520,`translate3d(-320px,60px,${V.FZ-70}px) rotateY(90deg)`));
-  o.push(pane('pane-jamb',140,520,`translate3d(320px,60px,${V.FZ-70}px) rotateY(-90deg)`));
-  o.push(pane('pane-jamb',640,140,`translate3d(0px,-200px,${V.FZ-70}px) rotateX(-90deg)`));
-  // allée : trois niches à gauche, deux à droite, le mur droit s'arrête à l'entrée du showroom
+  const V=VIS,F=FES,H=850,CYm=(V.CY+V.FY)/2;
+  const fes=[],seuil=[],allee=[],salle=[];
+  const kx=v=>Math.round(v*K);
+
+  /* =============== Fès : la médina =============== */
+  // Le ciel : la porte s'arrête assez bas pour qu'on voie le jour se lever
+  // au-dessus des terrasses — sans cela le zellige remplissait tout le cadre.
+  fes.push(pane('pane-ciel',9000,1500,`translate3d(0px,-1590px,2520px)`));
+  // la place et la ruelle, d'un seul tenant
+  fes.push(pane('pane-pave',2600,6200,`translate3d(0px,${F.SOL}px,1800px) rotateX(90deg)`));
+  // La porte : deux massifs de zellige, un linteau, l'arche en fer à cheval.
+  // Elle s'arrête à -950 pour qu'une bande de ciel reste visible au-dessus.
+  fes.push(pane('pane-zellige',3800,1470,`translate3d(-2300px,-215px,${F.ZP}px)`));
+  fes.push(pane('pane-zellige',3800,1470,`translate3d(2300px,-215px,${F.ZP}px)`));
+  fes.push(pane('pane-zellige',900,340,`translate3d(0px,-780px,${F.ZP}px)`));
+  fes.push(pane('pane-cedre',9000,120,`translate3d(0px,-1010px,${F.ZP+20}px)`));
+  // créneaux : la silhouette de la porte se découpe sur le jour qui se lève
+  fes.push(pane('pane-creneaux',9000,120,`translate3d(0px,-1130px,${F.ZP+22}px)`));
+  fes.push(pane('pane-vide',900,1080,`translate3d(0px,-220px,${F.ZP-20}px)`,
+    `<div class="arche" style="width:${kx(820)}px;height:${kx(1040)}px"><i></i></div>`));
+  // les murs de la ruelle : chaux, zellige en bas, cèdre en haut
+  const rl=F.ZR0-F.ZR1, rc=(F.ZR0+F.ZR1)/2, mh=F.SOL-F.HAUT, mz=(F.SOL+F.HAUT)/2;
+  fes.push(pane('pane-chaux',rl,mh,`translate3d(${-F.HW}px,${mz}px,${rc}px) rotateY(90deg)`));
+  fes.push(pane('pane-zellige fin bas',rl,380,`translate3d(${-F.HW+6}px,${F.SOL-190}px,${rc}px) rotateY(90deg)`));
+  fes.push(pane('pane-cedre',rl,130,`translate3d(${-F.HW+6}px,${F.HAUT+65}px,${rc}px) rotateY(90deg)`));
+  // côté droit : deux tronçons, l'écart ouvre sur les tanneries
+  [[630,2115],[2260,70]].forEach(([lg,zc])=>{
+    fes.push(pane('pane-chaux',lg,mh,`translate3d(${F.HW}px,${mz}px,${zc}px) rotateY(-90deg)`));
+    fes.push(pane('pane-zellige fin bas',lg,380,`translate3d(${F.HW-6}px,${F.SOL-190}px,${zc}px) rotateY(-90deg)`));
+    fes.push(pane('pane-cedre',lg,130,`translate3d(${F.HW-6}px,${F.HAUT+65}px,${zc}px) rotateY(-90deg)`));
+  });
+  // lanternes de cuivre accrochées aux murs
+  [[-F.HW+14,2050,90],[F.HW-14,2300,-90],[-F.HW+14,900,90],[F.HW-14,600,-90],[-F.HW+14,-300,90]]
+    .forEach(([lx,lz,ry])=>fes.push(pane('pane-lampe',58,80,`translate3d(${lx}px,-470px,${lz}px) rotateY(${ry}deg)`)));
+  // le toit de claies au-dessus de la ruelle
+  fes.push(pane('pane-claie',2*F.HW+40,rl,`translate3d(0px,${F.HAUT}px,${rc}px) rotateX(-90deg)`));
+  // les tanneries de Chouara : la nappe de cuves, et de quoi fermer la vue
+  fes.push(pane('pane-cuves',1000,780,`translate3d(1000px,${F.SOL-4}px,${F.ZT}px) rotateX(90deg)`));
+  fes.push(pane('pane-chaux',1060,1020,`translate3d(1530px,-190px,${F.ZT}px) rotateY(-90deg)`));
+  fes.push(pane('pane-chaux',1120,1020,`translate3d(1000px,-190px,${F.ZT-520}px)`));
+  fes.push(pane('pane-chaux',1120,1020,`translate3d(1000px,-190px,${F.ZT+520}px)`));
+  fes.push(pane('pane-cedre',1120,1060,`translate3d(1000px,-700px,${F.ZT}px) rotateX(-90deg)`));
+
+  /* =============== le seuil : la façade =============== */
+  seuil.push(pane('pane-wall',1880,1500,`translate3d(-1270px,-220px,${V.FZ}px)`));
+  seuil.push(pane('pane-wall',1880,1500,`translate3d(1270px,-220px,${V.FZ}px)`));
+  seuil.push(pane('pane-wall',640,700,`translate3d(0px,-550px,${V.FZ}px)`));
+  seuil.push(pane('pane-sign',600,200,`translate3d(0px,-560px,${V.FZ+14}px)`,'<div><b>benka</b><i>MOCASSINS · FÈS → CASABLANCA</i></div>'));
+  seuil.push(pane('pane-glass',700,430,`translate3d(-1000px,-120px,${V.FZ+10}px)`));
+  seuil.push(pane('pane-glass',700,430,`translate3d(1000px,-120px,${V.FZ+10}px)`));
+  // plinthe de zellige : 125 de haut, sous les vitrines, pour ne rien couper
+  seuil.push(pane('pane-zellige fin bas',1880,125,`translate3d(-1270px,${V.FY-62}px,${V.FZ+6}px)`));
+  seuil.push(pane('pane-zellige fin bas',1880,125,`translate3d(1270px,${V.FY-62}px,${V.FZ+6}px)`));
+  seuil.push(pane('pane-jamb',140,520,`translate3d(-320px,60px,${V.FZ-70}px) rotateY(90deg)`));
+  seuil.push(pane('pane-jamb',140,520,`translate3d(320px,60px,${V.FZ-70}px) rotateY(-90deg)`));
+  seuil.push(pane('pane-jamb',640,140,`translate3d(0px,-200px,${V.FZ-70}px) rotateX(-90deg)`));
+
+  /* =============== l'allée =============== */
+  allee.push(pane('pane-floor',1500,4600,`translate3d(0px,${V.FY}px,-1900px) rotateX(90deg)`));
+  allee.push(pane('pane-tapis',520,3600,`translate3d(0px,${V.FY-3}px,-2600px) rotateX(90deg)`));
+  allee.push(pane('pane-ceil',PETIT?1400:2200,PETIT?3800:6400,`translate3d(0px,${V.CY}px,-2600px) rotateX(-90deg)`));
   let li=''; CATALOG.forEach((p,k)=>{li+=niche(p,420+k*900,420,430,200);});
-  o.push(pane('pane-wall',3400,H,`translate3d(${-V.HW}px,${CYm}px,-3000px) rotateY(90deg)`,li));
+  allee.push(pane('pane-wall',3400,H,`translate3d(${-V.HW}px,${CYm}px,-3000px) rotateY(90deg)`,li));
+  allee.push(pane('pane-zellige fin bas',3400,125,`translate3d(${-V.HW+6}px,${V.FY-62}px,-3000px) rotateY(90deg)`));
   let ri=''; [0,1].forEach(k=>{ri+=niche(CATALOG[k],300+k*620,400,430,200,false,CATALOG[k].colors[1]||CATALOG[k].colors[0]);});
-  o.push(pane('pane-wall',1500,H,`translate3d(${V.HW}px,${CYm}px,-2050px) rotateY(-90deg)`,ri));
-  o.push(pane('pane-wall',1040,H,`translate3d(0px,${CYm}px,${V.Z1}px)`));
-  o.push(pane('pane-strip',170,3000,`translate3d(0px,${V.CY+16}px,-2900px) rotateX(-90deg)`));
-  if(RICHE) for(let i=0;i<5;i++) o.push(pane('pane-beam',1040,46,`translate3d(0px,${V.CY+34}px,${-1500-i*680}px) rotateX(-90deg)`));
+  allee.push(pane('pane-wall',1500,H,`translate3d(${V.HW}px,${CYm}px,-2050px) rotateY(-90deg)`,ri));
+  allee.push(pane('pane-zellige fin bas',1500,125,`translate3d(${V.HW-6}px,${V.FY-62}px,-2050px) rotateY(-90deg)`));
+  allee.push(pane('pane-wall',1040,H,`translate3d(0px,${CYm}px,${V.Z1}px)`));
+  allee.push(pane('pane-strip',170,3000,`translate3d(0px,${V.CY+16}px,-2900px) rotateX(-90deg)`));
+  if(RICHE) for(let i=0;i<5;i++) allee.push(pane('pane-beam',1040,46,`translate3d(0px,${V.CY+34}px,${-1500-i*680}px) rotateX(-90deg)`));
   if(RICHE) [[-300,-2050],[300,-2850]].forEach(([px,pz],i)=>{
     const p=CATALOG[i===0?0:2];
-    o.push(pane('pane-podium',300,250,`translate3d(${px}px,${V.FY-125}px,${pz+150}px)`));
-    o.push(pane('pane-podtop',300,300,`translate3d(${px}px,${V.FY-250}px,${pz}px) rotateX(90deg)`));
-    o.push(pane('pane-prop',200,290,`translate3d(${px}px,${V.FY-395}px,${pz}px)`,visuel(p,p.colors[0],true)));
+    allee.push(pane('pane-podium',300,250,`translate3d(${px}px,${V.FY-125}px,${pz+150}px)`));
+    allee.push(pane('pane-podtop',300,300,`translate3d(${px}px,${V.FY-250}px,${pz}px) rotateX(90deg)`));
+    allee.push(pane('pane-prop',200,290,`translate3d(${px}px,${V.FY-395}px,${pz}px)`,visuel(p,p.colors[0],true)));
   });
-  /* ---- le grand showroom ---- */
+
+  /* =============== la grande salle =============== */
   const SH=V.FY-V.SCY, SZc=(V.SZ0+V.SZ1)/2, SL=V.SZ0-V.SZ1, SYm=(V.SCY+V.FY)/2;
-  const nb=PETIT?8:VITRINES.length, cols=PETIT?4:7, cw=PETIT?230:230, gap=30, ch=PETIT?360:420;
+  salle.push(pane('pane-floor',2800,3400,`translate3d(1400px,${V.FY}px,-4300px) rotateX(90deg)`));
+  salle.push(pane('pane-tapis',760,2600,`translate3d(1760px,${V.FY-3}px,-4300px) rotateX(90deg)`));
+  salle.push(pane('pane-ceil',PETIT?1900:2100,PETIT?2600:3000,`translate3d(1560px,${V.SCY}px,-4300px) rotateX(-90deg)`));
+  const nb=PETIT?8:VITRINES.length, cols=PETIT?4:7, cw=230, gap=30, ch=PETIT?360:420;
   const emprise=cols*cw+(cols-1)*gap, marge=(SL-emprise)/2;
   let mi='';
   for(let i=0;i<nb;i++){
     const [p,c]=VITRINES[i%VITRINES.length];
     mi+=niche(p,marge+(i%cols)*(cw+gap),cw,ch,i<cols?120:120+ch+45,true,c);
   }
-  o.push(pane('pane-wall',SL,SH,`translate3d(${V.SX}px,${SYm}px,${SZc}px) rotateY(-90deg)`,mi));
-  o.push(pane('pane-wall',2080,SH,`translate3d(1560px,${SYm}px,${V.SZ1-100}px)`));
-  o.push(pane('pane-strip',150,SL,`translate3d(${V.SX-110}px,${V.SCY+18}px,${SZc}px) rotateX(-90deg)`));
-  o.push(pane('pane-strip',150,SL,`translate3d(${V.SX0+180}px,${V.SCY+18}px,${SZc}px) rotateX(-90deg)`));
+  salle.push(pane('pane-wall',SL,SH,`translate3d(${V.SX}px,${SYm}px,${SZc}px) rotateY(-90deg)`,mi));
+  salle.push(pane('pane-zellige',SL,125,`translate3d(${V.SX-8}px,${V.FY-62}px,${SZc}px) rotateY(-90deg)`));
+  salle.push(pane('pane-wall',2080,SH,`translate3d(1560px,${SYm}px,${V.SZ1-100}px)`));
+  // Côté entrée : sans ce mur, le virage ouvrait sur le vide derrière la caméra.
+  // Le demi-tour est indispensable — un plan montre sa face avant vers +z, et
+  // backface-visibility:hidden le rend invisible quand on le regarde de dos.
+  salle.push(pane('pane-wall',2080,SH,`translate3d(1560px,${SYm}px,${V.SZ0}px) rotateY(180deg)`));
+  salle.push(pane('pane-zellige fin bas',2080,125,`translate3d(1560px,${V.FY-62}px,${V.SZ0-8}px) rotateY(180deg)`));
+  // et le retour du mur proche, qui ferme l'angle au fond
+  salle.push(pane('pane-wall',1100,SH,`translate3d(${V.SX0}px,${SYm}px,-5190px) rotateY(90deg)`));
+  salle.push(pane('pane-mouchara',440,640,`translate3d(1060px,-230px,${V.SZ1-88}px)`));
+  salle.push(pane('pane-mouchara',440,640,`translate3d(2060px,-230px,${V.SZ1-88}px)`));
+  salle.push(pane('pane-strip',150,SL,`translate3d(${V.SX-110}px,${V.SCY+18}px,${SZc}px) rotateX(-90deg)`));
+  salle.push(pane('pane-strip',150,SL,`translate3d(${V.SX0+180}px,${V.SCY+18}px,${SZc}px) rotateX(-90deg)`));
+  [-3500,-4300,-5100].forEach(lz=>salle.push(pane('pane-lampe',74,100,`translate3d(2340px,-640px,${lz}px) rotateY(-90deg)`)));
+  // claustras de cèdre sur le mur proche, et deux appliques au-dessus du banc
+  salle.push(pane('pane-mouchara',420,620,`translate3d(${V.SX0+8}px,-230px,-3700px) rotateY(90deg)`));
+  salle.push(pane('pane-mouchara',420,620,`translate3d(${V.SX0+8}px,-230px,-4900px) rotateY(90deg)`));
+  [-3900,-4700].forEach(lz=>salle.push(pane('pane-lampe',66,90,`translate3d(1700px,-690px,${lz}px)`)));
   // banc central, parallèle au mur
   if(RICHE){
-    o.push(pane('pane-podium',2200,150,`translate3d(1950px,${V.FY-75}px,-4300px) rotateY(-90deg)`));
-    o.push(pane('pane-podtop',300,2200,`translate3d(2100px,${V.FY-150}px,-4300px) rotateX(90deg)`));
+    salle.push(pane('pane-podium',2200,150,`translate3d(1950px,${V.FY-75}px,-4300px) rotateY(-90deg)`));
+    salle.push(pane('pane-podtop',300,2200,`translate3d(2100px,${V.FY-150}px,-4300px) rotateX(90deg)`));
     [[-3600,0],[-4150,1],[-4700,2],[-5200,0]].forEach(([pz,k])=>{
       const p=CATALOG[k];
-      o.push(pane('pane-prop',190,270,`translate3d(2100px,${V.FY-285}px,${pz}px) rotateY(-90deg)`,visuel(p,p.colors[0],true)));
+      salle.push(pane('pane-prop',190,270,`translate3d(2100px,${V.FY-285}px,${pz}px) rotateY(-90deg)`,visuel(p,p.colors[0],true)));
     });
   }
-  w.innerHTML=o.join('');
+
+  w.innerHTML=[['fes',fes],['seuil',seuil],['allee',allee],['salle',salle]]
+    .map(([n,a])=>`<div class="zone" data-z="${n}">${a.join('')}</div>`).join('');
 }
 
 function cr(a,b,c,d,t){const t2=t*t,t3=t2*t;
@@ -1793,10 +2058,24 @@ function initVisite(){
     });
     return;
   }
+  // Un quartier hors de portée est retiré du document : plus de calque, plus
+  // de mémoire. Le masque ne change qu'aux frontières — quelques écritures
+  // DOM sur toute la visite, rien par image.
+  const zel=ZONES.map(([nom])=>world.querySelector('.zone[data-z="'+nom+'"]'));
+  let masque=-1;
+  function majZones(p){
+    let m=0;
+    for(let i=0;i<ZONES.length;i++) if(p>=ZONES[i][1]&&p<=ZONES[i][2]) m|=1<<i;
+    if(m===masque)return;
+    masque=m;
+    for(let i=0;i<zel.length;i++) if(zel[i]) zel[i].style.display=(m>>i&1)?'':'none';
+  }
+  majZones(0);
   const cam=echantillon(0); let roll=0, prevYaw=cam.yaw, capPrec=-1, hintPrec=-1;
   avancer((dt,sy)=>{
     const p=borne((sy-GEO.vTop)/GEO.vSpan,0,1);
     const proche=sy>GEO.vTop-GEO.vh*1.4 && sy<GEO.vTop+GEO.vSpan+GEO.vh*0.6;
+    majZones(p);
     const c=echantillon(p);
     const k=1-Math.pow(.0012,dt);
     cam.x+=(c.x-cam.x)*k; cam.z+=(c.z-cam.z)*k; cam.yaw+=(c.yaw-cam.yaw)*k;
@@ -2006,6 +2285,18 @@ document.addEventListener('change',e=>{
   }catch(err){toast('Fichier de sauvegarde illisible');}};
   fr.readAsText(e.target.files[0]);e.target.value='';
 });
+/* menu de téléphone : ouverture, fermeture au choix d'une section,
+   à l'échappement, et dès qu'on clique ailleurs. */
+(function(){
+  const b=$('#menubtn'), m=$('#navmob'); if(!b||!m)return;
+  const poser=ouvert=>{m.hidden=!ouvert;b.setAttribute('aria-expanded',String(ouvert));
+    b.setAttribute('aria-label',ouvert?'Fermer le menu':'Ouvrir le menu');};
+  b.addEventListener('click',e=>{e.stopPropagation();poser(m.hidden);});
+  m.addEventListener('click',e=>{if(e.target.closest('a'))poser(false);});
+  document.addEventListener('click',e=>{if(!m.hidden&&!m.contains(e.target)&&e.target!==b)poser(false);});
+  addEventListener('keydown',e=>{if(e.key==='Escape'&&!m.hidden){poser(false);b.focus();}});
+  addEventListener('resize',()=>{if(innerWidth>860&&!m.hidden)poser(false);},{passive:true});
+})();
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&e.target.id==='pw'){e.preventDefault();document.querySelector('[data-act="login"]')?.click();return;}
   if(e.key==='Escape'&&S.panel){S.panel=null;S.manual=null;draw();}});
