@@ -44,4 +44,5 @@ printf '</body>\n</html>\n'
 } > index.html
 cp index.html public/index.html
 cp -f robots.txt sitemap.xml public/ 2>/dev/null || true
+rm -rf public/assets && cp -R assets public/assets 2>/dev/null || true
 echo "index.html + public/index.html générés ($(wc -c < index.html) octets) — canonique : $URL"
