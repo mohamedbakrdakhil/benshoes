@@ -7,7 +7,7 @@
 set -e
 cd "$(dirname "$0")"
 URL="${SITE_URL:-https://www.benkashoes.ma/}"
-DESC="Benkashoes — sandales à lit de liège et latex naturels, cuir pleine fleur tanné en Europe. Six modèles du 35 au 46, livraison 48 h, essai 30 jours, ressemelage garanti à vie."
+DESC="Benkashoes — mocassins-mules en daim et latex naturels, cuir pleine fleur tanné en Europe. Six modèles du 35 au 46, livraison 48 h, essai 30 jours, ressemelage garanti à vie."
 mkdir -p public
 {
 cat <<HEAD
@@ -16,13 +16,13 @@ cat <<HEAD
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Benkashoes — sandales à lit de liège</title>
+<title>Benkashoes — mocassins-mules en daim</title>
 <meta name="description" content="$DESC">
 <meta name="theme-color" content="#15181b">
 <link rel="canonical" href="$URL">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Benkashoes">
-<meta property="og:title" content="Benkashoes — sandales à lit de liège">
+<meta property="og:title" content="Benkashoes — mocassins-mules en daim">
 <meta property="og:description" content="$DESC">
 <meta property="og:url" content="$URL">
 <meta property="og:locale" content="fr_FR">
