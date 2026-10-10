@@ -115,7 +115,9 @@ img,svg{max-width:100%}
 
 /* bandeau défilant */
 .ticker{overflow:hidden}
-.marquee{display:flex;overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.marquee{display:flex;overflow:hidden;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
 .mq-track{display:flex;flex:0 0 auto;animation:marquee 34s linear infinite}
 .ticker:hover .mq-track{animation-play-state:paused}
 .mq-group{display:flex;flex:0 0 auto;gap:0}
@@ -214,7 +216,7 @@ img,svg{max-width:100%}
 .btn{display:inline-flex;align-items:center;gap:9px;height:46px;padding:0 22px;border-radius:var(--r);font-size:.84rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;text-decoration:none;border:1px solid transparent;transition:transform .12s ease}
 .btn:active{transform:translateY(1px)}
 .btn-pri{background:var(--accent);color:#fff}
-.btn-pri:hover{background:color-mix(in srgb,var(--accent) 86%,#fff)}
+.btn-pri:hover{background:var(--accent-2);background:color-mix(in srgb,var(--accent) 86%,#fff)}
 .btn-hero{background:#fff;color:#5a1009}
 .btn-hero:hover{background:var(--band-accent);color:#450c07}
 .btn-ghost{border-color:var(--band-line);color:var(--band-fg)}
@@ -402,7 +404,8 @@ html{scroll-behavior:smooth;scroll-padding-top:86px}
 
 /* ================= l'atelier : galerie horizontale au défilement ================= */
 .atelier{position:relative;height:440vh;background:var(--band-bg);color:var(--band-fg)}
-.at-stage{position:sticky;top:0;height:100svh;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
+.at-stage{position:sticky;top:0;height:100vh;height:100svh;min-height:420px;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:center}
 .at-intro{flex:0 0 auto;width:min(360px,74vw);display:flex;flex-direction:column;justify-content:center;
   padding-right:12px}
 .at-intro h2{font-size:clamp(1.7rem,3.6vw,2.7rem);color:var(--band-fg);margin-top:10px}
@@ -419,7 +422,7 @@ html{scroll-behavior:smooth;scroll-padding-top:86px}
 .at-bar{position:absolute;left:6vw;right:6vw;bottom:5vh;height:2px;background:rgba(240,185,166,.16);z-index:2}
 .at-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent-2),var(--band-accent))}
 @media(max-width:700px){
-  .atelier{height:380vh}
+  .atelier{height:240vh}
   .at-track{gap:16px}
   .at-ph{width:76vw}
   .at-intro{width:78vw}
@@ -440,7 +443,7 @@ html{scroll-behavior:smooth;scroll-padding-top:86px}
    défilement. Aucune bibliothèque. Sur demande de mouvement réduit, la
    section se replie en une simple bannière. */
 .visite{position:relative;height:640vh;background:#0c0604;isolation:isolate}
-.visite-stage{position:sticky;top:0;height:100svh;overflow:hidden;
+.visite-stage{position:sticky;top:0;height:100vh;height:100svh;min-height:420px;overflow:hidden;
   perspective:900px;perspective-origin:50% 47%;background:radial-gradient(120% 90% at 50% 55%,#1e0d08,#070403 70%)}
 .world{position:absolute;left:0;top:0;width:100%;height:100%;transform-style:preserve-3d;will-change:transform}
 .pane{position:absolute;left:50%;top:50%;transform-style:preserve-3d;backface-visibility:hidden}
@@ -514,7 +517,7 @@ html{scroll-behavior:smooth;scroll-padding-top:86px}
 .vskip{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:16px;pointer-events:auto;z-index:4;
   font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:#eaae97;
   border:1px solid rgba(240,185,166,.35);border-radius:3px;padding:9px 13px;background:rgba(10,4,7,.45);
-  backdrop-filter:blur(6px);transition:border-color .2s,color .2s}
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:border-color .2s,color .2s}
 .vskip:hover{color:#fff;border-color:#f0b9a6}
 .vhint{position:absolute;left:0;right:0;bottom:26px;text-align:center;color:#cc9a8a;z-index:2;
   font-size:.64rem;letter-spacing:.26em;text-transform:uppercase;transition:opacity .4s}
@@ -525,11 +528,22 @@ html{scroll-behavior:smooth;scroll-padding-top:86px}
   background:rgba(240,185,166,.16);z-index:4}
 .vprog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#b5301f,#f0b9a6)}
 @media(max-width:700px){
-  .visite{height:560vh}
+  .visite{height:300vh}
   .visite-stage{perspective:640px}
   .pane-sign b{font-size:38px}.pane-sign i{font-size:11px;letter-spacing:.3em;margin-top:10px}
   .niche b{font-size:11px}.niche span{font-size:9px}
 }
+html.degrade .visite,html.degrade .atelier{height:auto!important}
+html.degrade .visite-stage,html.degrade .at-stage{position:static;height:auto;min-height:0;padding-block:52px}
+html.degrade .world,html.degrade .vhint,html.degrade .vprog,html.degrade .vskip,html.degrade .at-bar{display:none}
+html.degrade .visite-ui{position:static;pointer-events:auto}
+html.degrade .visite-ui::after{display:none}
+html.degrade .vcap{position:static;opacity:1!important;padding-block:22px}
+html.degrade .at-track{flex-wrap:wrap;transform:none!important;gap:18px}
+html.degrade .at-ph{width:min(320px,100%)}
+html.degrade .at-img img{transform:none!important;width:100%}
+html.degrade [data-rv]{opacity:1!important;transform:none!important}
+
 @media(prefers-reduced-motion:reduce){
   .visite{height:auto}
   .visite-stage{position:static;height:auto;padding-block:64px;perspective:none}
@@ -540,7 +554,8 @@ html{scroll-behavior:smooth;scroll-padding-top:86px}
 }
 
 /* ---------- overlays ---------- */
-.scrim{position:fixed;inset:0;z-index:80;background:rgba(10,12,14,.5);backdrop-filter:blur(3px);animation:fade .18s ease}
+.scrim{position:fixed;inset:0;z-index:80;background:rgba(10,12,14,.5);
+  -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:fade .18s ease}
 @keyframes fade{from{opacity:0}}
 .panel{position:fixed;top:0;bottom:0;z-index:90;width:min(480px,100%);background:var(--bg);display:flex;flex-direction:column;box-shadow:0 0 70px rgba(0,0,0,.4)}
 .panel.right{right:0;border-left:1px solid var(--line);animation:inR .26s cubic-bezier(.2,.8,.25,1)}
@@ -575,7 +590,7 @@ html{scroll-behavior:smooth;scroll-padding-top:86px}
 .sizebtn small{position:absolute;bottom:4px;font-size:.56rem;font-weight:500;letter-spacing:.06em;color:var(--fg-soft)}
 .sizebtn:hover:not([disabled]){border-color:var(--fg)}
 .sizebtn[aria-pressed="true"]{background:var(--fg);border-color:var(--fg);color:var(--bg)}
-.sizebtn[aria-pressed="true"] small{color:color-mix(in srgb,var(--bg) 70%,transparent)}
+.sizebtn[aria-pressed="true"] small{color:var(--line);color:color-mix(in srgb,var(--bg) 70%,transparent)}
 .sizebtn[disabled]{color:var(--fg-soft);background:transparent;border-style:dashed;cursor:not-allowed;text-decoration:line-through}
 .spec{list-style:none;margin:22px 0 0;padding:0;border-top:1px solid var(--line);font-size:.88rem}
 .spec li{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid var(--line)}
@@ -1880,9 +1895,23 @@ document.addEventListener('keydown',e=>{
 addEventListener('hashchange',()=>{S.panel=null;draw();window.scrollTo(0,0);});
 
 /* ======================= démarrage ======================= */
-renderStatic();
-initMotion();initVisite();initAtelier();initNav();initCounters();initProgress();
-avancer(tacheRevelations);revelations();
+function degrader(raison){
+  document.documentElement.classList.add('degrade');
+  MOTEUR.taches.length=0;
+  document.querySelectorAll('[data-rv]').forEach(el=>{el.style.opacity='';el.style.transform='';});
+  console.warn('[benka] affichage simplifié :',raison);
+}
+try{
+  renderStatic();
+  initMotion();initVisite();initAtelier();initNav();initCounters();initProgress();
+  avancer(tacheRevelations);revelations();
+}catch(err){ degrader(err&&err.message||err); }
+// garde-fou : si les scènes n'ont pas de hauteur (unité svh refusée, 3D
+// indisponible), on replie plutôt que d'afficher une zone vide.
+addEventListener('load',()=>{
+  const st=$('.visite-stage');
+  if(st && st.getBoundingClientRect().height<260) degrader('scène sans hauteur');
+});
 mesurer();
 addEventListener('scroll',reveiller,{passive:true});
 addEventListener('resize',()=>{mesurer();reveiller();},{passive:true});
