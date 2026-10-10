@@ -85,6 +85,7 @@ img,svg{max-width:100%}
    d'animation n'est pas disponible. */
 @keyframes lineUp{from{transform:translateY(105%) rotate(2deg)}to{transform:translateY(0) rotate(0)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+@keyframes riseUp{from{transform:translateY(22px)}to{transform:none}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes artIn{from{opacity:0;transform:translateY(46px) scale(.9) rotate(-7deg)}to{opacity:1;transform:none}}
 @keyframes floatY{0%,100%{transform:translateY(0) rotate(-.6deg)}50%{transform:translateY(-16px) rotate(.6deg)}}
@@ -122,14 +123,8 @@ img,svg{max-width:100%}
   font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
 .mq-group span::before{content:"";width:5px;height:5px;background:var(--band-accent);border-radius:50%;flex:0 0 auto}
 
-/* révélations au défilement */
-@supports (animation-timeline: view()){
-  .rv{animation:fadeUp linear both;animation-timeline:view();animation-range:entry 2% cover 26%}
-  .grid .card{animation:fadeUp .01s linear both;animation-timeline:view();animation-range:entry 0% cover 22%}
-  .anat-item{animation:fadeUp linear both;animation-timeline:view();animation-range:entry 4% cover 30%}
-  .pledge{animation:fadeUp linear both;animation-timeline:view();animation-range:entry 4% cover 30%}
-  .sizetable tbody tr{animation:fadeIn linear both;animation-timeline:view();animation-range:entry 0% cover 16%}
-}
+/* révélations au défilement : pilotées en JS, jamais par le CSS seul.
+   Sans JavaScript, tout reste visible — rien ne peut rester bloqué. */
 
 /* survol des cartes */
 .card{overflow:hidden}
@@ -176,7 +171,7 @@ img,svg{max-width:100%}
 }
 
 /* ---------- header ---------- */
-.hdr{position:sticky;top:env(safe-area-inset-top,0px);z-index:60;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.hdr{position:sticky;top:env(safe-area-inset-top,0px);z-index:60;background:var(--bg);border-bottom:1px solid var(--line)}
 .hdr-in{display:flex;align-items:center;gap:18px;height:62px;min-width:0}
 .brand{display:flex;align-items:baseline;gap:7px;font-family:var(--fd);font-size:1.26rem;letter-spacing:-.03em}
 .brand i{display:block;width:7px;height:7px;background:var(--accent);border-radius:50%;transform:translateY(-3px)}
@@ -193,8 +188,8 @@ img,svg{max-width:100%}
 @media(max-width:360px){.logo{font-size:21px}}
 .pv{display:block;object-fit:contain}
 .card-art .pv,.sheet-art .pv,.cthumb .pv,.cmp .mdl .pv,.pane-prop .pv{height:100%;width:auto;max-width:100%}
-.niche .pv{height:72%;width:auto;filter:drop-shadow(0 16px 20px rgba(0,0,0,.65))}
-.n3 .nb .pv{height:68%;width:auto;filter:drop-shadow(0 20px 24px rgba(0,0,0,.72))}
+.niche .pv{height:72%;width:auto}
+.n3 .nb .pv{height:68%;width:auto}
 .nav{display:flex;gap:22px;margin-left:auto;font-size:.82rem;font-weight:500}
 .nav a{text-decoration:none;color:var(--fg-soft);padding:4px 0;border-bottom:1px solid transparent}
 .nav a:hover{color:var(--fg);border-color:var(--accent)}
@@ -451,8 +446,8 @@ html{scroll-behavior:smooth;scroll-padding-top:86px}
 .pane{position:absolute;left:50%;top:50%;transform-style:preserve-3d;backface-visibility:hidden}
 .pane-wall{background:linear-gradient(180deg,#3f2019,#251410 48%,#170b08);
   box-shadow:inset 0 0 140px rgba(0,0,0,.6)}
-.pane-strip{background:linear-gradient(90deg,rgba(240,185,166,.08),#fbe8e0 42%,#fbe8e0 58%,rgba(240,185,166,.08));
-  box-shadow:0 0 110px 34px rgba(240,185,166,.4)}
+.pane-strip{background:linear-gradient(90deg,rgba(240,185,166,.1),#fbe8e0 42%,#fbe8e0 58%,rgba(240,185,166,.1));
+  box-shadow:0 0 54px 16px rgba(240,185,166,.38)}
 .pane-floor{background:
   repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 2px,transparent 2px 190px),
   radial-gradient(60% 34% at 50% 44%,rgba(240,185,166,.16),transparent 70%),
@@ -471,11 +466,11 @@ html{scroll-behavior:smooth;scroll-padding-top:86px}
 .niche{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
   background:linear-gradient(180deg,#3c1c16,#1e0e0a);border:1px solid #5b2317;
   box-shadow:inset 0 22px 60px rgba(209,69,44,.3),0 0 50px rgba(0,0,0,.6);padding:16px 10px 14px}
-.niche svg{height:72%;width:auto;filter:drop-shadow(0 16px 20px rgba(0,0,0,.65))}
+.niche svg{height:72%;width:auto}
 .niche b{font-family:var(--fu);font-size:13px;font-weight:700;color:#fbf0ea;letter-spacing:.04em;margin-top:9px}
 .niche span{font-family:var(--fu);font-size:11px;color:#dfae9c;letter-spacing:.1em}
 .niche::before{content:"";position:absolute;top:0;left:12%;right:12%;height:4px;border-radius:3px;
-  background:#fbe8e0;box-shadow:0 0 34px 11px rgba(240,185,166,.75)}
+  background:#fbe8e0;box-shadow:0 0 18px 6px rgba(240,185,166,.7)}
 /* niche en volume : fond en retrait, deux joues, un plafond lumineux, un plancher */
 .n3{position:absolute;transform-style:preserve-3d;--d:112px}
 .n3.plate{--d:64px}
@@ -483,14 +478,14 @@ html{scroll-behavior:smooth;scroll-padding-top:86px}
 .n3 .nb{inset:0;display:flex;flex-direction:column;align-items:center;
   justify-content:flex-end;padding:16px 8px 13px;background:linear-gradient(180deg,#562619,#2a150f 70%,#1e0e0a);
   box-shadow:inset 0 26px 56px rgba(240,185,166,.3)}
-.n3 .nb svg{height:68%;width:auto;filter:drop-shadow(0 20px 24px rgba(0,0,0,.72))}
+.n3 .nb svg{height:68%;width:auto}
 .n3 .nb b{font-family:var(--fu);font-size:13px;font-weight:700;color:#fdf3ee;letter-spacing:.04em;margin-top:8px}
 .n3 .nb span{font-family:var(--fu);font-size:11px;color:#e4b0a0;letter-spacing:.1em}
 .n3 .ns{top:0;height:100%;width:var(--d);background:linear-gradient(90deg,#6d3020,#311a12)}
 .n3 .nl{left:0;transform-origin:left center;transform:rotateY(-90deg)}
 .n3 .nr{right:0;transform-origin:right center;transform:rotateY(90deg)}
 .n3 .nt{left:0;top:0;width:100%;height:var(--d);transform-origin:top center;transform:rotateX(90deg);
-  background:linear-gradient(180deg,#f0b9a6,#fff3ee);box-shadow:0 0 46px 18px rgba(240,185,166,.55)}
+  background:linear-gradient(180deg,#f0b9a6,#fff3ee);box-shadow:0 0 22px 7px rgba(240,185,166,.5)}
 .n3 .nf{left:0;bottom:0;width:100%;height:var(--d);transform-origin:bottom center;transform:rotateX(-90deg);
   background:linear-gradient(180deg,#1c0d09,#3c1c16)}
 .spill{position:absolute;pointer-events:none;
@@ -500,7 +495,7 @@ html{scroll-behavior:smooth;scroll-padding-top:86px}
 .pane-podium{background:linear-gradient(180deg,#4d2217,#2b1510);box-shadow:inset 0 0 60px rgba(0,0,0,.6)}
 .pane-podtop{background:linear-gradient(180deg,#602f20,#3c1d15)}
 .pane-prop{display:grid;place-items:end center}
-.pane-prop svg{height:100%;width:auto;filter:drop-shadow(0 14px 18px rgba(0,0,0,.6))}
+.pane-prop svg{height:100%;width:auto}
 .pool{position:absolute;border-radius:50%;filter:blur(26px);
   background:radial-gradient(closest-side,rgba(240,185,166,.4),transparent)}
 
@@ -735,10 +730,10 @@ label.f.bad input{border-color:var(--bad)}
         <p>À gauche l’Opus et ses huit cuirs, à droite le Stepy et le Western. Tous montés sur forme, tous sur la même première en liège.</p></div>
       <div class="vcap" data-a=".56" data-b=".72"><span class="k">04 — Au fond, à droite</span>
         <h3>Tournez vers le showroom.</h3>
-        <p>L’allée s’ouvre sur la salle où toute la collection est présentée ensemble, sous ses rampes de lumière.</p></div>
+        <p>L’allée débouche sur la grande salle : plafond rehaussé, deux corniches lumineuses, et le mur de présentation sur toute sa longueur.</p></div>
       <div class="vcap" data-a=".72" data-b="1.01"><span class="k">05 — Le mur de la collection</span>
-        <h3>Toute la collection,<br>d’un seul regard.</h3>
-        <p>De 259 à 359 DH, du 37 au 41. Choisissez la vôtre.</p>
+        <h3>Quatorze cuirs,<br>un seul mur.</h3>
+        <p>Chaque modèle dans chacun de ses coloris, sur deux rangées. De 259 à 359 DH, du 37 au 41.</p>
         <a class="btn btn-hero" href="#modeles" data-act="skipvisite">Voir la collection</a></div>
       <div class="vhint" id="vhint">Faites défiler pour entrer<i></i></div>
     </div>
@@ -898,10 +893,10 @@ const SHOP={
 const BRAND={logo:'',logoClair:''};
 const PHOTOS={/* 'opus':{_:'assets/produits/opus.jpg', noir:'assets/produits/opus-noir.jpg'} */};
 function photoDe(id,c){const e=PHOTOS[id];return (e&&(e[c]||e._))||'';}
-function visuel(p,c){
+function visuel(p,c,lite){
   const src=photoDe(p.id,c);
   if(src) return `<img class="pv" src="${src}" alt="${p.name} — ${(COLORS[c]||{}).n||''}" loading="lazy" decoding="async">`;
-  return sandal(p.style,c,p.platform);
+  return sandal(p.style,c,p.platform,lite);
 }
 // Le logo benka, redessiné : mot rond et gras, empreinte de pied en appui.
 // Si un vrai fichier est fourni dans BRAND.logo, il prend le dessus.
@@ -1018,23 +1013,19 @@ function strapOf(st,u,col){
     +`<path d="M54 142H146M54 172H146" stroke="rgba(255,255,255,.24)" stroke-width="1" stroke-dasharray="4 4"/>`
     +`<path d="M58 136v42M142 136v42" stroke="rgba(0,0,0,.28)" stroke-width="1"/>`;
 }
-function mule(st,colorKey,u){
+function mule(st,colorKey,u,lite){
   const col=COLORS[colorKey]||COLORS.noir;
   // tige : contour avant du chausson, évidé de l'ouverture où entre le pied
   const TIGE="M58 292C50 244 32 172 34 118C38 58 66 22 100 22C134 22 162 58 166 118"
     +"C168 172 150 244 142 292C120 304 80 304 58 292Z"
     +"M100 72C127 72 137 102 135 150C133 212 123 266 100 270C77 266 67 212 65 150C63 102 73 72 100 72Z";
-  return `<g>`
-    // doublure visible dans l'ouverture
-    +`<path d="M100 76C125 76 134 104 132 150C130 208 121 262 100 266C79 262 70 208 68 150C66 104 75 76 100 76Z" fill="url(#d${u})"/>`
-    +`<path d="${TIGE}" fill="url(#l${u})" fill-rule="evenodd" stroke="rgba(0,0,0,.35)" stroke-width="1.2"/>`
-    // surpiqûre du pourtour et de l'ouverture
-    +`<path d="M62 286C54 240 38 170 40 120C44 64 70 29 100 29C130 29 156 64 160 120C162 170 146 240 138 286" fill="none" stroke="rgba(255,255,255,.26)" stroke-width="1" stroke-dasharray="5 5"/>`
-    +`<path d="M100 79C123 79 131 105 129 150C127 206 119 259 100 263C81 259 73 206 71 150C69 105 77 79 100 79Z" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1" stroke-dasharray="4 4"/>`
-    +strapOf(st,u,col)
-    +`</g>`;
+  let s=`<g><path d="M100 76C125 76 134 104 132 150C130 208 121 262 100 266C79 262 70 208 68 150C66 104 75 76 100 76Z" fill="url(#d${u})"/>`
+    +`<path d="${TIGE}" fill="url(#l${u})" fill-rule="evenodd" stroke="rgba(0,0,0,.35)" stroke-width="1.2"/>`;
+  if(!lite) s+=`<path d="M62 286C54 240 38 170 40 120C44 64 70 29 100 29C130 29 156 64 160 120C162 170 146 240 138 286" fill="none" stroke="rgba(255,255,255,.26)" stroke-width="1" stroke-dasharray="5 5"/>`
+    +`<path d="M100 79C123 79 131 105 129 150C127 206 119 259 100 263C81 259 73 206 71 150C69 105 77 79 100 79Z" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1" stroke-dasharray="4 4"/>`;
+  return s+strapOf(st,u,col)+`</g>`;
 }
-function sandal(st,colorKey,platform){
+function sandal(st,colorKey,platform,lite){
   const u=++_uid, col=COLORS[colorKey]||COLORS.noir;
   const lift=platform?14:9;
   let s=`<svg viewBox="-6 0 212 478" role="img" aria-label="Mocassin Benkashoes, ${col.n}"><defs>`
@@ -1048,13 +1039,14 @@ function sandal(st,colorKey,platform){
   for(let i=2;i>=1;i--) s+=`<path d="${SOLE}" transform="translate(${(-3.4*i/2).toFixed(2)},${(lift*i/2-2.6*i/2).toFixed(2)}) scale(${(1+.034*i/2).toFixed(3)})" fill="url(#k${u})" stroke="rgba(40,26,8,.34)" stroke-width=".7"/>`;
   // première de propreté en liège, visible derrière la tige
   s+=`<path d="${SOLE}" fill="url(#b${u})"/><g clip-path="url(#sc${u})">`;
-  [.86,.7,.54,.38].forEach(k=>{s+=`<path d="${SOLE}" transform="translate(100,222) scale(${k}) translate(-100,-222)" fill="none" stroke="rgba(92,62,24,.14)" stroke-width="1"/>`;});
-  s+=`<path d="M58 316Q100 294 142 316Q147 382 100 398Q53 382 58 316Z" fill="rgba(70,46,16,.12)"/>`
-   // estampe benka sur le liège
-   +`<g transform="translate(100,344)" opacity=".5"><text text-anchor="middle" font-family="Archivo, sans-serif" font-weight="700" font-size="21" fill="#4a3312" letter-spacing="-.5">benka</text>`
-   +`<g fill="#4a3312"><ellipse cx="36" cy="-14" rx="4.6" ry="6"/><circle cx="42" cy="-22" r="2"/><circle cx="46.5" cy="-26.5" r="1.6"/><circle cx="50" cy="-30.5" r="1.2"/></g></g></g>`
+  if(!lite){
+    [.86,.7,.54,.38].forEach(k=>{s+=`<path d="${SOLE}" transform="translate(100,222) scale(${k}) translate(-100,-222)" fill="none" stroke="rgba(92,62,24,.14)" stroke-width="1"/>`;});
+    s+=`<g transform="translate(100,344)" opacity=".5"><text text-anchor="middle" font-family="Archivo, sans-serif" font-weight="700" font-size="21" fill="#4a3312" letter-spacing="-.5">benka</text>`
+      +`<g fill="#4a3312"><ellipse cx="36" cy="-14" rx="4.6" ry="6"/><circle cx="42" cy="-22" r="2"/><circle cx="46.5" cy="-26.5" r="1.6"/><circle cx="50" cy="-30.5" r="1.2"/></g></g>`;
+  }
+  s+=`<path d="M58 316Q100 294 142 316Q147 382 100 398Q53 382 58 316Z" fill="rgba(70,46,16,.12)"/></g>`
    +`<path d="${SOLE}" fill="none" stroke="rgba(62,42,16,.32)" stroke-width="1.2"/>`
-   +mule(st,colorKey,u)+`</svg>`;
+   +mule(st,colorKey,u,lite)+`</svg>`;
   return s;
 }
 function anatomySVG(){
@@ -1466,10 +1458,13 @@ function initMotion(){
     glow.style.setProperty('--mx',((e.clientX-r.left)/r.width*100).toFixed(1)+'%');
     glow.style.setProperty('--my',((e.clientY-r.top)/r.height*100).toFixed(1)+'%');
   },{passive:true});
-  // parallaxe des courbes topographiques
-  const topo=$('#herotopo');let raf=0;
-  if(topo)addEventListener('scroll',()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;
-    const y=Math.min(scrollY,900);topo.style.transform=`translate3d(0,${(y*.22).toFixed(1)}px,0) scale(${(1+y*.00022).toFixed(4)})`;});},{passive:true});
+  // parallaxe des courbes topographiques, servie par la boucle unique
+  const topo=$('#herotopo');
+  if(topo){let yPrec=-1;
+    avancer((dt,sy)=>{const y=Math.min(sy,900);
+      if(Math.abs(y-yPrec)>.5){yPrec=y;
+        topo.style.transform=`translate3d(0,${(y*.22).toFixed(1)}px,0) scale(${(1+y*.00022).toFixed(4)})`;}
+      return sy<1400;});}
   // boutons magnétiques
   document.addEventListener('pointermove',e=>{
     const b=e.target.closest('.btn-pri,.btn-hero,.cartbtn');
@@ -1479,12 +1474,7 @@ function initMotion(){
     b.style.transform=`translate(${((e.clientX-r.left-r.width/2)*.14).toFixed(1)}px,${((e.clientY-r.top-r.height/2)*.22).toFixed(1)}px)`;
   },{passive:true});
   document.addEventListener('pointerleave',()=>document.querySelectorAll('[data-mag]').forEach(x=>{x.style.transform='';x.removeAttribute('data-mag')}),true);
-  // repli : si le navigateur ignore animation-timeline, on révèle à l'ancienne
-  if(!(CSS.supports&&CSS.supports('animation-timeline','view'))&&'IntersectionObserver' in window){
-    const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){
-      en.target.style.animation='fadeUp .7s cubic-bezier(.16,1,.3,1) both';io.unobserve(en.target);}}),{rootMargin:'0px 0px -8%'});
-    document.querySelectorAll('.rv,.anat-item,.pledge').forEach(el=>io.observe(el));
-  }
+
 }
 function initNav(){
   const nav=$('#nav'),ink=$('#navink'); if(!nav||!ink)return;
@@ -1526,153 +1516,209 @@ function initProgress(){
     bar.style.transform='scaleX('+(max>0?Math.min(1,scrollY/max):0).toFixed(4)+')';};
   addEventListener('scroll',()=>{if(!raf)raf=requestAnimationFrame(up);},{passive:true});up();
 }
+// Révélations : confiées au moteur, pas à un observateur. La position de
+// chaque élément est mesurée une fois ; dès que le défilement la dépasse,
+// l'élément s'anime. Rien ne peut rester masqué, et sans JavaScript tout
+// est visible d'emblée.
+let RV=[];
+function revelations(){
+  if(!MOTION)return;
+  document.querySelectorAll('.rv,.anat-item,.pledge,.grid .card').forEach(el=>{
+    if(el.dataset.rv)return;
+    el.dataset.rv='1'; el.style.transform='translateY(22px)'; RV.push(el);
+  });
+  mesurerRV(); reveiller();
+}
+function mesurerRV(){
+  const sy=scrollY;
+  for(const el of RV) el._y=el.getBoundingClientRect().top+sy;
+}
+function tacheRevelations(dt,sy){
+  if(!RV.length)return false;
+  const limite=sy+GEO.vh*0.92;
+  for(let i=RV.length-1;i>=0;i--){
+    const el=RV[i];
+    if(el._y<limite){
+      // la révélation ne joue que sur la position, jamais sur l'opacité :
+      // même si l'animation ne tourne pas, le contenu reste lisible.
+      el.style.transform='';
+      el.style.animation='riseUp .65s cubic-bezier(.16,1,.3,1)';
+      el.addEventListener('animationend',()=>{el.style.animation='';},{once:true});
+      RV.splice(i,1);
+    }
+  }
+  return RV.length>0;
+}
 function bumpCart(){const b=$('#cartbtn');if(!b||!MOTION)return;b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump');}
 
-/* ======================= la visite en 3D =======================
-   Caméra continue : la position de défilement donne une cible, et un
-   amortissement exponentiel l'y amène image par image. Le chemin passe
-   par une spline de Catmull-Rom, donc aucune cassure aux points clés.
-   L'inclinaison naît de la vitesse de rotation, comme une caméra à
-   l'épaule qui prend un virage. */
-const VIS={HW:520,FY:330,CY:-520,FZ:-1100,Z1:-4700,SX:1900,SZ0:-3100,SZ1:-4800};
-const CAM=[[0,0,420,0],[.16,0,-820,0],[.34,0,-1700,0],[.56,0,-2950,0],
-           [.70,180,-3600,72],[.86,470,-3915,84],[1,700,-3950,88]];
+/* ======================= moteur d'animation =======================
+   Une seule boucle pour toute la page. La géométrie est mesurée une fois
+   et remesurée au redimensionnement : plus aucune lecture forcée du
+   rendu pendant l'animation, qui est la première cause de saccade. */
+const MOTEUR={taches:[],actif:false,t:0};
+const GEO={};
+function mesurer(){
+  GEO.vw=innerWidth; GEO.vh=innerHeight;
+  if(typeof RV!=='undefined'&&RV.length)mesurerRV();
+  const v=$('#visite'); if(v){GEO.vTop=v.offsetTop; GEO.vSpan=Math.max(1,v.offsetHeight-GEO.vh);}
+  const a=$('#atelier'),t=$('#attrack');
+  if(a){GEO.aTop=a.offsetTop; GEO.aSpan=Math.max(1,a.offsetHeight-GEO.vh);}
+  if(t){GEO.tW=t.scrollWidth;
+    GEO.figs=[...t.children].map(el=>({im:el.querySelector('img'),x:el.offsetLeft,w:el.offsetWidth}))
+      .filter(o=>o.im);}
+}
+function avancer(fn){MOTEUR.taches.push(fn);}
+function tourner(ts){
+  const dt=Math.min(.05,(ts-MOTEUR.t)/1000||.016); MOTEUR.t=ts;
+  let encore=false;
+  for(let i=0;i<MOTEUR.taches.length;i++) if(MOTEUR.taches[i](dt,scrollY)) encore=true;
+  if(encore&&!document.hidden) requestAnimationFrame(tourner); else MOTEUR.actif=false;
+}
+function reveiller(){
+  if(MOTEUR.actif||document.hidden||!MOTEUR.taches.length)return;
+  MOTEUR.actif=true; MOTEUR.t=performance.now(); requestAnimationFrame(tourner);
+}
+const borne=(v,a,b)=>v<a?a:v>b?b:v;
+
+/* ======================= la boutique en 3D =======================
+   Allée, puis grand showroom : mur de présentation de 2 800 px sur deux
+   rangées, banc central, plafond rehaussé, corniche lumineuse. */
+const VIS={HW:520,FY:320,CY:-520,FZ:-1100,Z1:-4700,
+           SX:2600,SZ0:-2900,SZ1:-5700,SCY:-820,SX0:520};
+const CAM=[[0,0,420,0],[.13,0,-820,0],[.28,0,-1750,0],[.44,0,-2550,0],
+           [.56,260,-2950,62],[.68,1150,-3550,88],[.84,1190,-3950,90],[1,1210,-4300,90]];
 const PETIT=innerWidth<700, RICHE=!PETIT;
-const PAIRES=CATALOG.flatMap(p=>[[p,p.colors[0]],[p,p.colors[1]||p.colors[0]]]);
-if(PETIT){CAM[5]=[.86,560,-3900,86];CAM[6]=[1,760,-3950,90];}
+// toutes les combinaisons modèle × cuir, pour garnir le grand mur
+const VITRINES=CATALOG.flatMap(p=>p.colors.map(c=>[p,c]));
 
 function pane(cls,w,ht,tf,inner){
   return `<div class="pane ${cls}" style="width:${w}px;height:${ht}px;margin-left:${-w/2}px;margin-top:${-ht/2}px;transform:${tf}">${inner||''}</div>`;}
 function niche(p,left,w,ht,top,plate,col){
-  const corps=`${visuel(p,col||p.colors[0])}<b>${p.name}</b><span>${fmt(priceOf(p))}</span>`;
+  const corps=`${visuel(p,col||p.colors[0],true)}<b>${p.name}</b><span>${(COLORS[col||p.colors[0]]||{}).n||''}</span>`;
   if(!RICHE) return `<div class="niche" style="left:${left}px;top:${top}px;width:${w}px;height:${ht}px">${corps}</div>`;
   return `<div class="n3${plate?' plate':''}" style="left:${left}px;top:${top}px;width:${w}px;height:${ht}px">
       <div class="nb">${corps}</div><div class="ns nl"></div><div class="ns nr"></div>
-      <div class="nt"></div><div class="nf"></div></div>
-    <div class="spill" style="left:${left}px;top:${top+ht}px;width:${w}px;height:170px"></div>`;}
+      <div class="nt"></div><div class="nf"></div></div>`;}
 
 function buildWorld(){
   const w=$('#world'); if(!w)return;
   const V=VIS,H=850,CYm=(V.CY+V.FY)/2,o=[];
-  o.push(pane('pane-floor',4200,6400,`translate3d(200px,${V.FY}px,-2600px) rotateX(90deg)`));
-  o.push(pane('pane-ceil',4200,6400,`translate3d(200px,${V.CY}px,-2600px) rotateX(-90deg)`));
-  // façade et encadrement de porte en épaisseur
+  // sol et plafonds
+  o.push(pane('pane-floor',5600,7200,`translate3d(700px,${V.FY}px,-2800px) rotateX(90deg)`));
+  o.push(pane('pane-ceil',2200,6400,`translate3d(0px,${V.CY}px,-2600px) rotateX(-90deg)`));
+  o.push(pane('pane-ceil',2100,3000,`translate3d(1560px,${V.SCY}px,-4300px) rotateX(-90deg)`));
+  // façade
   o.push(pane('pane-wall',1880,1500,`translate3d(-1270px,-220px,${V.FZ}px)`));
   o.push(pane('pane-wall',1880,1500,`translate3d(1270px,-220px,${V.FZ}px)`));
   o.push(pane('pane-wall',640,700,`translate3d(0px,-550px,${V.FZ}px)`));
-  o.push(pane('pane-sign',600,200,`translate3d(0px,-560px,${V.FZ+14}px)`,'<div><b>BENKASHOES</b><i>LIÈGE &amp; CUIR</i></div>'));
+  o.push(pane('pane-sign',600,200,`translate3d(0px,-560px,${V.FZ+14}px)`,'<div><b>benka</b><i>MOCASSINS · CASABLANCA</i></div>'));
   o.push(pane('pane-glass',700,430,`translate3d(-1000px,-120px,${V.FZ+10}px)`));
   o.push(pane('pane-glass',700,430,`translate3d(1000px,-120px,${V.FZ+10}px)`));
-  o.push(pane('pane-jamb',140,530,`translate3d(-320px,65px,${V.FZ-70}px) rotateY(90deg)`));
-  o.push(pane('pane-jamb',140,530,`translate3d(320px,65px,${V.FZ-70}px) rotateY(-90deg)`));
+  o.push(pane('pane-jamb',140,520,`translate3d(-320px,60px,${V.FZ-70}px) rotateY(90deg)`));
+  o.push(pane('pane-jamb',140,520,`translate3d(320px,60px,${V.FZ-70}px) rotateY(-90deg)`));
   o.push(pane('pane-jamb',640,140,`translate3d(0px,-200px,${V.FZ-70}px) rotateX(-90deg)`));
-  // murs de l'allée et leurs niches
-  let li=''; [0,1,2].forEach(k=>{li+=niche(CATALOG[k%CATALOG.length],420+k*900,420,430,200);});
+  // allée : trois niches à gauche, deux à droite, le mur droit s'arrête à l'entrée du showroom
+  let li=''; CATALOG.forEach((p,k)=>{li+=niche(p,420+k*900,420,430,200);});
   o.push(pane('pane-wall',3400,H,`translate3d(${-V.HW}px,${CYm}px,-3000px) rotateY(90deg)`,li));
-  let ri=''; [0,1].forEach(k=>{ri+=niche(CATALOG[k],320+k*900,420,430,200,false,CATALOG[k].colors[1]||CATALOG[k].colors[0]);});
-  o.push(pane('pane-wall',2000,H,`translate3d(${V.HW}px,${CYm}px,-2300px) rotateY(-90deg)`,ri));
+  let ri=''; [0,1].forEach(k=>{ri+=niche(CATALOG[k],300+k*620,400,430,200,false,CATALOG[k].colors[1]||CATALOG[k].colors[0]);});
+  o.push(pane('pane-wall',1500,H,`translate3d(${V.HW}px,${CYm}px,-2050px) rotateY(-90deg)`,ri));
   o.push(pane('pane-wall',1040,H,`translate3d(0px,${CYm}px,${V.Z1}px)`));
-  // rampes lumineuses et poutres
-  o.push(pane('pane-strip',170,3200,`translate3d(0px,${V.CY+16}px,-2900px) rotateX(-90deg)`));
-  o.push(pane('pane-strip',1100,170,`translate3d(1210px,${V.CY+16}px,-3950px) rotateX(-90deg)`));
+  o.push(pane('pane-strip',170,3000,`translate3d(0px,${V.CY+16}px,-2900px) rotateX(-90deg)`));
   if(RICHE) for(let i=0;i<5;i++) o.push(pane('pane-beam',1040,46,`translate3d(0px,${V.CY+34}px,${-1500-i*680}px) rotateX(-90deg)`));
-  // podiums au milieu de l'allée
   if(RICHE) [[-300,-2050],[300,-2850]].forEach(([px,pz],i)=>{
     const p=CATALOG[i===0?0:2];
     o.push(pane('pane-podium',300,250,`translate3d(${px}px,${V.FY-125}px,${pz+150}px)`));
     o.push(pane('pane-podtop',300,300,`translate3d(${px}px,${V.FY-250}px,${pz}px) rotateX(90deg)`));
-    o.push(pane('pane-prop',210,300,`translate3d(${px}px,${V.FY-400}px,${pz}px)`,visuel(p,p.colors[0])));
+    o.push(pane('pane-prop',200,290,`translate3d(${px}px,${V.FY-395}px,${pz}px)`,visuel(p,p.colors[0],true)));
   });
-  // showroom
+  /* ---- le grand showroom ---- */
+  const SH=V.FY-V.SCY, SZc=(V.SZ0+V.SZ1)/2, SL=V.SZ0-V.SZ1, SYm=(V.SCY+V.FY)/2;
+  const nb=PETIT?8:VITRINES.length, cols=PETIT?4:7, cw=PETIT?230:230, gap=30, ch=PETIT?360:420;
+  const emprise=cols*cw+(cols-1)*gap, marge=(SL-emprise)/2;
   let mi='';
-  if(PETIT) PAIRES.forEach(([p,c],i)=>{mi+=niche(p,450+(i%3)*280,240,340,i<3?70:440,false,c);});
-  else PAIRES.forEach(([p,c],i)=>{mi+=niche(p,175+i*232,200,420,210,true,c);});
-  o.push(pane('pane-wall',V.SZ0-V.SZ1,H,`translate3d(${V.SX}px,${CYm}px,${(V.SZ0+V.SZ1)/2}px) rotateY(-90deg)`,mi));
-  o.push(pane('pane-wall',1380,H,`translate3d(1210px,${CYm}px,${V.SZ1}px)`));
-  o.push(pane('pane-wall',1380,H,`translate3d(1210px,${CYm}px,${V.SZ0}px) rotateY(180deg)`));
+  for(let i=0;i<nb;i++){
+    const [p,c]=VITRINES[i%VITRINES.length];
+    mi+=niche(p,marge+(i%cols)*(cw+gap),cw,ch,i<cols?120:120+ch+45,true,c);
+  }
+  o.push(pane('pane-wall',SL,SH,`translate3d(${V.SX}px,${SYm}px,${SZc}px) rotateY(-90deg)`,mi));
+  o.push(pane('pane-wall',2080,SH,`translate3d(1560px,${SYm}px,${V.SZ1-100}px)`));
+  o.push(pane('pane-strip',150,SL,`translate3d(${V.SX-110}px,${V.SCY+18}px,${SZc}px) rotateX(-90deg)`));
+  o.push(pane('pane-strip',150,SL,`translate3d(${V.SX0+180}px,${V.SCY+18}px,${SZc}px) rotateX(-90deg)`));
+  // banc central, parallèle au mur
+  if(RICHE){
+    o.push(pane('pane-podium',2200,150,`translate3d(1950px,${V.FY-75}px,-4300px) rotateY(-90deg)`));
+    o.push(pane('pane-podtop',300,2200,`translate3d(2100px,${V.FY-150}px,-4300px) rotateX(90deg)`));
+    [[-3600,0],[-4150,1],[-4700,2],[-5200,0]].forEach(([pz,k])=>{
+      const p=CATALOG[k];
+      o.push(pane('pane-prop',190,270,`translate3d(2100px,${V.FY-285}px,${pz}px) rotateY(-90deg)`,visuel(p,p.colors[0],true)));
+    });
+  }
   w.innerHTML=o.join('');
 }
 
-// spline de Catmull-Rom, un canal à la fois
 function cr(a,b,c,d,t){const t2=t*t,t3=t2*t;
   return .5*((2*b)+(-a+c)*t+(2*a-5*b+4*c-d)*t2+(-a+3*b-3*c+d)*t3);}
 function echantillon(p){
   let i=0; while(i<CAM.length-2&&p>CAM[i+1][0])i++;
-  const A=CAM[i],B=CAM[i+1];
-  const P=CAM[Math.max(0,i-1)],N=CAM[Math.min(CAM.length-1,i+2)];
-  const t=Math.min(1,Math.max(0,(p-A[0])/((B[0]-A[0])||1)));
+  const A=CAM[i],B=CAM[i+1],P=CAM[Math.max(0,i-1)],N=CAM[Math.min(CAM.length-1,i+2)];
+  const t=borne((p-A[0])/((B[0]-A[0])||1),0,1);
   return {x:cr(P[1],A[1],B[1],N[1],t), z:cr(P[2],A[2],B[2],N[2],t), yaw:cr(P[3],A[3],B[3],N[3],t)};
 }
 function initVisite(){
   const sec=$('#visite'),world=$('#world'); if(!sec||!world)return;
   buildWorld();
   if(!MOTION)return;
-  const caps=[...sec.querySelectorAll('.vcap')].map(el=>({el,a:+el.dataset.a,b:+el.dataset.b,on:null}));
+  const caps=[...sec.querySelectorAll('.vcap')].map(el=>({el,a:+el.dataset.a,b:+el.dataset.b}));
   const bar=$('#vprogbar'),hint=$('#vhint');
-  const cam=echantillon(0); let roll=0, dyaw=0, prevYaw=cam.yaw, tPrec=0, actif=false, capPrec=-1;
-  const prog=()=>{const r=sec.getBoundingClientRect(),span=sec.offsetHeight-innerHeight;
-    return {p:span>0?Math.min(1,Math.max(0,-r.top/span)):0, proche:r.top<innerHeight*1.6&&r.bottom>-innerHeight*0.6};};
-  function image(ts){
-    const dt=Math.min(.05,(ts-tPrec)/1000||.016); tPrec=ts;
-    const {p,proche}=prog();
-    const cible=echantillon(p);
-    // amortissement exponentiel : indépendant du nombre d'images par seconde
+  const cam=echantillon(0); let roll=0, prevYaw=cam.yaw, capPrec=-1, hintPrec=-1;
+  avancer((dt,sy)=>{
+    const p=borne((sy-GEO.vTop)/GEO.vSpan,0,1);
+    const proche=sy>GEO.vTop-GEO.vh*1.4 && sy<GEO.vTop+GEO.vSpan+GEO.vh*0.6;
+    const c=echantillon(p);
     const k=1-Math.pow(.0012,dt);
-    cam.x+=(cible.x-cam.x)*k; cam.z+=(cible.z-cam.z)*k; cam.yaw+=(cible.yaw-cam.yaw)*k;
-    dyaw=cam.yaw-prevYaw; prevYaw=cam.yaw;
-    roll+=(Math.max(-6,Math.min(6,-dyaw*2.6))-roll)*Math.min(1,dt*7);
+    cam.x+=(c.x-cam.x)*k; cam.z+=(c.z-cam.z)*k; cam.yaw+=(c.yaw-cam.yaw)*k;
+    const d=cam.yaw-prevYaw; prevYaw=cam.yaw;
+    roll+=(borne(-d*2.6,-6,6)-roll)*Math.min(1,dt*7);
     const bob=Math.sin(p*46)*7;
     world.style.transform=`rotateZ(${roll.toFixed(2)}deg) rotateY(${cam.yaw.toFixed(2)}deg) `
       +`translate3d(${(-cam.x).toFixed(1)}px,${(-bob).toFixed(1)}px,${(-cam.z).toFixed(1)}px)`;
-    let vu=-1; caps.forEach((c,i)=>{if(p>=c.a&&p<c.b)vu=i;});
-    if(vu!==capPrec){capPrec=vu;caps.forEach((c,i)=>{c.el.style.opacity=i===vu?'1':'0';});}
+    let vu=-1; for(let i=0;i<caps.length;i++) if(p>=caps[i].a&&p<caps[i].b) vu=i;
+    if(vu!==capPrec){capPrec=vu; for(let i=0;i<caps.length;i++) caps[i].el.style.opacity=i===vu?'1':'0';}
     if(bar)bar.style.width=(p*100).toFixed(1)+'%';
-    if(hint){hint.style.opacity=p>.03?'0':'1';hint.style.visibility=p>.12?'hidden':'visible';}
-    const bouge=Math.abs(cible.x-cam.x)+Math.abs(cible.z-cam.z)+Math.abs(cible.yaw-cam.yaw)>.4||Math.abs(roll)>.05;
-    if((proche||bouge)&&!document.hidden){requestAnimationFrame(image);} else {actif=false;}
-  }
-  const relancer=()=>{if(!actif&&!document.hidden){actif=true;tPrec=performance.now();requestAnimationFrame(image);}};
-  addEventListener('scroll',relancer,{passive:true});
-  addEventListener('resize',relancer,{passive:true});
-  document.addEventListener('visibilitychange',relancer);
-  relancer();
+    const hv=p>.03?0:1;
+    if(hint&&hv!==hintPrec){hintPrec=hv;hint.style.opacity=hv;hint.style.visibility=p>.12?'hidden':'visible';}
+    return proche || Math.abs(c.x-cam.x)+Math.abs(c.z-cam.z)+Math.abs(c.yaw-cam.yaw)>.4 || Math.abs(roll)>.05;
+  });
 }
 
 /* ======================= l'atelier : panoramique horizontal ======================= */
 function initAtelier(){
   const sec=$('#atelier'), track=$('#attrack'), bar=$('#atbar');
   if(!sec||!track||!MOTION)return;
-  const imgs=[...track.querySelectorAll('.at-img img')];
-  let x=0, raf=0, actif=false, tPrec=0;
-  function image(ts){
-    raf=0;
-    const dt=Math.min(.05,(ts-tPrec)/1000||.016); tPrec=ts;
-    const r=sec.getBoundingClientRect(), span=sec.offsetHeight-innerHeight;
-    const p=span>0?Math.min(1,Math.max(0,-r.top/span)):0;
-    const course=Math.max(0,track.scrollWidth-innerWidth+innerWidth*0.12);
+  let x=0;
+  avancer((dt,sy)=>{
+    const p=borne((sy-GEO.aTop)/GEO.aSpan,0,1);
+    const proche=sy>GEO.aTop-GEO.vh*1.3 && sy<GEO.aTop+GEO.aSpan+GEO.vh*0.5;
+    const course=Math.max(0,GEO.tW-GEO.vw+GEO.vw*0.12);
     const cible=-course*p;
     x+=(cible-x)*(1-Math.pow(.0015,dt));
     track.style.transform=`translate3d(${x.toFixed(1)}px,0,0)`;
-    // parallaxe : l'image glisse dans son cadre, à contresens
-    imgs.forEach(im=>{const b=im.parentElement.getBoundingClientRect();
-      const q=(b.left+b.width/2)/innerWidth-0.5;
-      im.style.setProperty('--px',(-9-q*7).toFixed(2)+'%');});
+    // parallaxe calculée depuis le décalage mis en cache : aucune lecture du rendu
+    const f=GEO.figs||[];
+    for(let i=0;i<f.length;i++){
+      const centre=f[i].x+f[i].w/2+x;
+      f[i].im.style.setProperty('--px',(-9-(centre/GEO.vw-.5)*7).toFixed(2)+'%');
+    }
     if(bar)bar.style.width=(p*100).toFixed(1)+'%';
-    const proche=r.top<innerHeight*1.4&&r.bottom>-innerHeight*0.4;
-    if((proche||Math.abs(cible-x)>.5)&&!document.hidden){requestAnimationFrame(image);} else {actif=false;}
-  }
-  const relancer=()=>{if(!actif&&!document.hidden){actif=true;tPrec=performance.now();requestAnimationFrame(image);}};
-  addEventListener('scroll',relancer,{passive:true});
-  addEventListener('resize',relancer,{passive:true});
-  document.addEventListener('visibilitychange',relancer);
-  relancer();
+    return proche || Math.abs(cible-x)>.5;
+  });
 }
 
 /* ======================= rendu + interactions ======================= */
 function draw(){
   const adm=location.hash==='#admin';
   $('#shopview').hidden=adm;$('#admview').hidden=!adm;
-  if(adm)$('#admview').innerHTML=admHTML();else{renderGrid();renderCmp();}
+  if(adm)$('#admview').innerHTML=admHTML();else{renderGrid();renderCmp();revelations();}
   poserLogo();
   const o=$('#overlays');
   o.innerHTML=S.panel==='sheet'?sheetHTML():S.panel==='cart'?cartHTML():S.panel==='manual'?manualHTML():'';
@@ -1836,6 +1882,13 @@ addEventListener('hashchange',()=>{S.panel=null;draw();window.scrollTo(0,0);});
 /* ======================= démarrage ======================= */
 renderStatic();
 initMotion();initVisite();initAtelier();initNav();initCounters();initProgress();
+avancer(tacheRevelations);revelations();
+mesurer();
+addEventListener('scroll',reveiller,{passive:true});
+addEventListener('resize',()=>{mesurer();reveiller();},{passive:true});
+document.addEventListener('visibilitychange',reveiller);
+addEventListener('load',()=>{mesurer();reveiller();});
+reveiller();
 const savedCart=lsGet('benkashoes.cart');if(Array.isArray(savedCart))S.cart=savedCart.filter(i=>prod(i.id)&&COLORS[i.c]&&SIZES.includes(i.s));
 draw();
 if(!HASCLAUDE){
