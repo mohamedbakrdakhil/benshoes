@@ -536,8 +536,7 @@ html{scroll-behavior:smooth;scroll-padding-top:86px}
   background:linear-gradient(180deg,rgba(26,12,8,.2),rgba(20,9,6,.5) 52%,rgba(14,6,4,.92))}
 @media(max-width:700px){
   .visite{height:300vh}
-  .visite-stage{perspective:none}
-  .world{transform-style:flat;will-change:auto;transform:none!important}
+  .visite-stage{perspective:330px}
   .pane-sign b{font-size:38px}.pane-sign i{font-size:11px;letter-spacing:.3em;margin-top:10px}
   .niche b{font-size:11px}.niche span{font-size:9px}
 }
@@ -1611,12 +1610,27 @@ const VIS={HW:520,FY:320,CY:-520,FZ:-1100,Z1:-4700,
 const CAM=[[0,0,420,0],[.13,0,-820,0],[.28,0,-1750,0],[.44,0,-2550,0],
            [.56,260,-2950,62],[.68,1150,-3550,88],[.84,1190,-3950,90],[1,1210,-4300,90]];
 const PETIT=innerWidth<700, RICHE=!PETIT;
+// Safari iOS alloue un calque graphique par plan 3D, et sa mémoire suit la
+// SURFACE du plan. On garde la même scène, dessinée deux fois plus petite,
+// avec une perspective divisée d'autant : la projection reste identique.
+const K=PETIT?0.5:1;
+// Garde-fou : si l'onglet s'est déjà rechargé deux fois (Safari tue la page
+// quand elle manque de mémoire), on bascule sur la version en fondus.
+let MODE2D=false;
+try{
+  const b=+(sessionStorage.getItem('benka.boot')||0)+1;
+  sessionStorage.setItem('benka.boot',String(b));
+  if(b>=3){MODE2D=true;console.warn('[benka] 3D desactivee apres plusieurs rechargements');}
+  setTimeout(()=>{try{sessionStorage.setItem('benka.boot','0');}catch(e){}},9000);
+}catch(e){}
 // toutes les combinaisons modèle × cuir, pour garnir le grand mur
 const VITRINES=CATALOG.flatMap(p=>p.colors.map(c=>[p,c]));
 
 function pane(cls,w,ht,tf,inner){
+  if(K!==1){w*=K;ht*=K;tf=tf.replace(/(-?[\d.]+)px/g,(m,v)=>(v*K).toFixed(1)+'px');}
   return `<div class="pane ${cls}" style="width:${w}px;height:${ht}px;margin-left:${-w/2}px;margin-top:${-ht/2}px;transform:${tf}">${inner||''}</div>`;}
 function niche(p,left,w,ht,top,plate,col){
+  if(K!==1){left*=K;w*=K;ht*=K;top*=K;}
   const corps=`${visuel(p,col||p.colors[0],true)}<b>${p.name}</b><span>${(COLORS[col||p.colors[0]]||{}).n||''}</span>`;
   if(!RICHE) return `<div class="niche" style="left:${left}px;top:${top}px;width:${w}px;height:${ht}px">${corps}</div>`;
   return `<div class="n3${plate?' plate':''}" style="left:${left}px;top:${top}px;width:${w}px;height:${ht}px">
@@ -1630,18 +1644,19 @@ const PLANS=[
   ['assets/atelier/04-800.jpg','Le montage sur forme'],
   ['assets/produits/mocassin-noir-800.jpg','La collection, prête à partir']
 ];
+function construirePlans(){
+  const w=$('#world'); if(!w)return;
+  w.innerHTML=PLANS.map(([src,alt],i)=>
+    `<div class="mv"><img src="${src}" alt="${alt}" ${i?'loading="lazy"':''} decoding="async"></div>`).join('');
+}
 function buildWorld(){
   const w=$('#world'); if(!w)return;
-  if(PETIT){ // pas de 3D sur téléphone
-    w.innerHTML=PLANS.map(([src,alt],i)=>
-      `<div class="mv"><img src="${src}" alt="${alt}" ${i?'loading="lazy"':''} decoding="async"></div>`).join('');
-    return;
-  }
+  if(MODE2D){construirePlans();return;}
   const V=VIS,H=850,CYm=(V.CY+V.FY)/2,o=[];
   // sol et plafonds
-  o.push(pane('pane-floor',5600,7200,`translate3d(700px,${V.FY}px,-2800px) rotateX(90deg)`));
-  o.push(pane('pane-ceil',2200,6400,`translate3d(0px,${V.CY}px,-2600px) rotateX(-90deg)`));
-  o.push(pane('pane-ceil',2100,3000,`translate3d(1560px,${V.SCY}px,-4300px) rotateX(-90deg)`));
+  o.push(pane('pane-floor',PETIT?3400:5600,PETIT?5400:7200,`translate3d(700px,${V.FY}px,-2650px) rotateX(90deg)`));
+  o.push(pane('pane-ceil',PETIT?1400:2200,PETIT?3800:6400,`translate3d(0px,${V.CY}px,-2600px) rotateX(-90deg)`));
+  o.push(pane('pane-ceil',PETIT?1900:2100,PETIT?2600:3000,`translate3d(1560px,${V.SCY}px,-4300px) rotateX(-90deg)`));
   // façade
   o.push(pane('pane-wall',1880,1500,`translate3d(-1270px,-220px,${V.FZ}px)`));
   o.push(pane('pane-wall',1880,1500,`translate3d(1270px,-220px,${V.FZ}px)`));
@@ -1706,7 +1721,7 @@ function initVisite(){
   const caps=[...sec.querySelectorAll('.vcap')].map(el=>({el,a:+el.dataset.a,b:+el.dataset.b}));
   const bar=$('#vprogbar'),hint=$('#vhint');
   const bar2=bar;
-  if(PETIT){
+  if(MODE2D){
     const plans=[...world.querySelectorAll('.mv')];
     const bornes=caps.map(c=>[c.a,c.b]);
     let capPrec=-1;
@@ -1739,7 +1754,7 @@ function initVisite(){
     roll+=(borne(-d*2.6,-6,6)-roll)*Math.min(1,dt*7);
     const bob=Math.sin(p*46)*7;
     world.style.transform=`rotateZ(${roll.toFixed(2)}deg) rotateY(${cam.yaw.toFixed(2)}deg) `
-      +`translate3d(${(-cam.x).toFixed(1)}px,${(-bob).toFixed(1)}px,${(-cam.z).toFixed(1)}px)`;
+      +`translate3d(${(-cam.x*K).toFixed(1)}px,${(-bob*K).toFixed(1)}px,${(-cam.z*K).toFixed(1)}px)`;
     let vu=-1; for(let i=0;i<caps.length;i++) if(p>=caps[i].a&&p<caps[i].b) vu=i;
     if(vu!==capPrec){capPrec=vu; for(let i=0;i<caps.length;i++) caps[i].el.style.opacity=i===vu?'1':'0';}
     if(bar)bar.style.width=(p*100).toFixed(1)+'%';
@@ -1939,6 +1954,7 @@ addEventListener('hashchange',()=>{S.panel=null;draw();window.scrollTo(0,0);});
 
 /* ======================= démarrage ======================= */
 function degrader(raison){
+  MODE2D=true; construirePlans();
   document.documentElement.classList.add('degrade');
   MOTEUR.taches.length=0;
   document.querySelectorAll('[data-rv]').forEach(el=>{el.style.opacity='';el.style.transform='';});
