@@ -1,16 +1,17 @@
 # Benkashoes
 
-Boutique de sandales à lit de liège. Site statique, un seul fichier, sans dépendance ni build complexe.
+Boutique de mocassins-mules en daim, première en liège estampée benka. Site statique, un seul fichier, sans dépendance ni build complexe.
 
 **En ligne :** https://www.benkashoes.ma/
 **Espace atelier :** https://www.benkashoes.ma/#admin
 
 ## Ce que contient le site
 
-- Six modèles (Deux, Solo, Noor, Atlas, Oasis, Haut), illustrés en SVG généré — aucune photo à fournir.
-- Filtres par forme et par cuir, fiche produit, choix de pointure avec stock réel, panier, commande en trois étapes.
-- Coupe annotée du lit de liège, guide des pointures en millimètres, thème clair/sombre.
-- Espace atelier : chiffre d'affaires, commandes à traiter, panier moyen, suivi des statuts, saisie manuelle, édition des prix et du stock, export CSV, sauvegarde JSON.
+- Trois modèles — Opus (299 DH), Stepy (259 DH), Western (359 DH) — en huit cuirs, pointures 37 à 41, illustrés en SVG généré.
+- Une visite en 3D du show-room au défilement : l'allée, les vitrines, puis le mur des quatorze cuirs. À l'échelle réduite sur téléphone, pour la mémoire des petits appareils.
+- Filtres par cuir, fiche produit, choix de pointure avec stock réel, panier, commande en trois étapes.
+- Coupe annotée de la semelle, guide des pointures en millimètres, photos d'atelier, thème clair/sombre.
+- Espace commandes : chiffre d'affaires, commandes à traiter, panier moyen, suivi des statuts, saisie manuelle, édition des prix et du stock, export CSV, sauvegarde JSON.
 
 ## Personnaliser
 
@@ -47,9 +48,34 @@ Sur cet hébergement statique il n'y a pas de serveur. Le client valide son pani
 Deux conséquences à connaître :
 
 - Le carnet de commandes ne suit pas d'un appareil à l'autre. Utilisez le bouton **Sauvegarder** régulièrement, et **Restaurer** sur l'autre appareil.
-- L'adresse `#admin` n'est protégée par aucun mot de passe. Qui la connaît peut l'ouvrir. Un vrai contrôle d'accès demande un serveur.
+- L'adresse `#admin` n'est protégée par aucun mot de passe sur l'hébergement statique. Qui la connaît peut l'ouvrir. Un vrai contrôle d'accès demande un serveur : c'est ce que fait `server.js`, avec mot de passe et jeton de session.
 
 Pour des commandes qui arrivent toutes seules et un paiement en ligne, il faut passer à un hébergement avec serveur (Shopify, ou Netlify/Cloudflare avec une petite base).
+
+## Sécurité
+
+Ce qui est en place, et pourquoi.
+
+**Sur la page, côté client**
+
+- Toute commande venue d'ailleurs — le serveur ouvert à tous, la base partagée, un fichier de sauvegarde restauré — passe par `nettoyerCommande()` avant d'être affichée : pointures, statuts et noms de modèles sont repris du catalogue, les textes coupés et débarrassés des caractères de commande. Un nom de modèle soumis par un client n'atteint jamais la page.
+- Tout ce qui est écrit par un client est ensuite échappé à l'affichage (`esc`, `att`). Sans cela, un client malveillant pourrait glisser un script dans son nom de famille et le faire tourner dans l'espace commandes du propriétaire, qui y lit le jeton de session.
+- L'export CSV désamorce les formules : une cellule qui commence par `=`, `+`, `-` ou `@` est préfixée d'une apostrophe, sinon le tableur l'exécuterait à l'ouverture.
+- Une politique de sécurité du contenu est posée dans la page, chaque script en ligne scellé par son empreinte SHA-256 (`csp.py`, appelé par `build.sh`). Un script injecté n'aurait ni l'empreinte pour s'exécuter, ni le droit de se connecter ailleurs pour emporter ce qu'il a lu.
+- L'espace commandes refuse de s'ouvrir dans un cadre étranger — l'en-tête qui l'interdirait n'est pas réglable sur GitHub Pages, la page le vérifie donc elle-même.
+
+**Sur `server.js`**
+
+- Les prix et le stock sont recalculés par le serveur : ce que le navigateur annonce n'est jamais cru.
+- Mot de passe comparé sur empreinte de longueur fixe, en temps constant ; sans cela le temps de réponse révélerait sa longueur.
+- Limitation du débit par adresse : 10 commandes par heure, 8 tentatives de connexion par quart d'heure. Posez `TRUST_PROXY=1` derrière un proxy, sinon l'en-tête `x-forwarded-for` est écrit par le client et la limitation se contourne.
+- Service de fichiers borné au dossier `public` (séparateur compris, pour qu'un dossier voisin ne passe pas), 404 réel sur un fichier absent.
+- En-têtes envoyés à chaque réponse : CSP, `x-frame-options`, `nosniff`, `referrer-policy`, `permissions-policy`, COOP/CORP, et HSTS quand la connexion est chiffrée.
+
+**Ce qui reste à votre charge**
+
+- `ADMIN_PASSWORD` et `SESSION_SECRET` sont des variables d'environnement, jamais dans le dépôt. Sans `ADMIN_PASSWORD`, l'espace commandes du serveur reste fermé.
+- Le paiement en ligne n'est pas branché : aucune coordonnée bancaire ne transite par ce site, et c'est voulu tant qu'il n'y a pas de prestataire de paiement.
 
 ## Licence
 

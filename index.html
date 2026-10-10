@@ -3,21 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; script-src 'self' 'sha256-CvbPq/7EYFj9HomN942WjvGqSDTvXtWPsUCeQlxR214=' 'sha256-D5kNCjiMEjos5xgxW3Z/+eLtYy7lPmg++BS/lNnHn2s=' 'sha256-8OrlIyst8jwEh3zSiBXhTU971E5J+fDQtFMKIgtdHLc='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Benkashoes — mocassins-mules en daim</title>
-<meta name="description" content="Benkashoes — mocassins-mules en daim et latex naturels, cuir pleine fleur tanné en Europe. Six modèles du 35 au 46, livraison 48 h, essai 30 jours, ressemelage garanti à vie.">
+<meta name="description" content="Benkashoes — mocassins-mules en daim de veau, première en liège estampée, doublure cuir pleine fleur. Trois modèles, huit coloris, pointures 37 à 41. Livraison au Maroc, offerte dès 400 DH, ressemelage en atelier.">
 <meta name="theme-color" content="#15181b">
 <link rel="canonical" href="https://www.benkashoes.ma/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Benkashoes">
 <meta property="og:title" content="Benkashoes — mocassins-mules en daim">
-<meta property="og:description" content="Benkashoes — mocassins-mules en daim et latex naturels, cuir pleine fleur tanné en Europe. Six modèles du 35 au 46, livraison 48 h, essai 30 jours, ressemelage garanti à vie.">
+<meta property="og:description" content="Benkashoes — mocassins-mules en daim de veau, première en liège estampée, doublure cuir pleine fleur. Trois modèles, huit coloris, pointures 37 à 41. Livraison au Maroc, offerte dès 400 DH, ressemelage en atelier.">
 <meta property="og:url" content="https://www.benkashoes.ma/">
 <meta property="og:locale" content="fr_FR">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2315181b'/%3E%3Cpath d='M16 5c5 0 8 4 8 8 0 5-3 7-3 11 0 2-2 3-5 3s-5-1-5-3c0-4-3-6-3-11 0-4 3-8 8-8z' fill='%23cf9549'/%3E%3C/svg%3E">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Store","name":"Benkashoes","url":"https://www.benkashoes.ma/",
-"description":"Benkashoes — mocassins-mules en daim et latex naturels, cuir pleine fleur tanné en Europe. Six modèles du 35 au 46, livraison 48 h, essai 30 jours, ressemelage garanti à vie.","currenciesAccepted":"EUR","paymentAccepted":"Virement, paiement à la livraison",
+{"@context":"https://schema.org","@type":"ShoeStore","name":"Benkashoes","url":"https://www.benkashoes.ma/",
+"description":"Benkashoes — mocassins-mules en daim de veau, première en liège estampée, doublure cuir pleine fleur. Trois modèles, huit coloris, pointures 37 à 41. Livraison au Maroc, offerte dès 400 DH, ressemelage en atelier.","image":"https://www.benkashoes.ma/assets/marque/logo-sur-photo.jpg",
+"currenciesAccepted":"MAD","priceRange":"259-359 MAD",
+"paymentAccepted":"Paiement à la livraison, virement",
+"address":{"@type":"PostalAddress","addressCountry":"MA"},
+"areaServed":{"@type":"Country","name":"Maroc"},
 "openingHours":"Mo-Fr 09:00-18:00"}
 </script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -1100,11 +1106,44 @@ const S={cart:[],sheet:null,panel:null,step:1,filter:'tous',colorFilter:null,
 const $=s=>document.querySelector(s);
 const fmt=n=>new Intl.NumberFormat('fr-MA',{minimumFractionDigits:0,maximumFractionDigits:0}).format(Math.round(n))+' DH';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const att=s=>esc(s).replace(/`/g,'&#96;');
+/* Une commande peut arriver de trois endroits que nous ne contrôlons pas : le
+   serveur (ouvert à tous), la base partagée, ou un fichier de sauvegarde
+   restauré. On la ramène d'abord à une forme connue — pointures, statuts et
+   modèles tirés du catalogue, textes coupés et débarrassés des caractères de
+   commande — pour qu'aucun champ ne puisse se faire passer pour du balisage. */
+const txt=(v,m)=>String(v??'').replace(/[\u0000-\u001f\u007f-\u009f]/g,' ').trim().slice(0,m);
 const prod=id=>CATALOG.find(p=>p.id===id);
 const priceOf=p=>S.ov.prices[p.id]??p.price;
 const stockOf=(p,i)=>(S.ov.stock[p.id]||p.stock)[i]??0;
 const totStock=p=>SIZES.reduce((a,_,i)=>a+stockOf(p,i),0);
 const lsGet=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
+function nettoyerCommande(o){
+  if(!o||typeof o!=='object')return null;
+  const items=(Array.isArray(o.items)?o.items:[]).slice(0,40).map(i=>{
+    if(!i||typeof i!=='object')return null;
+    const p=prod(i.id);if(!p)return null;
+    const size=Number(i.size),q=Math.floor(Number(i.q)),u=Number(i.unit);
+    if(!SIZES.includes(size)||!(q>=1&&q<=99))return null;
+    const ck=p.colors.includes(i.colorKey)?i.colorKey:p.colors[0];
+    return {id:p.id,name:p.name,colorKey:ck,color:COLORS[ck].n,size:size,q:q,
+      unit:Number.isFinite(u)&&u>=0&&u<=1e6?u:priceOf(p)};
+  }).filter(Boolean);
+  if(!items.length)return null;
+  const c=(o.customer&&typeof o.customer==='object')?o.customer:{};
+  const sub=items.reduce((a,i)=>a+i.unit*i.q,0);
+  const num=(v,d)=>{const x=Number(v);return Number.isFinite(x)&&x>=0&&x<=1e9?x:d;};
+  return {ref:/^[A-Za-z0-9-]{1,24}$/.test(String(o.ref||''))?String(o.ref):'BS-SANS-REF',
+    createdAt:isNaN(Date.parse(o.createdAt))?new Date().toISOString():String(o.createdAt).slice(0,40),
+    status:STATUS[o.status]?o.status:'nouvelle',
+    source:o.source==='atelier'?'atelier':'boutique',
+    items:items,
+    customer:{name:txt(c.name,80),phone:txt(c.phone,40),email:txt(c.email,120),
+      addr:txt(c.addr,200),zip:txt(c.zip,20),city:txt(c.city,80),country:txt(c.country,60)||'Maroc'},
+    note:txt(o.note,500),sub:num(o.sub,sub),ship:num(o.ship,0),total:num(o.total,sub),
+    stockDeducted:!!o.stockDeducted,saved:!!o.saved};
+}
+const nettoyerListe=v=>(Array.isArray(v)?v:[]).slice(0,2000).map(nettoyerCommande).filter(Boolean);
 const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2300);}
 function newRef(){const d=new Date();const y=String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0');
@@ -1235,7 +1274,7 @@ function cartHTML(){
   if(S.step===3&&S.lastOrder){const o=S.lastOrder;
     body=`<div style="text-align:center;padding-top:18px">
       <div class="okmark"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12.5l5.2 5L20 6.5"/></svg></div>
-      <span class="eyebrow">Commande enregistrée</span><div class="ordref">${o.ref}</div>
+      <span class="eyebrow">Commande enregistrée</span><div class="ordref">${esc(o.ref)}</div>
       <p class="note" style="max-width:34ch;margin:8px auto 0">${o.saved
         ? `Nous avons reçu votre commande. Un e-mail de confirmation part à <b>${esc(o.customer.email)}</b>.`
         : `Votre récapitulatif est prêt. Envoyez-le à l'atelier : il confirme la disponibilité et vous rappelle pour la livraison.`}</p>
@@ -1245,7 +1284,7 @@ function cartHTML(){
         <p class="note" style="margin-top:10px">ou copiez le texte ci-dessous et envoyez-le à ${esc(SHOP.email)}</p>`}</div>
       ${o.saved?'':`<div class="callout" style="margin-top:20px"><b>Pourquoi cette étape ?</b> Le paiement en ligne n'est pas encore branché sur cette boutique. L'atelier confirme la disponibilité, puis vous règlez à la livraison ou par virement.</div>
       <textarea id="summ" readonly style="width:100%;height:176px;margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:3px;background:var(--surface);font-size:.8rem;font-family:var(--fu);line-height:1.55">${esc(orderText(o))}</textarea>`}
-      <ul class="spec" style="margin-top:18px">${o.items.map(i=>`<li><span>${i.q} × ${i.name} · ${i.color} · ${i.size}</span><span class="num">${fmt(i.unit*i.q)}</span></li>`).join('')}
+      <ul class="spec" style="margin-top:18px">${o.items.map(i=>`<li><span>${i.q} × ${esc(i.name)} · ${esc(i.color)} · ${i.size}</span><span class="num">${fmt(i.unit*i.q)}</span></li>`).join('')}
         <li><span>Livraison</span><span class="num">${o.ship?fmt(o.ship):'Offerte'}</span></li>
         <li style="font-weight:700"><span>Total</span><span class="num">${fmt(o.total)}</span></li></ul>`;
     foot=`${o.saved?'':`<button class="btn btn-pri" data-act="copysum" style="justify-content:center">Copier le récapitulatif</button>`}
@@ -1319,16 +1358,26 @@ async function placeOrder(){
     note:f.note,sub,ship,total:sub+ship,currency:'MAD'};
   if(MODE==='api'){
     try{const r=await api('orders',{method:'POST',body:{items:o.items,customer:o.customer,note:o.note}});
-      S.lastOrder=Object.assign({},r.order,{saved:true});S.cart=[];syncCart();S.step=3;S.form=null;
+      S.lastOrder=Object.assign({},nettoyerCommande(r.order)||o,{saved:true});S.cart=[];syncCart();S.step=3;S.form=null;
       await refreshCatalog();draw();return;}
     catch(e){toast(e.message);return;}}
   let saved=false;
   if(S.db){try{await S.db.doc('orders/'+o.ref).set(o);saved=true;}catch(e){saved=false;}}
-  S.lastOrder={...o,saved};S.cart=[];syncCart();S.step=3;S.form=null;draw();
+  S.lastOrder=Object.assign({},nettoyerCommande(o)||o,{saved:saved});S.cart=[];syncCart();S.step=3;S.form=null;draw();
 }
 
-/* ======================= espace commandes ======================= */
+/* ======================= espace commandes =======================
+   Un site tiers peut charger le nôtre dans un cadre invisible et guider les
+   clics du propriétaire vers « Supprimer » ou « Se déconnecter ». Les en-têtes
+   qui l'interdisent ne sont pas réglables sur un hébergement statique, alors
+   l'espace commandes vérifie lui-même qu'il est à l'air libre. Dans un artefact
+   Claude la page est légitimement encadrée : la vérification ne s'y applique pas. */
+const ENCADRE=(function(){try{return STATIC&&window.top!==window.self;}catch(e){return STATIC;}})();
 function admHTML(){
+  if(ENCADRE) return `<div class="wrap gate"><div style="text-align:center">
+    <h2 style="font-size:1.5rem;margin-bottom:10px">Espace commandes bloqué</h2>
+    <p class="serif">Cette page est affichée à l'intérieur d'un autre site. Pour votre sécurité, l'espace commandes ne s'ouvre qu'à l'adresse ${esc(SHOP.site)} dans une fenêtre à lui.</p>
+    <a class="btn btn-pri" href="https://${esc(SHOP.site)}/#admin" target="_blank" rel="noopener" style="margin-top:22px">Ouvrir la vraie page</a></div></div>`;
   const hd=`<div class="adm-hd"><div class="wrap adm-hd-in">
     <span class="brand">BENKASHOES<i></i><small>Liège &amp; Cuir</small></span>
     <span class="badge-adm">Espace commandes</span>
@@ -1377,13 +1426,13 @@ function admOrders(){
   else table=`<div class="scroll-x"><table class="tbl"><thead><tr>
     <th>Référence</th><th>Date</th><th>Client</th><th>Articles</th><th class="r">Total</th><th>Statut</th><th></th></tr></thead><tbody>`
     +list.map(o=>{const open=S.openRow===o.ref;const d=new Date(o.createdAt);
-      return `<tr class="${open?'open':''}" data-act="row" data-r="${o.ref}" style="cursor:pointer">
-        <td class="ref">${o.ref}</td>
+      return `<tr class="${open?'open':''}" data-act="row" data-r="${att(o.ref)}" style="cursor:pointer">
+        <td class="ref">${esc(o.ref)}</td>
         <td class="num" style="color:var(--fg-soft);white-space:nowrap">${d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})} · ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</td>
         <td><b style="font-weight:600">${esc(o.customer.name)}</b><br><span style="color:var(--fg-soft);font-size:.78rem">${esc(o.customer.city)}, ${esc(o.customer.country)}</span></td>
         <td class="num" style="color:var(--fg-soft)">${o.items.reduce((a,i)=>a+i.q,0)} art.</td>
         <td class="r" style="font-weight:600">${fmt(o.total)}</td>
-        <td><span class="st ${o.status}">${STATUS[o.status]}</span></td>
+        <td><span class="st ${att(o.status)}">${STATUS[o.status]||'—'}</span></td>
         <td style="color:var(--fg-soft);text-align:right">${open?'▲':'▼'}</td></tr>`
       +(open?`<tr class="det"><td colspan="7">${admDetail(o)}</td></tr>`:'');}).join('')
     +`</tbody></table></div>`;
@@ -1412,16 +1461,16 @@ function admDetail(o){
       ${o.note?`<span>Note</span><span style="font-family:var(--fb)">${esc(o.note)}</span>`:''}
       ${o.stockDeducted?`<span>Stock</span><span style="color:var(--ok)">déduit du catalogue</span>`:''}
     </div></div>
-    <div><h5>Articles</h5><ul>${o.items.map(i=>`<li><span>${i.q} × ${i.name}<br><span style="color:var(--fg-soft);font-size:.78rem">${esc(i.color)} · pointure ${i.size}</span></span><span class="num" style="font-weight:600">${fmt(i.unit*i.q)}</span></li>`).join('')}
+    <div><h5>Articles</h5><ul>${o.items.map(i=>`<li><span>${i.q} × ${esc(i.name)}<br><span style="color:var(--fg-soft);font-size:.78rem">${esc(i.color)} · pointure ${i.size}</span></span><span class="num" style="font-weight:600">${fmt(i.unit*i.q)}</span></li>`).join('')}
       <li><span>Livraison</span><span class="num">${o.ship?fmt(o.ship):'Offerte'}</span></li>
       <li style="font-weight:700;border-bottom:0"><span>Total</span><span class="num">${fmt(o.total)}</span></li></ul></div>
     <div class="actrow">
       <span class="eyebrow" style="margin-right:4px">Faire passer à</span>
-      ${next[o.status].map(k=>`<button class="btn btn-sm ${k==='annulee'?'btn-out':'btn-pri'}" data-act="setst" data-r="${o.ref}" data-k="${k}">${STATUS[k]}</button>`).join('')||'<span class="note">Commande clôturée.</span>'}
+      ${next[o.status].map(k=>`<button class="btn btn-sm ${k==='annulee'?'btn-out':'btn-pri'}" data-act="setst" data-r="${att(o.ref)}" data-k="${k}">${STATUS[k]}</button>`).join('')||'<span class="note">Commande clôturée.</span>'}
       <span style="margin-left:auto;display:flex;gap:8px">
-        ${o.stockDeducted?'':`<button class="btn btn-out btn-sm" data-act="deduct" data-r="${o.ref}">Déduire du stock</button>`}
-        <button class="btn btn-out btn-sm" data-act="copyord" data-r="${o.ref}">Copier</button>
-        <button class="btn btn-out btn-sm" data-act="del" data-r="${o.ref}" style="border-color:var(--bad);color:var(--bad)">Supprimer</button></span>
+        ${o.stockDeducted?'':`<button class="btn btn-out btn-sm" data-act="deduct" data-r="${att(o.ref)}">Déduire du stock</button>`}
+        <button class="btn btn-out btn-sm" data-act="copyord" data-r="${att(o.ref)}">Copier</button>
+        <button class="btn btn-out btn-sm" data-act="del" data-r="${att(o.ref)}" style="border-color:var(--bad);color:var(--bad)">Supprimer</button></span>
     </div></div>`;
 }
 function admCatalogue(){
@@ -1806,7 +1855,7 @@ async function copy(t){try{await navigator.clipboard.writeText(t);return true}ca
 const use=n=>(window.claude&&window.claude.use)?window.claude.use(n).catch(()=>null):Promise.resolve(null);
 
 function saveLocal(){lsSet('benkashoes.orders',S.orders);}
-function loadLocal(){const v=lsGet('benkashoes.orders');S.orders=Array.isArray(v)?v:[];}
+function loadLocal(){S.orders=nettoyerListe(lsGet('benkashoes.orders'));}
 async function dlFile(name,text,mime){
   if(!STATIC){const dl=await use('downloads');
     if(dl){try{await dl.save({filename:name,data:text});return true;}catch(e){if(e&&e.code==='declined')return true;}}
@@ -1817,7 +1866,7 @@ async function dlFile(name,text,mime){
 }
 async function refreshCatalog(){try{const c=await api('catalog');S.ov={prices:c.prices,stock:c.stock};}catch(e){}}
 async function loadOrders(){if(MODE!=='api')return;
-  try{const r=await api('orders');S.orders=Array.isArray(r.orders)?r.orders:[];}
+  try{const r=await api('orders');S.orders=nettoyerListe(r.orders);}
   catch(e){if(e.status===401){TOKEN='';lsSet('benkashoes.token','');S.canAdmin=false;}}}
 async function saveCat(){
   if(MODE==='api'){try{const r=await api('catalog',{method:'PUT',body:{prices:S.ov.prices,stock:S.ov.stock}});
@@ -1836,7 +1885,12 @@ async function exportCSV(){
   const rows=[H].concat(S.orders.map(o=>[o.ref,new Date(o.createdAt).toLocaleString('fr-FR'),STATUS[o.status],
     o.customer.name,o.customer.phone,o.customer.email,o.customer.addr,o.customer.zip,o.customer.city,o.customer.country,
     o.items.map(i=>`${i.q}x ${i.name} / ${i.color} / ${i.size}`).join(' | '),o.sub,o.ship,o.total,o.note||'']));
-  const csv='﻿'+rows.map(r=>r.map(c=>'"'+String(c??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');
+  /* Un tableur exécute toute cellule qui commence par = + - @ : on désamorce
+     avec une apostrophe, sinon un client malveillant pourrait glisser une
+     formule dans son nom et la faire tourner sur le poste de l'atelier. */
+  const cell=c=>{const v=String(c??'').replace(/[\r\n\t]+/g,' ');
+    return '"'+(/^[=+\-@]/.test(v)?"'"+v:v).replace(/"/g,'""')+'"';};
+  const csv='﻿'+rows.map(r=>r.map(cell).join(';')).join('\r\n');
   if(await dlFile('benkashoes-commandes.csv',csv,'text/csv;charset=utf-8'))toast('Export prêt');else toast('Export indisponible ici');
 }
 document.addEventListener('click',async e=>{
@@ -1855,7 +1909,11 @@ document.addEventListener('click',async e=>{
   else if(a==='closep'){S.panel=null;S.manual=null;draw();}
   else if(a==='setcol'){S.sheet.c=d.k;draw();}
   else if(a==='setsize'){S.sheet.s=+d.s;draw();}
-  else if(a==='add'){const{id,c,s}=S.sheet;const ex=S.cart.find(i=>i.id===id&&i.c===c&&i.s===s);
+  else if(a==='add'){const{id,c,s}=S.sheet;
+    // le bouton est désactivé sans pointure, mais une ligne sans pointure
+    // fausserait le panier et la commande : on refuse aussi ici.
+    if(!prod(id)||!COLORS[c]||!SIZES.includes(s)){toast('Choisissez une pointure');return;}
+    const ex=S.cart.find(i=>i.id===id&&i.c===c&&i.s===s);
     const max=stockOf(prod(id),SIZES.indexOf(s));
     if(ex){if(ex.q>=max){toast('Stock atteint pour cette pointure');return;}ex.q++;}else S.cart.push({id,c,s,q:1});
     syncCart();S.panel='cart';S.step=1;draw();bumpCart();toast('Ajouté au panier');}
@@ -1911,7 +1969,7 @@ async function saveManual(){readManual();const m=S.manual;
     note:m.note,sub,ship,total:sub+ship,currency:'MAD'};
   if(MODE==='api'){
     try{const r=await api('orders',{method:'PUT',body:{items:o.items,customer:o.customer,note:o.note}});
-      S.orders=[r.order].concat(S.orders);await refreshCatalog();
+      S.orders=nettoyerListe([r.order]).concat(S.orders);await refreshCatalog();
       S.panel=null;S.manual=null;S.openRow=r.order.ref;draw();toast('Commande '+r.order.ref+' enregistrée');return;}
     catch(e){toast(e.message);return;}}
   if(MODE==='local'){S.orders=[o].concat(S.orders);saveLocal();}
@@ -1939,7 +1997,7 @@ document.addEventListener('change',e=>{
   fr.onload=()=>{try{const v=JSON.parse(fr.result);
     if(!v||!Array.isArray(v.orders))throw 0;
     const seen=new Set(S.orders.map(o=>o.ref));
-    const add=v.orders.filter(o=>o&&o.ref&&!seen.has(o.ref));
+    const add=nettoyerListe(v.orders).filter(o=>!seen.has(o.ref));
     S.orders=add.concat(S.orders).sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
     if(v.catalog&&v.catalog.prices)S.ov=v.catalog;
     saveLocal();if(STATIC)lsSet('benkashoes.catalog',S.ov);draw();
@@ -1968,6 +2026,9 @@ try{
 // garde-fou : si les scènes n'ont pas de hauteur (unité svh refusée, 3D
 // indisponible), on replie plutôt que d'afficher une zone vide.
 addEventListener('load',()=>{
+  // Sur #admin la boutique est remplacée : la scène n'a légitimement aucune
+  // hauteur, et replier ici viderait le moteur pour le retour à la boutique.
+  if(location.hash==='#admin') return;
   const st=$('.visite-stage');
   if(st && st.getBoundingClientRect().height<260) degrader('scène sans hauteur');
 });
@@ -1977,7 +2038,9 @@ addEventListener('resize',()=>{mesurer();reveiller();},{passive:true});
 document.addEventListener('visibilitychange',reveiller);
 addEventListener('load',()=>{mesurer();reveiller();});
 reveiller();
-const savedCart=lsGet('benkashoes.cart');if(Array.isArray(savedCart))S.cart=savedCart.filter(i=>prod(i.id)&&COLORS[i.c]&&SIZES.includes(i.s));
+const savedCart=lsGet('benkashoes.cart');if(Array.isArray(savedCart))S.cart=savedCart.slice(0,40)
+  .filter(i=>i&&prod(i.id)&&COLORS[i.c]&&prod(i.id).colors.includes(i.c)&&SIZES.includes(i.s))
+  .map(i=>({id:i.id,c:i.c,s:i.s,q:Math.min(99,Math.max(1,Math.floor(Number(i.q))||1))}));
 draw();
 if(!HASCLAUDE){
   TOKEN=lsGet('benkashoes.token')||'';
@@ -2004,7 +2067,7 @@ if(!HASCLAUDE){
     try{const snap=await db.doc('settings/catalog').get();
       if(snap.exists){const v=snap.data()||{};S.ov={prices:v.prices||{},stock:v.stock||{}};}}catch(e){}
     db.collection('orders').orderBy('createdAt','desc').limit(500).onSnapshot(
-      s=>{S.orders=s.docs.map(d=>d.data()).filter(Boolean);draw();},
+      s=>{S.orders=nettoyerListe(s.docs.map(d=>d.data()));draw();},
       ()=>{});
   }
   draw();

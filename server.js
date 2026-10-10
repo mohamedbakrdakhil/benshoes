@@ -1,4 +1,4 @@
-/* Benshoes — serveur de la boutique.
+/* Benkashoes — serveur de la boutique.
    Zéro dépendance npm : uniquement la bibliothèque standard de Node.
    Sert le site, reçoit les commandes, protège l'espace atelier. */
 'use strict';
@@ -13,6 +13,13 @@ const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '.data');
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const DB_FILE = path.join(DATA_DIR, 'boutique.json');
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
+/* On compare des empreintes de longueur fixe : comparer les chaînes elles-mêmes
+   révélerait la longueur du mot de passe par le temps de réponse. */
+const PW_HASH = ADMIN_PASSWORD ? crypto.createHash('sha256').update(ADMIN_PASSWORD).digest() : null;
+/* Derrière un proxy (Railway, Cloudflare) l'adresse du client est dans
+   x-forwarded-for ; ailleurs cet en-tête est écrit par le client lui-même et
+   permettrait de remettre à zéro la limitation de débit à chaque requête. */
+const TRUST_PROXY = process.env.TRUST_PROXY === '1';
 const SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
 const SESSION_DAYS = 14;
 
@@ -88,23 +95,54 @@ function tooMany(key, max, windowMs) {
   if (hits.size > 5000) for (const [k, v] of hits) if (!v.some(t => now - t < windowMs)) hits.delete(k);
   return arr.length > max;
 }
-const ipOf = req => (req.headers['x-forwarded-for'] || '').split(',')[0].trim()
+const ipOf = req => (TRUST_PROXY && (req.headers['x-forwarded-for'] || '').split(',')[0].trim())
   || req.socket.remoteAddress || 'inconnu';
 
 /* ---------- utilitaires ---------- */
-const str = (v, max) => typeof v === 'string' ? v.trim().slice(0, max) : '';
+const str = (v, max) => typeof v === 'string'
+  ? v.replace(/[\u0000-\u001f\u007f-\u009f]/g, ' ').trim().slice(0, max) : '';
 function newRef() {
   const d = new Date();
   const y = String(d.getFullYear()).slice(2) + String(d.getMonth() + 1).padStart(2, '0');
   db.seq = (db.seq + 1) % 10000;
   const A = 'ACDEFHJKLMNPRTUVWXY34789';
-  let r = ''; for (let i = 0; i < 4; i++) r += A[crypto.randomInt(A.length)];
-  return `BS-${y}-${r}`;
+  for (let essai = 0; essai < 50; essai++) {
+    let r = ''; for (let i = 0; i < 5; i++) r += A[crypto.randomInt(A.length)];
+    const ref = `BS-${y}-${r}`;
+    if (!db.orders.some(o => o.ref === ref)) return ref;   // deux commandes ne partagent jamais une référence
+  }
+  return `BS-${y}-${Date.now().toString(36).toUpperCase()}`;
 }
 function json(res, code, body) {
   const s = JSON.stringify(body);
   res.writeHead(code, { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' });
-  res.end(s);
+  res.end(res.req && res.req.method === 'HEAD' ? undefined : s);
+}
+/* Politique de sécurité du contenu : la page est entièrement autonome, seules
+   les polices Google viennent de l'extérieur. Tout le reste est refusé — un
+   script injecté n'aurait ni d'où se charger ni où envoyer ce qu'il a lu. */
+const CSP = [
+  "default-src 'self'",
+  "base-uri 'none'",
+  "object-src 'none'",
+  "frame-ancestors 'none'",
+  "form-action 'none'",
+  "script-src 'self' 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' https://fonts.gstatic.com",
+  "img-src 'self' data:",
+  "connect-src 'self'",
+  'upgrade-insecure-requests',
+].join('; ');
+function durcir(res, chiffre) {
+  res.setHeader('content-security-policy', CSP);
+  res.setHeader('x-content-type-options', 'nosniff');
+  res.setHeader('x-frame-options', 'DENY');
+  res.setHeader('referrer-policy', 'strict-origin-when-cross-origin');
+  res.setHeader('permissions-policy', 'geolocation=(), camera=(), microphone=(), payment=(), usb=()');
+  res.setHeader('cross-origin-opener-policy', 'same-origin');
+  res.setHeader('cross-origin-resource-policy', 'same-origin');
+  if (chiffre) res.setHeader('strict-transport-security', 'max-age=31536000; includeSubDomains');
 }
 function readBody(req, limit = 64 * 1024) {
   return new Promise((resolve, reject) => {
@@ -171,18 +209,25 @@ const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=
 function serveStatic(req, res, pathname) {
   let rel = decodeURIComponent(pathname).replace(/\\+/g, '/');
   if (rel.endsWith('/')) rel += 'index.html';
-  const file = path.join(PUBLIC_DIR, path.normalize(rel));
-  if (!file.startsWith(PUBLIC_DIR)) { res.writeHead(403).end('Interdit'); return; }
+  if (rel.includes('\u0000')) { res.writeHead(400).end('Chemin invalide'); return; }
+  const file = path.resolve(PUBLIC_DIR, '.' + path.posix.normalize('/' + rel));
+  // startsWith(PUBLIC_DIR) seul laisserait passer un dossier voisin nommé
+  // « public-sauvegarde » : on exige le séparateur.
+  if (file !== PUBLIC_DIR && !file.startsWith(PUBLIC_DIR + path.sep)) { res.writeHead(403).end('Interdit'); return; }
   fs.stat(file, (err, st) => {
     if (err || !st.isFile()) {
+      // Un fichier manquant répond 404 ; seule une adresse sans extension
+      // retombe sur la page, sinon les moteurs indexeraient des pages fantômes.
+      if (/\.[a-z0-9]{1,8}$/i.test(rel) && !rel.endsWith('.html')) { res.writeHead(404).end('Introuvable'); return; }
       const idx = path.join(PUBLIC_DIR, 'index.html');
       return fs.createReadStream(idx).on('error', () => res.writeHead(404).end('Introuvable'))
-        .once('open', () => res.writeHead(200, { 'content-type': TYPES['.html'], 'cache-control': 'no-cache' })).pipe(res);
+        .once('open', () => res.writeHead(404, { 'content-type': TYPES['.html'], 'cache-control': 'no-cache' })).pipe(res);
     }
     const ext = path.extname(file).toLowerCase();
     const cache = ext === '.html' ? 'no-cache' : 'public, max-age=3600';
     res.writeHead(200, { 'content-type': TYPES[ext] || 'application/octet-stream',
       'content-length': st.size, 'cache-control': cache });
+    if (req.method === 'HEAD') { res.end(); return; }
     fs.createReadStream(file).pipe(res);
   });
 }
@@ -191,8 +236,9 @@ function serveStatic(req, res, pathname) {
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
   const p = url.pathname;
-  res.setHeader('x-content-type-options', 'nosniff');
-  res.setHeader('referrer-policy', 'same-origin');
+  // Railway et Cloudflare terminent le TLS en amont : l'en-tête dit si le
+  // client, lui, était bien en HTTPS. Sans cela on promettrait HSTS en clair.
+  durcir(res, TRUST_PROXY ? req.headers['x-forwarded-proto'] === 'https' : !!req.socket.encrypted);
 
   if (!p.startsWith('/api/')) {
     if (req.method !== 'GET' && req.method !== 'HEAD') return json(res, 405, { error: 'Méthode non autorisée' });
@@ -219,10 +265,10 @@ const server = http.createServer(async (req, res) => {
     /* connexion à l'espace atelier */
     if (p === '/api/login' && req.method === 'POST') {
       if (tooMany('log:' + ipOf(req), 8, 900e3)) return json(res, 429, { error: 'Trop de tentatives. Réessayez dans 15 minutes.' });
-      if (!ADMIN_PASSWORD) return json(res, 503, { error: "Aucun mot de passe n'est configuré sur le serveur." });
+      if (!PW_HASH) return json(res, 503, { error: "Aucun mot de passe n'est configuré sur le serveur." });
       const { password } = await readBody(req, 4096);
-      const a = Buffer.from(String(password || '')), b = Buffer.from(ADMIN_PASSWORD);
-      const ok = a.length === b.length && crypto.timingSafeEqual(a, b);
+      const a = crypto.createHash('sha256').update(String(password || '')).digest();
+      const ok = crypto.timingSafeEqual(a, PW_HASH);
       if (!ok) { await new Promise(r => setTimeout(r, 400)); return json(res, 401, { error: 'Mot de passe incorrect.' }); }
       return json(res, 200, { token: makeToken() });
     }
@@ -279,8 +325,14 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
+server.headersTimeout = 10000;
+server.requestTimeout = 20000;
+server.keepAliveTimeout = 5000;
+server.maxHeadersCount = 60;
+
 load().then(() => server.listen(PORT, () => {
   console.log(`[benkashoes] en écoute sur le port ${PORT}`);
   if (!ADMIN_PASSWORD) console.warn('[benkashoes] ATTENTION : ADMIN_PASSWORD non défini — espace atelier inaccessible.');
   if (!process.env.SESSION_SECRET) console.warn('[benkashoes] SESSION_SECRET non défini — les sessions seront perdues à chaque redémarrage.');
+  if (!TRUST_PROXY) console.warn('[benkashoes] TRUST_PROXY non défini — derrière un proxy, posez TRUST_PROXY=1 pour que la limitation de débit voie la vraie adresse.');
 }));

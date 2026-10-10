@@ -2,7 +2,7 @@
   "name": "benkashoes",
   "version": "1.0.0",
   "private": true,
-  "description": "Boutique Benkashoes — sandales à lit de liège",
+  "description": "Boutique Benkashoes — mocassins-mules en daim, première en liège",
   "main": "server.js",
   "scripts": {
     "build": "sh ./build.sh",

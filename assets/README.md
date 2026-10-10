@@ -24,7 +24,7 @@ Exemples : `deux-bordeaux.jpg`, `atlas-marron.jpg`, `solo-noir.jpg`
 Une photo sans coloris — `deux.jpg` — sert de secours pour toutes les
 couleurs de ce modèle.
 
-**Cadrage** : vue du dessus, sandale seule, fond uni très clair ou détouré.
+**Cadrage** : vue de trois quarts, la mule seule, fond uni très clair ou détouré.
 C'est ce qui s'accorde avec la mise en page. Format carré ou légèrement
 vertical, 1200 px de côté minimum, JPEG de qualité 80.
 
