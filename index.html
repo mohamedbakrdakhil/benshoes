@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; script-src 'self' 'sha256-CvbPq/7EYFj9HomN942WjvGqSDTvXtWPsUCeQlxR214=' 'sha256-D5kNCjiMEjos5xgxW3Z/+eLtYy7lPmg++BS/lNnHn2s=' 'sha256-8OrlIyst8jwEh3zSiBXhTU971E5J+fDQtFMKIgtdHLc='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; script-src 'self' 'sha256-CvbPq/7EYFj9HomN942WjvGqSDTvXtWPsUCeQlxR214=' 'sha256-D5kNCjiMEjos5xgxW3Z/+eLtYy7lPmg++BS/lNnHn2s=' 'sha256-itMQZ0ozxagVQxUlZAPpYlEMdV7ODDoTWzLj1+D8e2Y='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Benkashoes — mocassins-mules en daim</title>
 <meta name="description" content="Benkashoes — mocassins-mules en daim de veau, première en liège estampée, doublure cuir pleine fleur. Trois modèles, huit coloris, pointures 37 à 41. Livraison au Maroc, offerte dès 400 DH, ressemelage en atelier.">
@@ -2048,7 +2048,11 @@ if(!HASCLAUDE){
   const c=lsGet('benkashoes.catalog');if(c&&c.prices)S.ov=c;
   draw();
   (async function(){
-    let cat;try{cat=await api('catalog');}catch(e){return;}   // pas de serveur : on reste en carnet local
+    // Sur l'hébergement statique il n'y a pas de serveur : sonder /api/catalog
+    // coûterait un aller-retour et un 404 rouge dans la console à chaque
+    // visiteur. build.sh ne pose ce repère que sur la page servie par server.js.
+    if(!document.querySelector('meta[name="benka-api"]'))return;
+    let cat;try{cat=await api('catalog');}catch(e){return;}   // serveur injoignable : on reste en carnet local
     MODE='api';S.ov={prices:cat.prices,stock:cat.stock};S.orders=[];S.canAdmin=false;
     if(TOKEN){try{await api('session');S.canAdmin=true;await loadOrders();}
       catch(e){TOKEN='';lsSet('benkashoes.token','');}}

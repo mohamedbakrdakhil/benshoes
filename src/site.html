@@ -2016,7 +2016,11 @@ if(!HASCLAUDE){
   const c=lsGet('benkashoes.catalog');if(c&&c.prices)S.ov=c;
   draw();
   (async function(){
-    let cat;try{cat=await api('catalog');}catch(e){return;}   // pas de serveur : on reste en carnet local
+    // Sur l'hébergement statique il n'y a pas de serveur : sonder /api/catalog
+    // coûterait un aller-retour et un 404 rouge dans la console à chaque
+    // visiteur. build.sh ne pose ce repère que sur la page servie par server.js.
+    if(!document.querySelector('meta[name="benka-api"]'))return;
+    let cat;try{cat=await api('catalog');}catch(e){return;}   // serveur injoignable : on reste en carnet local
     MODE='api';S.ov={prices:cat.prices,stock:cat.stock};S.orders=[];S.canAdmin=false;
     if(TOKEN){try{await api('session');S.canAdmin=true;await loadOrders();}
       catch(e){TOKEN='';lsSet('benkashoes.token','');}}

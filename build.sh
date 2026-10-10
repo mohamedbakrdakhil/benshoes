@@ -65,7 +65,14 @@ fi
 
 grep -q '@@CSP@@' index.html && { echo "ERREUR : la politique de sécurité n'a pas été posée"; exit 1; }
 
-cp index.html public/index.html
+# index.html part sur GitHub Pages, où il n'y a pas de serveur : pas de repère,
+# donc pas de sondage d'API. public/index.html est servi par server.js : repère posé.
+python3 - <<'PY' || cp index.html public/index.html
+import io
+h=io.open('index.html',encoding='utf-8').read()
+io.open('public/index.html','w',encoding='utf-8').write(
+  h.replace('<meta name="referrer"','<meta name="benka-api" content="oui">\n<meta name="referrer"',1))
+PY
 cp -f robots.txt sitemap.xml public/ 2>/dev/null || true
 rm -rf public/assets && cp -R assets public/assets 2>/dev/null || true
 echo "index.html + public/index.html générés ($(wc -c < index.html | tr -d ' ') octets) — canonique : $URL"
