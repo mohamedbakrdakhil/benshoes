@@ -16,11 +16,56 @@ Boutique de mocassins-mules en daim, première en liège estampée benka. Site s
 - Coupe annotée de la semelle, guide des pointures en millimètres, photos d'atelier, thème clair/sombre.
 - Espace commandes : chiffre d'affaires, commandes à traiter, panier moyen, suivi des statuts, saisie manuelle, édition des prix et du stock, export CSV, sauvegarde JSON.
 
+## Comment le code est rangé
+
+Il n'y a plus de fichier unique : `build.sh` assemble le site à partir de
+modules, dans l'ordre de leurs numéros.
+
+```
+src/
+  page.html              le balisage
+  styles/
+    00-polices.css       @font-face, polices servies par le site
+    01-fondations.css    variables, remise à zéro, utilitaires
+    02-mouvement.css     animations, transitions, mouvement réduit
+    03-ossature.css      en-tête, héros, sections, pied de page
+    04-architecture.css  barre de progression, chiffres, comparatif, questions
+    05-atelier.css       la galerie horizontale
+    06-visite.css        la scène 3D : Fès, la boutique, le show-room
+    07-boutique.css      panneaux, fiche produit, panier, formulaires
+    08-commandes.css     l'espace commandes
+  scripts/
+    01-reglages.js       vos coordonnées, le logo, les photos
+    02-catalogue.js      pointures, coloris, modèles, questions
+    03-dessins.js        les illustrations en SVG
+    04-outils.js         état, échappement, stockage local, assainisseur
+    05-theme.js          clair / sombre
+    06-collection.js     la grille et les filtres
+    07-fiche.js          la fiche produit
+    08-panier.js         panier, livraison, envoi de la commande
+    09-commandes.js      l'espace commandes
+    10-revelations.js    apparitions au défilement
+    11-moteur.js         la boucle d'animation unique
+    12-visite.js         géométrie de la scène, caméra, quartiers
+    13-atelier.js        le panoramique horizontal
+    14-evenements.js     tous les écouteurs
+    15-demarrage.js      l'amorçage
+```
+
+Trois outils accompagnent l'assemblage :
+
+- **`minifier.py`** allège le fichier livré sans jamais toucher aux sources.
+  Chaque traitement est choisi pour ne rien pouvoir casser — le détail est en
+  tête du fichier.
+- **`csp.py`** scelle chaque script en ligne par son empreinte SHA-256.
+- **`build.sh`** orchestre, et refuse de livrer si le scellage a échoué.
+
+Le dossier `.build/` ne contient que des fichiers intermédiaires ; il n'est pas
+versionné.
+
 ## Personnaliser
 
-Tout est dans `src/site.html`.
-
-**Coordonnées** — en haut du premier `<script>`, le bloc `const SHOP` :
+**Coordonnées** — `src/scripts/01-reglages.js`, le bloc `const SHOP` :
 
 ```js
 const SHOP={
@@ -33,7 +78,7 @@ const SHOP={
 
 Renseigner `whatsapp` fait apparaître un bouton « Envoyer sur WhatsApp » : le client arrive sur votre WhatsApp avec sa commande déjà rédigée. C'est le moyen le plus simple de recevoir les commandes.
 
-**Modèles, prix, stock** — le tableau `CATALOG`, juste en dessous. Les prix et le stock se modifient aussi depuis l'espace atelier, sans toucher au code.
+**Modèles, prix, stock** — le tableau `CATALOG` dans `src/scripts/02-catalogue.js`. Les prix et le stock se modifient aussi depuis l'espace atelier, sans toucher au code.
 
 ## Publier une modification
 
@@ -42,7 +87,7 @@ Renseigner `whatsapp` fait apparaître un bouton « Envoyer sur WhatsApp » : le
 git add -A && git commit -m "mise à jour" && git push
 ```
 
-`build.sh` régénère `index.html` à partir de `src/site.html` en y ajoutant l'en-tête HTML et les métadonnées de référencement. GitHub Pages met le site à jour en une minute environ.
+`build.sh` réassemble `index.html` à partir des modules de `src/`, l'allège, y pose la politique de sécurité et les métadonnées de référencement. GitHub Pages met le site à jour en une minute environ.
 
 ## Où sont les commandes
 

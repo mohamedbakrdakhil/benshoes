@@ -2,6 +2,9 @@
 """Remplace @@CSP@@ dans le HTML construit par une politique de sécurité
 du contenu où chaque script en ligne est désigné par son empreinte.
 
+Depuis que les polices sont servies par le site lui-même, la page ne contacte
+plus aucune origine extérieure : la politique se referme sur 'self'.
+
 Un script injecté dans la page n'aurait alors ni la bonne empreinte pour
 s'exécuter, ni le droit de se connecter ailleurs pour emporter ce qu'il a lu.
 Appelé par build.sh ; si quelque chose cloche, on retombe sur une politique
@@ -27,8 +30,8 @@ politique = '; '.join([
     "object-src 'none'",
     "form-action 'none'",
     'script-src ' + script_src,
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "font-src 'self' https://fonts.gstatic.com",
+    "style-src 'self' 'unsafe-inline'",
+    "font-src 'self'",
     "img-src 'self' data:",
     "connect-src 'self'",
     "media-src 'none'",

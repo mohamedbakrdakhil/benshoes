@@ -1,0 +1,239 @@
+/* ================= la visite : boutique traversée au défilement =================
+   Une scène en CSS 3D. La caméra suit une trajectoire scénarisée (vitrine,
+   porte, allée, virage à droite, mur des formes) pilotée par la position de
+   défilement. Aucune bibliothèque. Sur demande de mouvement réduit, la
+   section se replie en une simple bannière. */
+.visite{position:relative;height:980vh;background:#0c0604;isolation:isolate}
+.visite-stage{position:sticky;top:0;height:100vh;height:100svh;min-height:420px;overflow:hidden;
+  perspective:900px;perspective-origin:50% 47%;background:radial-gradient(120% 90% at 50% 55%,#1e0d08,#070403 70%)}
+.world{position:absolute;left:0;top:0;width:100%;height:100%;transform-style:preserve-3d;will-change:transform}
+.pane{--f:1;position:absolute;left:50%;top:50%;transform-style:preserve-3d;backface-visibility:hidden}
+.pane-wall{background:linear-gradient(180deg,#3f2019,#251410 48%,#170b08);
+  box-shadow:inset 0 0 calc(140px/var(--f)) rgba(0,0,0,.6)}
+.pane-strip{background:linear-gradient(90deg,rgba(240,185,166,.1),#fbe8e0 42%,#fbe8e0 58%,rgba(240,185,166,.1));
+  box-shadow:0 0 54px 16px rgba(240,185,166,.38)}
+.pane-floor{background:
+  repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 calc(2px/var(--f)),transparent calc(2px/var(--f)) calc(190px/var(--f))),
+  radial-gradient(60% 34% at 50% 44%,rgba(240,185,166,.16),transparent 70%),
+  linear-gradient(180deg,#271710,#110806)}
+/* Plafond à caissons de cèdre. L'ancien plafond était presque noir : sur un
+   téléphone, dont l'écran est haut, il occupait un quart du cadre sans rien
+   montrer. */
+.pane-ceil{background:
+  repeating-linear-gradient(90deg,rgba(0,0,0,.6) 0 calc(9px/var(--f)),transparent calc(9px/var(--f)) calc(180px/var(--f))),
+  repeating-linear-gradient(0deg,rgba(0,0,0,.6) 0 calc(9px/var(--f)),transparent calc(9px/var(--f)) calc(180px/var(--f))),
+  radial-gradient(60% 50% at 50% 50%,rgba(240,186,110,.14),transparent 72%),
+  linear-gradient(180deg,#2b1810,#150b06);
+  box-shadow:inset 0 0 calc(130px/var(--f)) rgba(0,0,0,.7)}
+.pane-sign{display:grid;place-items:center;background:linear-gradient(180deg,#6e1710,#48100a);
+  border:1px solid #8c2418;box-shadow:0 0 80px rgba(209,69,44,.35),inset 0 0 50px rgba(0,0,0,.5)}
+.pane-sign b{font-family:var(--fd);color:#fdf3ee;letter-spacing:.06em;font-size:64px;line-height:1;
+  text-shadow:0 0 28px rgba(240,185,166,.65)}
+.pane-sign i{display:block;font-style:normal;font-family:var(--fu);font-size:15px;letter-spacing:.42em;
+  color:#eaae97;margin-top:16px;text-align:center}
+.pane-glass{background:linear-gradient(110deg,rgba(240,185,166,.1),rgba(255,255,255,.03) 45%,rgba(240,185,166,.08));
+  border:1px solid rgba(240,185,166,.22)}
+
+/* niches à produits */
+.niche{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  background:linear-gradient(180deg,#3c1c16,#1e0e0a);border:1px solid #5b2317;
+  box-shadow:inset 0 22px 60px rgba(209,69,44,.3),0 0 50px rgba(0,0,0,.6);padding:16px 10px 14px}
+.niche svg{height:72%;width:auto}
+.niche b{font-family:var(--fu);font-size:13px;font-weight:700;color:#fbf0ea;letter-spacing:.04em;margin-top:9px}
+.niche span{font-family:var(--fu);font-size:11px;color:#dfae9c;letter-spacing:.1em}
+.niche::before{content:"";position:absolute;top:0;left:12%;right:12%;height:4px;border-radius:3px;
+  background:#fbe8e0;box-shadow:0 0 18px 6px rgba(240,185,166,.7)}
+/* niche en volume : fond en retrait, deux joues, un plafond lumineux, un plancher */
+.n3{position:absolute;transform-style:preserve-3d;--d:112px}
+.n3.plate{--d:64px}
+.n3>div{position:absolute}
+.n3 .nb{inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-end;padding:16px 8px 13px;background:linear-gradient(180deg,#562619,#2a150f 70%,#1e0e0a);
+  box-shadow:inset 0 26px 56px rgba(240,185,166,.3)}
+.n3 .nb svg{height:68%;width:auto}
+.n3 .nb b{font-family:var(--fu);font-size:13px;font-weight:700;color:#fdf3ee;letter-spacing:.04em;margin-top:8px}
+.n3 .nb span{font-family:var(--fu);font-size:11px;color:#e4b0a0;letter-spacing:.1em}
+.n3 .ns{top:0;height:100%;width:var(--d);background:linear-gradient(90deg,#6d3020,#311a12)}
+.n3 .nl{left:0;transform-origin:left center;transform:rotateY(-90deg)}
+.n3 .nr{right:0;transform-origin:right center;transform:rotateY(90deg)}
+.n3 .nt{left:0;top:0;width:100%;height:var(--d);transform-origin:top center;transform:rotateX(90deg);
+  background:linear-gradient(180deg,#f0b9a6,#fff3ee);box-shadow:0 0 22px 7px rgba(240,185,166,.5)}
+.n3 .nf{left:0;bottom:0;width:100%;height:var(--d);transform-origin:bottom center;transform:rotateX(-90deg);
+  background:linear-gradient(180deg,#1c0d09,#3c1c16)}
+.pane-jamb{background:linear-gradient(180deg,#472419,#251410)}
+.pane-beam{background:linear-gradient(180deg,#1b0d09,#2b1610)}
+.pane-podium{background:linear-gradient(180deg,#4d2217,#2b1510);box-shadow:inset 0 0 calc(60px/var(--f)) rgba(0,0,0,.6)}
+.pane-podtop{background:linear-gradient(180deg,#602f20,#3c1d15)}
+.pane-prop{display:grid;place-items:end center}
+.pane-prop svg{height:100%;width:auto}
+
+/* ---- Fès : la médina avant la boutique ----
+   Tout est dessiné en dégradés CSS : pas une image à télécharger, pas un
+   octet de plus, et un seul calque graphique par plan quelle que soit la
+   richesse du motif. Le zellige, les tanneries et le moucharabieh sont
+   des empilements de dégradés sur un plan unique. */
+.zone{position:absolute;left:0;top:0;width:100%;height:100%;transform-style:preserve-3d}
+
+/* ciel de Fès au lever du jour */
+.pane-ciel{background:linear-gradient(180deg,#101a30 0%,#2b2242 26%,#5d3650 50%,#99584f 70%,#cf8349 88%,#eeb97c 100%)}
+.pane-ciel::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(42% 30% at 50% 88%,rgba(255,214,160,.5),transparent 70%)}
+
+/* Zellige : étoile ocre au croisement, damier vert, joints à la chaux.
+   Cinq dégradés empilés sur UN seul plan — un calque graphique, pas cinq. */
+.pane-zellige{--zv:#14584f;--zo:#b4722a;--zb:#e9dfc8;--zf:#07302c;--zt:72px;
+  --z:calc(var(--zt)/var(--f));--j:calc(2px/var(--f));
+  background:
+    repeating-linear-gradient(45deg,var(--zb) 0 var(--j),transparent var(--j) calc(var(--z)/1.414)),
+    repeating-linear-gradient(-45deg,var(--zb) 0 var(--j),transparent var(--j) calc(var(--z)/1.414)),
+    radial-gradient(circle at 0 0,var(--zo) 0 22%,transparent 23%) 0 0/var(--z) var(--z),
+    radial-gradient(circle at 100% 100%,var(--zo) 0 22%,transparent 23%) 0 0/var(--z) var(--z),
+    repeating-conic-gradient(from 45deg at 50% 50%,var(--zv) 0 25%,transparent 0 50%) 0 0/var(--z) var(--z),
+    var(--zf);
+  box-shadow:inset 0 0 calc(90px/var(--f)) rgba(0,0,0,.6)}
+.pane-zellige.fin{--zt:40px}
+/* le bandeau bas des murs : plus sobre, ocre dominant */
+.pane-zellige.bas{--zv:#6f3d18;--zo:#cf9549;--zf:#2d1a0c;--zt:44px}
+
+/* mur de médina : enduit à la chaux, ocre, patiné */
+.pane-chaux{background:
+  radial-gradient(70% 40% at 30% 10%,rgba(255,236,205,.16),transparent 70%),
+  repeating-linear-gradient(92deg,rgba(0,0,0,.07) 0 calc(3px/var(--f)),transparent calc(3px/var(--f)) calc(120px/var(--f))),
+  linear-gradient(180deg,#9a6c45,#6d4a30 55%,#442d1d);
+  box-shadow:inset 0 0 calc(120px/var(--f)) rgba(0,0,0,.5)}
+
+/* cèdre sculpté : le bandeau au-dessus des murs */
+.pane-creneaux{background:
+  repeating-linear-gradient(90deg,#3a2011 0 calc(46px/var(--f)),transparent calc(46px/var(--f)) calc(96px/var(--f)));
+  filter:drop-shadow(0 2px 0 rgba(0,0,0,.4))}
+.pane-cedre{background:
+  repeating-linear-gradient(90deg,#4a2a16 0 calc(6px/var(--f)),#6b4024 calc(6px/var(--f)) calc(13px/var(--f)),#3a2011 calc(13px/var(--f)) calc(22px/var(--f))),
+  #4a2a16;
+  box-shadow:inset 0 calc(10px/var(--f)) calc(24px/var(--f)) rgba(0,0,0,.5)}
+
+/* pavés de la ruelle */
+.pane-pave{background:
+  radial-gradient(50% 36% at 50% 42%,rgba(255,205,150,.14),transparent 72%),
+  repeating-linear-gradient(90deg,rgba(0,0,0,.34) 0 calc(3px/var(--f)),transparent calc(3px/var(--f)) calc(54px/var(--f))),
+  repeating-linear-gradient(0deg,rgba(0,0,0,.34) 0 calc(3px/var(--f)),transparent calc(3px/var(--f)) calc(54px/var(--f))),
+  linear-gradient(180deg,#6a5138,#3b2b1d)}
+
+/* l'arche en fer à cheval : un seul élément, bordure + rayon */
+.arche{position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+  border:30px solid #c08034;border-bottom:0;
+  border-radius:50% 50% 0 0/58% 58% 0 0;
+  box-shadow:0 0 60px rgba(227,168,108,.4),inset 0 0 40px rgba(0,0,0,.35)}
+.arche i{position:absolute;inset:-30px;border:9px solid #0f4b45;border-bottom:0;
+  border-radius:inherit;opacity:.9}
+
+/* les tanneries de Chouara : une nappe de cuves, un seul plan */
+.pane-cuves{background-color:#2a1d12;background-repeat:no-repeat;
+  background-image:
+    radial-gradient(circle,#d8a033 58%,#4a3317 60%),radial-gradient(circle,#b8541f 58%,#4a3317 60%),
+    radial-gradient(circle,#e6ddc4 58%,#4a3317 60%),radial-gradient(circle,#8e3418 58%,#4a3317 60%),
+    radial-gradient(circle,#c98a28 58%,#4a3317 60%),radial-gradient(circle,#ded3b4 58%,#4a3317 60%),
+    radial-gradient(circle,#6f4a16 58%,#4a3317 60%),radial-gradient(circle,#a84a1c 58%,#4a3317 60%),
+    radial-gradient(circle,#dcc48c 58%,#4a3317 60%),radial-gradient(circle,#bf7a24 58%,#4a3317 60%),
+    radial-gradient(circle,#e8e0c8 58%,#4a3317 60%),radial-gradient(circle,#93401a 58%,#4a3317 60%);
+  background-size:150px 150px;
+  background-position:40px 40px,210px 40px,380px 40px,550px 40px,
+    120px 210px,290px 210px,460px 210px,630px 210px,
+    40px 380px,210px 380px,380px 380px,550px 380px}
+
+/* lanterne de cuivre */
+.pane-lampe{background:linear-gradient(180deg,#8a5a22,#d9a44c 42%,#7a4a1c);
+  clip-path:polygon(50% 0,100% 26%,86% 100%,14% 100%,0 26%);
+  box-shadow:0 0 42px 14px rgba(240,186,110,.42)}
+.pane-lampe::after{content:"";position:absolute;inset:14% 15% 17%;
+  background:radial-gradient(closest-side,#fff3d6,#f0ba6e);filter:blur(1px)}
+/* plan sans matière : sert de support à l'arche */
+.pane-vide{background:none}
+
+/* Le toit de lattes de la derb. Les souks de Fès sont couverts de claies de
+   roseau : la lumière y tombe en lames. Cela ferme aussi le haut du cadre, qui
+   sans cela ouvrait sur le vide. */
+.pane-claie{background:
+  repeating-linear-gradient(90deg,
+    #2a1a10 0 calc(26px/var(--f)),
+    #120a06 calc(26px/var(--f)) calc(34px/var(--f)),
+    rgba(255,214,150,.5) calc(34px/var(--f)) calc(42px/var(--f)),
+    #1d1209 calc(42px/var(--f)) calc(62px/var(--f))),
+  #150c07}
+
+/* moucharabieh : claustra de cèdre tourné */
+.pane-mouchara{background:
+  repeating-linear-gradient(45deg,rgba(74,42,22,.96) 0 calc(7px/var(--f)),transparent calc(7px/var(--f)) calc(26px/var(--f))),
+  repeating-linear-gradient(-45deg,rgba(74,42,22,.96) 0 calc(7px/var(--f)),transparent calc(7px/var(--f)) calc(26px/var(--f))),
+  linear-gradient(180deg,rgba(255,214,160,.2),rgba(255,190,120,.07));
+  box-shadow:inset 0 0 36px rgba(0,0,0,.4)}
+
+/* tapis du show-room */
+.pane-tapis{background:
+  repeating-linear-gradient(90deg,transparent 0 calc(30px/var(--f)),rgba(0,0,0,.22) calc(30px/var(--f)) calc(34px/var(--f))),
+  repeating-conic-gradient(from 45deg at 50% 50%,#7d2218 0 25%,transparent 0 50%) 0 0/calc(120px/var(--f)) calc(120px/var(--f)),
+  linear-gradient(180deg,#9a3324,#5e1a12);
+  box-shadow:0 0 calc(50px/var(--f)) rgba(0,0,0,.5) inset}
+
+/* habillage 2D par-dessus la scène */
+.visite-ui{position:absolute;inset:0;pointer-events:none;z-index:3}
+.visite-ui::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(130% 100% at 50% 50%,transparent 42%,rgba(6,3,2,.78) 100%)}
+.vcap{position:absolute;left:0;right:0;bottom:12%;text-align:center;padding-inline:22px;opacity:0;
+  transition:opacity .26s ease;z-index:2}
+.vcap[style*="opacity: 1"]{z-index:3}
+.vcap .k{font-size:.66rem;letter-spacing:.3em;text-transform:uppercase;color:#f0b9a6;font-weight:600}
+.vcap h3{font-family:var(--fd);color:#fff;font-size:clamp(1.6rem,4.4vw,3rem);letter-spacing:-.03em;margin-top:14px}
+.vcap p{font-family:var(--fb);color:#e5c8bb;font-size:clamp(.95rem,2.1vw,1.1rem);line-height:1.6;
+  max-width:46ch;margin:12px auto 0}
+.vcap .btn{pointer-events:auto;margin-top:22px}
+.vskip{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:16px;pointer-events:auto;z-index:4;
+  font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:#eaae97;
+  border:1px solid rgba(240,185,166,.35);border-radius:3px;padding:9px 13px;background:rgba(10,4,7,.45);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:border-color .2s,color .2s}
+.vskip:hover{color:#fff;border-color:#f0b9a6}
+.vhint{position:absolute;left:0;right:0;bottom:26px;text-align:center;color:#cc9a8a;z-index:2;
+  font-size:.64rem;letter-spacing:.26em;text-transform:uppercase;transition:opacity .4s}
+.vhint i{display:block;width:1px;height:28px;margin:12px auto 0;background:linear-gradient(#f0b9a6,transparent);
+  animation:hint 1.8s ease-in-out infinite}
+@keyframes hint{0%,100%{transform:scaleY(.35);opacity:.3}50%{transform:scaleY(1);opacity:1}}
+.vprog{position:absolute;left:50%;transform:translateX(-50%);bottom:0;height:2px;width:min(360px,62%);
+  background:rgba(240,185,166,.16);z-index:4}
+.vprog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#b5301f,#f0b9a6)}
+/* Sur téléphone, pas de 3D : Safari iOS crée un calque GPU par élément
+   transformé et finit par manquer de mémoire — la page se recharge en
+   boucle. La visite devient une suite de plans en fondu, quelques calques. */
+.mv{position:absolute;inset:0;opacity:0;overflow:hidden;will-change:opacity}
+.mv img{width:100%;height:100%;object-fit:cover;display:block;transform-origin:50% 45%}
+.mv::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(26,12,8,.2),rgba(20,9,6,.5) 52%,rgba(14,6,4,.92))}
+@media(max-width:700px){
+  .visite{height:460vh}
+  .arche{border-width:18px}
+  /* L'écran d'un téléphone est bien plus haut que large : avec la perspective
+     courte du bureau, le cadre débordait la scène par le haut et par le bas.
+     650 px resserre le champ — mesuré : la couverture passe de 57 % à 82 %
+     au point le plus défavorable, sans un octet de mémoire en plus. */
+  .visite-stage{perspective:650px}
+  .pane-sign b{font-size:38px}.pane-sign i{font-size:11px;letter-spacing:.3em;margin-top:10px}
+  .niche b{font-size:11px}.niche span{font-size:9px}
+}
+html.degrade .visite,html.degrade .atelier{height:auto!important}
+html.degrade .visite-stage,html.degrade .at-stage{position:static;height:auto;min-height:0;padding-block:52px}
+html.degrade .world,html.degrade .vhint,html.degrade .vprog,html.degrade .vskip,html.degrade .at-bar{display:none}
+html.degrade .visite-ui{position:static;pointer-events:auto}
+html.degrade .visite-ui::after{display:none}
+html.degrade .vcap{position:static;opacity:1!important;padding-block:22px}
+html.degrade .at-track{flex-wrap:wrap;transform:none!important;gap:18px}
+html.degrade .at-ph{width:min(320px,100%)}
+html.degrade .at-img img{transform:none!important;width:100%}
+html.degrade [data-rv]{opacity:1!important;transform:none!important}
+
+@media(prefers-reduced-motion:reduce){
+  .visite{height:auto}
+  .visite-stage{position:static;height:auto;padding-block:64px;perspective:none}
+  .world,.vhint,.vprog,.vskip{display:none}
+  .visite-ui{position:static;pointer-events:auto}
+  .visite-ui::after{display:none}
+  .vcap{position:static;opacity:1!important;padding-block:26px}
+}
+

@@ -1,0 +1,66 @@
+/* ======================= démarrage ======================= */
+function degrader(raison){
+  MODE2D=true; construirePlans();
+  document.documentElement.classList.add('degrade');
+  MOTEUR.taches.length=0;
+  document.querySelectorAll('[data-rv]').forEach(el=>{el.style.opacity='';el.style.transform='';});
+  console.warn('[benka] affichage simplifié :',raison);
+}
+try{
+  renderStatic();
+  initMotion();initVisite();initAtelier();initNav();initCounters();initProgress();
+  avancer(tacheRevelations);revelations();
+}catch(err){ degrader(err&&err.message||err); }
+// garde-fou : si les scènes n'ont pas de hauteur (unité svh refusée, 3D
+// indisponible), on replie plutôt que d'afficher une zone vide.
+addEventListener('load',()=>{
+  // Sur #admin la boutique est remplacée : la scène n'a légitimement aucune
+  // hauteur, et replier ici viderait le moteur pour le retour à la boutique.
+  if(location.hash==='#admin') return;
+  const st=$('.visite-stage');
+  if(st && st.getBoundingClientRect().height<260) degrader('scène sans hauteur');
+});
+mesurer();
+addEventListener('scroll',reveiller,{passive:true});
+addEventListener('resize',()=>{mesurer();reveiller();},{passive:true});
+document.addEventListener('visibilitychange',reveiller);
+addEventListener('load',()=>{mesurer();reveiller();});
+reveiller();
+const savedCart=lsGet('benkashoes.cart');if(Array.isArray(savedCart))S.cart=savedCart.slice(0,40)
+  .filter(i=>i&&prod(i.id)&&COLORS[i.c]&&prod(i.id).colors.includes(i.c)&&SIZES.includes(i.s))
+  .map(i=>({id:i.id,c:i.c,s:i.s,q:Math.min(99,Math.max(1,Math.floor(Number(i.q))||1))}));
+draw();
+if(!HASCLAUDE){
+  TOKEN=lsGet('benkashoes.token')||'';
+  S.canAdmin=true;loadLocal();
+  const c=lsGet('benkashoes.catalog');if(c&&c.prices)S.ov=c;
+  draw();
+  (async function(){
+    // Sur l'hébergement statique il n'y a pas de serveur : sonder /api/catalog
+    // coûterait un aller-retour et un 404 rouge dans la console à chaque
+    // visiteur. build.sh ne pose ce repère que sur la page servie par server.js.
+    if(!document.querySelector('meta[name="benka-api"]'))return;
+    let cat;try{cat=await api('catalog');}catch(e){return;}   // serveur injoignable : on reste en carnet local
+    MODE='api';S.ov={prices:cat.prices,stock:cat.stock};S.orders=[];S.canAdmin=false;
+    if(TOKEN){try{await api('session');S.canAdmin=true;await loadOrders();}
+      catch(e){TOKEN='';lsSet('benkashoes.token','');}}
+    draw();
+    setInterval(()=>{if(S.canAdmin&&location.hash==='#admin'&&!S.panel&&S.admTab==='commandes')
+      loadOrders().then(draw);},20000);
+  })();
+}
+(async function(){
+  if(STATIC)return;
+  const [db,user]=await Promise.all([use('db'),use('user')]);
+  S.db=db;S.user=user;
+  if(user){try{S.canAdmin=await user.canEdit();}catch(e){}
+    try{const me=await user.me();S.me=(me&&me.name)||'';}catch(e){}}
+  if(db){
+    try{const snap=await db.doc('settings/catalog').get();
+      if(snap.exists){const v=snap.data()||{};S.ov={prices:v.prices||{},stock:v.stock||{}};}}catch(e){}
+    db.collection('orders').orderBy('createdAt','desc').limit(500).onSnapshot(
+      s=>{S.orders=nettoyerListe(s.docs.map(d=>d.data()));draw();},
+      ()=>{});
+  }
+  draw();
+})();

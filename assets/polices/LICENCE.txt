@@ -1,0 +1,9 @@
+Archivo, Archivo Black, Newsreader et Baloo 2
+Copyright leurs auteurs respectifs.
+
+Distribués sous la SIL Open Font License, version 1.1.
+Texte complet : https://openfontlicense.org
+
+Fichiers repris du service Google Fonts, sous-ensemble latin,
+sans modification. Leur redistribution avec ce site est permise
+par la licence ; ils ne sont pas vendus séparément.

@@ -1,0 +1,95 @@
+/* ================= mouvement =================
+   Trois mécaniques : une entrée orchestrée au chargement (héros),
+   des révélations pilotées par le défilement (animation-timeline: view()),
+   et des micro-interactions au survol. Tout se désactive avec
+   prefers-reduced-motion, et rien ne reste invisible si le moteur
+   d'animation n'est pas disponible. */
+@keyframes lineUp{from{transform:translateY(105%) rotate(2deg)}to{transform:translateY(0) rotate(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+@keyframes riseUp{from{transform:translateY(22px)}to{transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes artIn{from{opacity:0;transform:translateY(46px) scale(.9) rotate(-7deg)}to{opacity:1;transform:none}}
+@keyframes floatY{0%,100%{transform:translateY(0) rotate(-.6deg)}50%{transform:translateY(-16px) rotate(.6deg)}}
+@keyframes sweep{from{transform:translateX(-101%)}to{transform:translateX(101%)}}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes popIn{0%{transform:scale(.82)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+@keyframes badgePop{0%{transform:scale(1)}40%{transform:scale(1.45)}100%{transform:scale(1)}}
+@keyframes ringOut{from{opacity:.5;transform:scale(.7)}to{opacity:0;transform:scale(1.9)}}
+
+.hero h1 .ln{display:block;overflow:hidden;padding-bottom:.06em}
+.hero h1 .ln>i{display:block;font-style:inherit;animation:lineUp .95s cubic-bezier(.16,1,.3,1) backwards}
+.hero h1 .ln:nth-child(1)>i{animation-delay:.10s}
+.hero h1 .ln:nth-child(2)>i{animation-delay:.20s}
+.hero h1 .ln:nth-child(3)>i{animation-delay:.30s}
+.hero .eyebrow{animation:fadeUp .7s cubic-bezier(.16,1,.3,1) backwards}
+.hero p{animation:fadeUp .8s cubic-bezier(.16,1,.3,1) .42s backwards}
+.hero-cta{animation:fadeUp .8s cubic-bezier(.16,1,.3,1) .54s backwards}
+.hero-art #heroart{animation:artIn 1.1s cubic-bezier(.16,1,.3,1) .2s backwards}
+.hero-art #heroart svg{animation:floatY 7s ease-in-out 1.4s infinite}
+.hero-art .tag{animation:fadeIn 1s ease .9s backwards}
+.hero-topo{animation:fadeIn 1.6s ease .1s backwards;will-change:transform}
+
+/* lueur bordeaux qui suit le curseur */
+.hero-glow{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .5s ease;
+  background:radial-gradient(420px circle at var(--mx,50%) var(--my,40%),color-mix(in srgb,var(--accent-2) 42%,transparent),transparent 68%)}
+.hero:hover .hero-glow{opacity:1}
+
+/* bandeau défilant */
+.ticker{overflow:hidden}
+.marquee{display:flex;overflow:hidden;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.mq-track{display:flex;flex:0 0 auto;animation:marquee 34s linear infinite}
+.ticker:hover .mq-track{animation-play-state:paused}
+.mq-group{display:flex;flex:0 0 auto;gap:0}
+.mq-group span{display:flex;align-items:center;gap:10px;padding-inline:26px;white-space:nowrap;
+  font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+.mq-group span::before{content:"";width:5px;height:5px;background:var(--band-accent);border-radius:50%;flex:0 0 auto}
+
+/* révélations au défilement : pilotées en JS, jamais par le CSS seul.
+   Sans JavaScript, tout reste visible — rien ne peut rester bloqué. */
+
+/* survol des cartes */
+.card{overflow:hidden}
+.card::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .35s ease;
+  background:radial-gradient(360px circle at 50% 18%,var(--accent-wash),transparent 70%)}
+.card:hover::after{opacity:1}
+.card>*{position:relative;z-index:1}
+.card-name h3{transition:color .25s ease}
+.card:hover .card-name h3{color:var(--accent-text)}
+.card-art svg{filter:drop-shadow(0 14px 22px rgba(90,16,9,.14))}
+.card:hover .card-art svg{transform:translateY(-10px) scale(1.05) rotate(-1.5deg)}
+
+/* boutons */
+.btn{position:relative;overflow:hidden;transition:transform .18s cubic-bezier(.2,.8,.3,1),background .2s,border-color .2s,box-shadow .25s}
+.btn-pri:hover,.btn-hero:hover{box-shadow:0 10px 26px -10px color-mix(in srgb,var(--accent-2) 70%,transparent)}
+.btn::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.3),transparent)}
+.btn:hover::before{animation:sweep .7s ease}
+.chip,.sw,.colopt,.sizebtn{transition:transform .18s cubic-bezier(.2,.8,.3,1),background .18s,border-color .18s,color .18s,box-shadow .18s}
+.chip:hover,.sw:hover{transform:translateY(-2px)}
+.sizebtn:hover:not([disabled]){transform:translateY(-2px)}
+.sizebtn[aria-pressed="true"],.colopt[aria-pressed="true"]{animation:popIn .3s cubic-bezier(.2,.8,.3,1)}
+.cartbtn{transition:transform .18s cubic-bezier(.2,.8,.3,1),box-shadow .25s}
+.cartbtn:hover{transform:translateY(-2px);box-shadow:0 10px 22px -12px rgba(0,0,0,.5)}
+.cartbtn b{transition:transform .25s}
+.cartbtn.bump b{animation:badgePop .45s cubic-bezier(.2,.8,.3,1)}
+.icbtn{transition:transform .18s,border-color .18s,color .18s}
+.icbtn:hover{transform:rotate(-14deg)}
+.nav a{transition:color .2s}
+.anat-item{transition:background .25s}
+.anat-item:hover{background:var(--accent-wash)}
+.tbl tbody tr{transition:background .18s}
+.kpi .v{animation:fadeUp .6s cubic-bezier(.16,1,.3,1) backwards}
+.kpi:nth-child(2) .v{animation-delay:.06s}.kpi:nth-child(3) .v{animation-delay:.12s}.kpi:nth-child(4) .v{animation-delay:.18s}
+.toast{animation:fadeUp .3s cubic-bezier(.16,1,.3,1)}
+.okmark{animation:popIn .5s cubic-bezier(.2,.8,.3,1)}
+.panel.right{animation:inR .42s cubic-bezier(.16,1,.3,1)}
+.panel.left{animation:inL .42s cubic-bezier(.16,1,.3,1)}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;
+    transition-duration:.001ms!important;scroll-behavior:auto!important}
+  .hero-glow{display:none}
+}
+

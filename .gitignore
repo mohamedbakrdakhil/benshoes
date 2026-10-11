@@ -2,5 +2,7 @@
 .claude/
 .data/
 .data-test/
+.build/
 node_modules/
 *.log
+apercus/

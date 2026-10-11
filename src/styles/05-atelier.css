@@ -1,0 +1,35 @@
+/* ================= l'atelier : galerie horizontale au défilement ================= */
+.atelier{position:relative;height:440vh;background:var(--band-bg);color:var(--band-fg)}
+.at-stage{position:sticky;top:0;height:100vh;height:100svh;min-height:420px;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:center}
+.at-intro{flex:0 0 auto;width:min(360px,74vw);display:flex;flex-direction:column;justify-content:center;
+  padding-right:12px}
+.at-intro h2{font-size:clamp(1.7rem,3.6vw,2.7rem);color:var(--band-fg);margin-top:10px}
+.at-intro p{font-family:var(--fb);color:var(--band-soft);max-width:44ch;margin-top:12px;font-size:1rem;line-height:1.55}
+.at-track{display:flex;gap:26px;padding-inline:6vw;will-change:transform;align-items:center}
+.at-ph{flex:0 0 auto;width:min(400px,70vw);margin:0}
+.at-img{overflow:hidden;aspect-ratio:3/4;background:#120806;border:1px solid var(--band-line)}
+.at-img img{width:118%;height:100%;object-fit:cover;display:block;will-change:transform;
+  transform:translateX(var(--px,-9%))}
+.at-ph figcaption{margin-top:14px}
+.at-ph b{display:block;font-family:var(--fu);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--band-accent);font-weight:600}
+.at-ph span{display:block;font-family:var(--fb);font-size:.96rem;line-height:1.5;color:var(--band-soft);margin-top:7px}
+.at-bar{position:absolute;left:6vw;right:6vw;bottom:5vh;height:2px;background:rgba(240,185,166,.16);z-index:2}
+.at-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent-2),var(--band-accent))}
+@media(max-width:700px){
+  .atelier{height:240vh}
+  .at-track{gap:16px}
+  .at-ph{width:76vw}
+  .at-intro{width:78vw}
+}
+@media(prefers-reduced-motion:reduce){
+  .atelier{height:auto}
+  .at-stage{position:static;height:auto;padding-block:56px}
+  .at-track{flex-wrap:wrap;transform:none!important;margin-top:28px;gap:20px}
+  .at-ph{width:min(320px,100%)}
+  .at-img img{transform:none!important;width:100%}
+  .at-intro{width:min(360px,100%)}
+  .at-bar{display:none}
+}
+
