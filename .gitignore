@@ -3,6 +3,7 @@
 .data/
 .data-test/
 .build/
+.travail/
 node_modules/
 *.log
 apercus/
