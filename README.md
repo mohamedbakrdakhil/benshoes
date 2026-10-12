@@ -93,6 +93,23 @@ git add -A && git commit -m "mise à jour" && git push
 
 `build.sh` réassemble `index.html` à partir des modules de `src/`, l'allège, y pose la politique de sécurité et les métadonnées de référencement. GitHub Pages met le site à jour en une minute environ.
 
+## Le carnet de commandes Excel
+
+`integrations/carnet-excel.py` fabrique `benkashoes-carnet.xlsx` : quatre
+feuilles — tableau de bord qui se calcule seul, journal des commandes,
+catalogue, stock.
+
+```sh
+python3 integrations/carnet-excel.py benkashoes-carnet.xlsx
+```
+
+Les colonnes A à P du journal sont **exactement** celles que produisent le site
+et le script du tableur : une exportation se colle sous l'en-tête sans rien
+réaligner. Q et R sont libres pour votre suivi.
+
+Écrit sans bibliothèque, comme l'export du site — un `.xlsx` est une archive de
+fichiers XML.
+
 ## Recevoir les commandes dans un tableur
 
 Chaque commande validée dépose une ligne dans une feuille Google — date,
