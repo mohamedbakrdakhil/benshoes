@@ -5,7 +5,11 @@ const SHOP={
   email:'contact@benkashoes.ma',   // votre vraie adresse e-mail
   phone:'',                       // ex. '+212 6 12 34 56 78'  (vide = masqué)
   whatsapp:'',                    // ex. '2126XXXXXXXX' indicatif SANS le +  (vide = bouton masqué)
-  site:'www.benkashoes.ma'       // l'adresse affichée en bas de page
+  site:'www.benkashoes.ma',      // l'adresse affichée en bas de page
+  // Adresse du script qui dépose les commandes dans votre tableur.
+  // Vide = le client reçoit un récapitulatif à vous envoyer lui-même.
+  // Comment l'obtenir : integrations/LISEZMOI.md
+  tableur:''
 };
 /* Logo et photos. Laisser vide = illustration vectorielle et logo typographique.
    Déposer les fichiers dans assets/ puis renseigner ici — voir assets/README.md */

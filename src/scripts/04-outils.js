@@ -1,7 +1,7 @@
 /* ======================= état ======================= */
 const S={cart:[],sheet:null,panel:null,step:1,filter:'tous',colorFilter:null,
   ov:{prices:{},stock:{}},orders:[],db:null,user:null,canAdmin:false,dbTried:false,
-  admTab:'commandes',openRow:null,lastOrder:null,manual:null,me:''};
+  admTab:'commandes',openRow:null,lastOrder:null,manual:null,me:'',envoi:false};
 const $=s=>document.querySelector(s);
 const fmt=n=>new Intl.NumberFormat('fr-MA',{minimumFractionDigits:0,maximumFractionDigits:0}).format(Math.round(n))+' DH';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

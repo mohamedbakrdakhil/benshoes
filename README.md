@@ -57,7 +57,11 @@ Trois outils accompagnent l'assemblage :
 - **`minifier.py`** allège le fichier livré sans jamais toucher aux sources.
   Chaque traitement est choisi pour ne rien pouvoir casser — le détail est en
   tête du fichier.
-- **`csp.py`** scelle chaque script en ligne par son empreinte SHA-256.
+- **`csp.py`** scelle chaque script en ligne par son empreinte SHA-256 et
+  n'ouvre `connect-src` que si le tableur est configuré.
+- **`verif-catalogue.py`** compare le catalogue du site à celui du script du
+  tableur. Deux catalogues, c'est deux occasions de diverger — et un prix
+  changé d'un seul côté ferait facturer autre chose que l'affiché.
 - **`build.sh`** orchestre, et refuse de livrer si le scellage a échoué.
 
 Le dossier `.build/` ne contient que des fichiers intermédiaires ; il n'est pas
@@ -88,6 +92,26 @@ git add -A && git commit -m "mise à jour" && git push
 ```
 
 `build.sh` réassemble `index.html` à partir des modules de `src/`, l'allège, y pose la politique de sécurité et les métadonnées de référencement. GitHub Pages met le site à jour en une minute environ.
+
+## Recevoir les commandes dans un tableur
+
+Chaque commande validée dépose une ligne dans une feuille Google — date,
+référence, nom, téléphone, e-mail, adresse, articles, total — et vous envoie
+un e-mail. La feuille se télécharge en `.xlsx` pour Excel.
+
+Dix minutes à installer, une seule fois : **`integrations/LISEZMOI.md`**.
+
+Le script receveur (`integrations/tableur.gs`) ne fait confiance à rien : il
+recalcule les prix depuis son propre catalogue, vérifie modèle, coloris et
+pointure, borne les textes, désamorce les formules avant qu'elles n'entrent
+dans la feuille, écarte les robots par un champ invisible et refuse les
+doublons grâce à une clé par commande. 25 vérifications automatiques couvrent
+ces points — `node .travail/essai-tableur.js` après avoir recréé le banc.
+
+Tant que `SHOP.tableur` est vide, la page ne contacte rien à l'extérieur et la
+politique de sécurité reste entièrement refermée sur `'self'` ; `build.sh`
+l'ouvre tout seul, et juste ce qu'il faut, le jour où vous renseignez
+l'adresse.
 
 ## Où sont les commandes
 

@@ -77,12 +77,15 @@ cat .build/corps.html
 printf '</body>\n</html>\n'
 } > index.html
 
-# ---------- 4. allègement du fichier livré (les sources restent lisibles) ----------
+# ---------- 4. le catalogue du tableur doit suivre celui du site ----------
+if command -v python3 >/dev/null 2>&1; then python3 verif-catalogue.py; fi
+
+# ---------- 5. allègement du fichier livré (les sources restent lisibles) ----------
 # Doit passer avant le scellage : il modifie le texte des scripts, donc leurs
 # empreintes.
 if command -v python3 >/dev/null 2>&1; then python3 minifier.py index.html; fi
 
-# ---------- 5. politique de sécurité : chaque script scellé par son empreinte ----------
+# ---------- 6. politique de sécurité : chaque script scellé par son empreinte ----------
 if command -v python3 >/dev/null 2>&1 && python3 csp.py index.html; then
   :
 else
@@ -92,7 +95,7 @@ else
 fi
 grep -q '@@CSP@@' index.html && { echo "ERREUR : la politique de sécurité n'a pas été posée"; exit 1; }
 
-# ---------- 6. la version servie par server.js porte le repère d'API ----------
+# ---------- 7. la version servie par server.js porte le repère d'API ----------
 # Sans ce repère, la page ne sonde pas /api/catalog : inutile sur GitHub Pages,
 # où il n'y a pas de serveur et où le sondage coûtait un 404 à chaque visite.
 python3 - <<'PY' || cp index.html public/index.html

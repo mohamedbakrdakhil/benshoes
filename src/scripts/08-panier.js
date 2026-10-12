@@ -6,7 +6,9 @@ function cartHTML(){
     body=`<div style="text-align:center;padding-top:18px">
       <div class="okmark"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12.5l5.2 5L20 6.5"/></svg></div>
       <span class="eyebrow">Commande enregistrée</span><div class="ordref">${esc(o.ref)}</div>
-      <p class="note" style="max-width:34ch;margin:8px auto 0">${o.saved
+      <p class="note" style="max-width:34ch;margin:8px auto 0">${o.canal==='tableur'
+        ? `Votre commande est arrivée à l'atelier. On vous rappelle au <b>${esc(o.customer.phone)}</b> pour confirmer la disponibilité et la livraison.`
+        : o.saved
         ? `Nous avons reçu votre commande. Un e-mail de confirmation part à <b>${esc(o.customer.email)}</b>.`
         : `Votre récapitulatif est prêt. Envoyez-le à l'atelier : il confirme la disponibilité et vous rappelle pour la livraison.`}</p>
       ${o.saved?'':`<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px">
@@ -24,14 +26,15 @@ function cartHTML(){
     const f=S.form||{};
     body=`<div class="steps" style="margin-bottom:20px"><b>Panier</b><i></i><b data-on="1">Livraison</b><i></i><b>Confirmation</b></div>
       <div class="form">
-      <label class="f full">Nom et prénom<input id="f_name" value="${esc(f.name)}" autocomplete="name" placeholder="Amina Benali"></label>
-      <label class="f">Téléphone<input id="f_phone" value="${esc(f.phone)}" autocomplete="tel" placeholder="06 12 34 56 78"></label>
-      <label class="f">E-mail<input id="f_email" type="email" value="${esc(f.email)}" autocomplete="email" placeholder="amina@exemple.fr"></label>
-      <label class="f full">Adresse<input id="f_addr" value="${esc(f.addr)}" autocomplete="street-address" placeholder="12 rue Tahar Sebti"></label>
-      <label class="f">Code postal<input id="f_zip" value="${esc(f.zip)}" autocomplete="postal-code" placeholder="20250"></label>
-      <label class="f">Ville<input id="f_city" value="${esc(f.city)}" autocomplete="address-level2" placeholder="Casablanca"></label>
+      <label class="f full">Nom et prénom<input id="f_name" maxlength="80" value="${esc(f.name)}" autocomplete="name" placeholder="Amina Benali"></label>
+      <label class="f">Téléphone<input id="f_phone" type="tel" inputmode="tel" maxlength="20" value="${esc(f.phone)}" autocomplete="tel" placeholder="06 12 34 56 78"></label>
+      <label class="f">E-mail<input id="f_email" type="email" maxlength="120" value="${esc(f.email)}" autocomplete="email" placeholder="amina@exemple.fr"></label>
+      <label class="f full">Adresse<input id="f_addr" maxlength="200" value="${esc(f.addr)}" autocomplete="street-address" placeholder="12 rue Tahar Sebti"></label>
+      <label class="f">Code postal<input id="f_zip" maxlength="20" inputmode="numeric" value="${esc(f.zip)}" autocomplete="postal-code" placeholder="20250"></label>
+      <label class="f">Ville<input id="f_city" maxlength="80" value="${esc(f.city)}" autocomplete="address-level2" placeholder="Casablanca"></label>
       <label class="f full">Pays<select id="f_country">${['Maroc','France','Belgique','Espagne','Algérie','Tunisie','Canada','Autre'].map(c=>`<option ${(f.country||'Maroc')===c?'selected':''}>${c}</option>`).join('')}</select></label>
-      <label class="f full">Note pour l'atelier <span style="text-transform:none;letter-spacing:0;font-weight:400">(optionnel)</span><textarea id="f_note" placeholder="Pied large, livrer après 18 h…">${esc(f.note)}</textarea></label>
+      <label class="f full">Note pour l'atelier <span style="text-transform:none;letter-spacing:0;font-weight:400">(optionnel)</span><textarea id="f_note" maxlength="500" placeholder="Pied large, livrer après 18 h…">${esc(f.note)}</textarea></label>
+      <input id="f_site" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
       </div>
       <div class="callout" style="margin-top:18px"><b>Aucun paiement maintenant.</b> L'atelier vérifie la disponibilité, vous recevez la confirmation, puis vous réglez à la livraison ou par virement.</div>`;
     foot=`<div class="totals"><div><span>Sous-total</span><span class="num">${fmt(sub)}</span></div>
@@ -73,12 +76,48 @@ function orderText(o){
 function readForm(){
   const g=id=>($('#'+id)?.value||'').trim();
   return {name:g('f_name'),phone:g('f_phone'),email:g('f_email'),addr:g('f_addr'),
-    zip:g('f_zip'),city:g('f_city'),country:$('#f_country')?.value||'Maroc',note:g('f_note')};
+    zip:g('f_zip'),city:g('f_city'),country:$('#f_country')?.value||'Maroc',note:g('f_note'),
+    site:g('f_site')};   // piège à robots : un humain ne voit pas ce champ
+}
+/* ---------- dépôt de la commande dans le tableur de l'atelier ----------
+   Envoyé en text/plain : avec un type JSON le navigateur enverrait d'abord
+   une requête de contrôle, à laquelle Apps Script ne sait pas répondre.
+   Chaque commande porte une clé : si la réponse ne nous revient pas — la
+   politique d'origine peut l'empêcher — on peut renvoyer sans créer de
+   doublon, le script reconnaît la clé et rend la même référence. */
+function cleCommande(){
+  const a=new Uint8Array(12);
+  if(self.crypto&&crypto.getRandomValues)crypto.getRandomValues(a);
+  else for(let i=0;i<a.length;i++)a[i]=Math.random()*256|0;
+  return Array.from(a,b=>('0'+b.toString(16)).slice(-2)).join('');
+}
+async function envoyerAuTableur(o,cle,leurre){
+  const charge=JSON.stringify({cle,
+    items:o.items.map(i=>({id:i.id,colorKey:i.colorKey,size:i.size,q:i.q})),
+    customer:o.customer,note:o.note,site:leurre||''});
+  const envoi=m=>fetch(SHOP.tableur,{method:'POST',mode:m,
+    headers:{'Content-Type':'text/plain;charset=utf-8'},body:charge});
+  try{
+    const r=await envoi('cors');
+    let d=null; try{d=await r.json();}catch(e){}
+    if(d&&d.ok)return {ok:true,ref:d.ref};
+    // L'atelier a répondu non : c'est un refus motivé, pas une panne.
+    if(d&&d.erreur)return {ok:false,refus:true,message:d.erreur};
+    return {ok:true,ref:null,aveugle:true};
+  }catch(e){
+    // Lecture refusée ou réseau coupé : on ne sait pas lequel. On rejoue avec
+    // la même clé — sans risque — et on considère la commande partie.
+    try{await envoi('no-cors');return {ok:true,ref:null,aveugle:true};}
+    catch(e2){return {ok:false,refus:false,message:'L\u2019envoi n\u2019a pas abouti. Voici votre récapitulatif à envoyer à l\u2019atelier.'};}
+  }
 }
 async function placeOrder(){
+  if(S.envoi)return;   // le bouton a déjà été cliqué
   const f=readForm();S.form=f;
   const miss=['name','phone','email','addr','city'].filter(k=>!f[k]);
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(f.email))miss.push('email');
+  // Un numéro mal saisi, c'est une commande qu'on ne peut pas confirmer.
+  if(f.phone && !/^[0-9+().\s-]{8,20}$/.test(f.phone))miss.push('phone');
   if(miss.length){document.querySelectorAll('label.f').forEach(l=>l.classList.remove('bad'));
     miss.forEach(k=>$('#f_'+k)?.closest('label')?.classList.add('bad'));
     toast('Complétez les champs en rouge');$('#f_'+miss[0])?.focus();return;}
@@ -92,6 +131,27 @@ async function placeOrder(){
       S.lastOrder=Object.assign({},nettoyerCommande(r.order)||o,{saved:true});S.cart=[];syncCart();S.step=3;S.form=null;
       await refreshCatalog();draw();return;}
     catch(e){toast(e.message);return;}}
+  if(SHOP.tableur){
+    S.envoi=true;
+    const b=document.querySelector('[data-act="place"]');
+    if(b){b.disabled=true;b.textContent='Envoi en cours…';}
+    const r=await envoyerAuTableur(o,cleCommande(),f.site);
+    S.envoi=false;
+    if(r.ok){
+      if(r.ref)o.ref=r.ref;
+      S.lastOrder=Object.assign({},nettoyerCommande(o)||o,{saved:true,canal:'tableur'});
+      S.cart=[];syncCart();S.step=3;S.form=null;
+      if(MODE==='local'){S.orders=[S.lastOrder].concat(S.orders);saveLocal();}
+      draw();return;
+    }
+    if(b){b.disabled=false;b.textContent='Valider la commande';}
+    toast(r.message);
+    // Refus motivé : on garde le client sur le formulaire, sa commande n'est
+    // pas passée et lui faire croire le contraire serait pire que tout.
+    if(r.refus)return;
+    // Panne de liaison : on ne le bloque pas, il repart avec son récapitulatif
+    // et de quoi nous l'envoyer.
+  }
   let saved=false;
   if(S.db){try{await S.db.doc('orders/'+o.ref).set(o);saved=true;}catch(e){saved=false;}}
   S.lastOrder=Object.assign({},nettoyerCommande(o)||o,{saved:saved});S.cart=[];syncCart();S.step=3;S.form=null;draw();

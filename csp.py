@@ -24,6 +24,15 @@ if not empreintes:
 
 script_src = "'self' " + ' '.join(empreintes)
 
+# La page ne se connecte qu'à elle-même. Seule exception : si le tableur de
+# l'atelier est configuré, on ouvre juste ce qu'il faut pour lui parler —
+# Apps Script répond derrière une redirection, d'où les deux origines. Tant
+# que SHOP.tableur est vide, la politique reste entièrement refermée.
+destinations = ["'self'"]
+if re.search(r"tableur:\s*'https://script\.google\.com/[^']+'", h):
+    destinations += ['https://script.google.com', 'https://script.googleusercontent.com']
+    print('  tableur configuré : connect-src ouvert vers Apps Script')
+
 politique = '; '.join([
     "default-src 'self'",
     "base-uri 'none'",
@@ -33,7 +42,7 @@ politique = '; '.join([
     "style-src 'self' 'unsafe-inline'",
     "font-src 'self'",
     "img-src 'self' data:",
-    "connect-src 'self'",
+    'connect-src ' + ' '.join(destinations),
     "media-src 'none'",
     "worker-src 'none'",
     'upgrade-insecure-requests',
