@@ -42,6 +42,24 @@ async function patchOrder(ref,patch){const o=S.orders.find(x=>x.ref===ref);if(!o
     catch(e){toast(e.message);await loadOrders();draw();}return;}
   if(MODE==='local'){saveLocal();return;}
   if(S.db){try{await S.db.doc('orders/'+ref).update(patch);}catch(e){toast('Modification non enregistrée');}}}
+async function exportExcel(){
+  if(!S.orders.length){toast('Aucune commande à exporter');return;}
+  try{
+    const bin=classeurCommandes(S.orders);
+    const nom='benkashoes-commandes-'+new Date().toISOString().slice(0,10)+'.xlsx';
+    const b=new Blob([bin],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    if(STATIC){
+      const u=URL.createObjectURL(b);const a=document.createElement('a');
+      a.href=u;a.download=nom;document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(u),3000);
+    }else{
+      const dl=await use('downloads');
+      if(!dl){toast('Téléchargement indisponible ici');return;}
+      await dl.save({filename:nom,data:bin});
+    }
+    toast('Classeur Excel prêt');
+  }catch(e){toast('Export impossible');}
+}
 async function exportCSV(){
   const H=['Référence','Date','Statut','Client','Téléphone','E-mail','Adresse','CP','Ville','Pays','Articles','Sous-total','Livraison','Total','Note'];
   const rows=[H].concat(S.orders.map(o=>[o.ref,new Date(o.createdAt).toLocaleString('fr-FR'),STATUS[o.status],
@@ -102,6 +120,7 @@ document.addEventListener('click',async e=>{
     if(MODE==='local'){saveLocal();return;}
     if(S.db){try{await S.db.doc('orders/'+d.r).delete();}catch(err){toast('Suppression non enregistrée');}}}
   else if(a==='copyord'){const o=S.orders.find(x=>x.ref===d.r);const ok=await copy(orderText(o));toast(ok?'Commande copiée':'Copie refusée');}
+  else if(a==='excel'){exportExcel();}
   else if(a==='csv'){exportCSV();}
   else if(a==='backup'){await dlFile('benkashoes-sauvegarde-'+new Date().toISOString().slice(0,10)+'.json',
     JSON.stringify({version:1,exportedAt:new Date().toISOString(),orders:S.orders,catalog:S.ov},null,2),'application/json');

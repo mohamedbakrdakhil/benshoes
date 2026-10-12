@@ -14,7 +14,7 @@ Boutique de mocassins-mules en daim, première en liège estampée benka. Site s
 - Filtres par cuir, fiche produit, choix de pointure avec stock réel, panier, commande en trois étapes.
 - Menu de sections sur téléphone : sous 860 px la barre de navigation disparaissait sans rien à la place.
 - Coupe annotée de la semelle, guide des pointures en millimètres, photos d'atelier, thème clair/sombre.
-- Espace commandes : chiffre d'affaires, commandes à traiter, panier moyen, suivi des statuts, saisie manuelle, édition des prix et du stock, export CSV, sauvegarde JSON.
+- Espace commandes : chiffre d'affaires, commandes à traiter, panier moyen, suivi des statuts, saisie manuelle, édition des prix et du stock, sauvegarde JSON, et **export Excel** — un vrai `.xlsx` fabriqué dans le navigateur, sans bibliothèque (`src/scripts/09b-export-excel.js`). Dates et montants typés, en-tête figé, filtre posé. Le CSV reste disponible, mais il se répartit mal dans un Excel français et lit les montants comme du texte.
 
 ## Comment le code est rangé
 

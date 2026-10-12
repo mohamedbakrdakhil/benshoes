@@ -74,7 +74,8 @@ function admOrders(){
       <button class="chip" data-act="stf" data-k="" aria-pressed="${!S.stFilter}">Toutes (${os.length})</button>
       ${Object.entries(STATUS).map(([k,l])=>`<button class="chip" data-act="stf" data-k="${k}" aria-pressed="${S.stFilter===k}">${l} (${os.filter(o=>o.status===k).length})</button>`).join('')}
       <span style="margin-left:auto;display:flex;gap:8px">
-        <button class="btn btn-out btn-sm" data-act="csv" ${os.length?'':'disabled'}>Exporter CSV</button>
+        <button class="btn btn-out btn-sm" data-act="excel" ${os.length?'':'disabled'}>Exporter Excel</button>
+        <button class="btn btn-out btn-sm" data-act="csv" ${os.length?'':'disabled'}>CSV</button>
         ${MODE!=='artifact'?`<button class="btn btn-out btn-sm" data-act="backup" ${os.length?'':'disabled'}>Sauvegarder</button>`:''}
         ${MODE==='local'?`<button class="btn btn-out btn-sm" data-act="restore">Restaurer</button>
         <input type="file" id="impfile" accept="application/json,.json" hidden>`:''}

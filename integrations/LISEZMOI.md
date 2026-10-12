@@ -79,14 +79,24 @@ apparaître dans la feuille en deux ou trois secondes, et l'e-mail arriver.
 
 ---
 
-## Ouvrir dans Excel
+## Travailler dans Excel
 
-**Fichier → Télécharger → Microsoft Excel (.xlsx)**
+Trois façons, de la plus simple à la plus confortable.
 
-Pour qu'Excel se mette à jour tout seul, sans téléchargement :
-**Fichier → Partager → Publier sur le Web → Feuille « Commandes » → .csv**,
-puis dans Excel **Données → À partir du Web**, collez l'adresse. Excel
-rafraîchit d'un clic.
+**1 · Télécharger ponctuellement**
+Dans la feuille : **Fichier → Télécharger → Microsoft Excel (.xlsx)**.
+
+**2 · Excel se met à jour tout seul** — le plus confortable au quotidien.
+Dans la feuille : **Fichier → Partager → Publier sur le Web**, choisissez
+l'onglet *Commandes* et le format **.csv**, copiez l'adresse. Puis dans Excel :
+**Données → À partir du Web**, collez l'adresse. Ensuite un seul clic sur
+**Actualiser tout** suffit : vos filtres, vos couleurs et vos formules restent.
+
+**3 · Sans rien installer du tout**
+L'espace commandes du site (`/#admin`) a un bouton **Exporter Excel** qui
+fabrique un vrai `.xlsx` dans le navigateur — dates, montants et filtres déjà
+en place. Utile pour les commandes que vous saisissez à la main, ou si vous
+préférez ne pas passer par Google.
 
 ---
 
