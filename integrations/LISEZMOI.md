@@ -1,5 +1,9 @@
 # Recevoir les commandes dans un tableur
 
+> **Déjà installé.** La feuille « Commandes benka » existe dans votre Drive, le
+> script est déployé en version 3, et le site lui parle. Ce document reste pour
+> comprendre, dépanner, ou tout refaire ailleurs.
+
 Quand un client valide son panier, une ligne s'ajoute toute seule à votre
 feuille — date, référence, nom, téléphone, e-mail, adresse, articles, total —
 et vous recevez un e-mail. La feuille s'ouvre dans Excel quand vous voulez.

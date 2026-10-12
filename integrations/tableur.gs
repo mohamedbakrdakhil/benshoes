@@ -65,6 +65,17 @@ function cellule(v) {
   return /^[=+\-@\t\r]/.test(s) ? "'" + s : s;
 }
 
+/**
+ * Force une valeur à rester du texte. Sans cela, le tableur lit « 0600000000 »
+ * comme un nombre et laisse tomber le zéro de tête : le numéro n'est plus
+ * composable. L'apostrophe ne s'affiche pas, elle dit juste « ceci est du
+ * texte ». Vaut aussi pour un code postal.
+ */
+function texteBrut(v) {
+  var s = String(v === null || v === undefined ? '' : v);
+  return s === '' ? '' : "'" + s;
+}
+
 function reponse(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
@@ -238,8 +249,8 @@ function doPost(e) {
       ref = nouvelleReference(f);
       f.appendRow([
         new Date(), ref, 'Nouvelle',
-        cellule(cmd.client.nom), cellule(cmd.client.tel), cellule(cmd.client.email),
-        cellule(cmd.client.adr), cellule(cmd.client.cp), cellule(cmd.client.ville),
+        cellule(cmd.client.nom), texteBrut(cmd.client.tel), cellule(cmd.client.email),
+        cellule(cmd.client.adr), texteBrut(cmd.client.cp), cellule(cmd.client.ville),
         cellule(cmd.client.pays), cellule(cmd.articles),
         cmd.sousTotal, cmd.livraison, cmd.total, 'MAD', cellule(cmd.note)
       ]);

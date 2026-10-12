@@ -9,7 +9,7 @@ const SHOP={
   // Adresse du script qui dépose les commandes dans votre tableur.
   // Vide = le client reçoit un récapitulatif à vous envoyer lui-même.
   // Comment l'obtenir : integrations/LISEZMOI.md
-  tableur:''
+  tableur:'https://script.google.com/macros/s/AKfycbxe9a0sMOxdZh4uBQuCSkdsi12cUepOBlLI5_M2ZwJhoyAJPIFM9THGg744WT1a1K8Z6Q/exec'
 };
 /* Logo et photos. Laisser vide = illustration vectorielle et logo typographique.
    Déposer les fichiers dans assets/ puis renseigner ici — voir assets/README.md */
