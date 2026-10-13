@@ -45,6 +45,31 @@ Autrement dit : la porte est ouverte, personne n'est encore entré.
   `og:locale` en `fr_MA`, carte Twitter en grand format.
 - Le plan du site est daté du jour à chaque build et déclare l'image.
 
+## IndexNow : les moteurs qu'on peut prévenir sans compte
+
+Google n'accepte pas qu'on lui annonce une adresse : il faut passer par la
+Search Console, donc par un navigateur connecté au compte du propriétaire.
+
+Bing, Yandex, DuckDuckGo et Seznam acceptent le protocole **IndexNow** : une
+clé déposée à la racine du site prouve qu'on en est responsable, et une simple
+requête leur dit « venez voir ». Aucun compte, aucune connexion.
+
+La clé est dans un fichier `<clé>.txt` à la racine du dépôt, recopié dans
+`public/` par `build.sh`. Pour réannoncer le site après une refonte :
+
+```bash
+CLE=$(cat .indexnow-cle)
+curl -s -X POST https://api.indexnow.org/indexnow \
+  -H 'Content-Type: application/json' \
+  -d '{"host":"www.benkashoes.ma","key":"'"$CLE"'",
+       "keyLocation":"https://www.benkashoes.ma/'"$CLE"'.txt",
+       "urlList":["https://www.benkashoes.ma/"]}'
+```
+
+Une réponse `200` ou `202` signifie que l'annonce est acceptée. Cela **ne
+remplace pas** la Search Console : Google reste à faire, et Google est de loin
+le premier moteur au Maroc.
+
 ## Ce que vous seul pouvez faire — par ordre d'importance
 
 ### 1. Search Console (le seul geste vraiment urgent)
