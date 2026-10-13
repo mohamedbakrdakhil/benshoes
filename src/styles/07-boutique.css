@@ -81,3 +81,16 @@ label.f.bad input{border-color:var(--bad)}
 .okmark{width:52px;height:52px;border-radius:50%;background:var(--ok-wash);color:var(--ok);display:grid;place-items:center;margin:0 auto 18px}
 .ordref{font-family:var(--fd);font-size:1.5rem;letter-spacing:.02em;text-align:center;margin-block:4px 2px}
 
+
+/* Repli sans script : la collection en texte, dans un <noscript>. Le
+   navigateur n'en affiche jamais le contenu tant que le script tourne — ces
+   règles ne servent qu'au visiteur qui a coupé JavaScript, et aux robots qui
+   n'en exécutent pas. */
+.repli-catalogue{margin-top:28px}
+.repli-catalogue ul{list-style:none;margin:0;padding:0;display:grid;gap:22px;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.repli-catalogue li{border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;
+  background:var(--surface);color:var(--fg)}
+.repli-catalogue h3{margin:0 0 6px;font-size:18px}
+.repli-catalogue p{margin:0 0 8px;font-size:14px;line-height:1.55;color:var(--fg-soft)}
+.repli-catalogue strong{color:var(--fg)}

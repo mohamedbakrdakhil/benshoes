@@ -6,6 +6,11 @@ const SHOP={
   phone:'',                       // ex. '+212 6 12 34 56 78'  (vide = masqué)
   whatsapp:'',                    // ex. '2126XXXXXXXX' indicatif SANS le +  (vide = bouton masqué)
   site:'www.benkashoes.ma',      // l'adresse affichée en bas de page
+  // Vos pages publiques. C'est ce qui dit à Google que ce site, cette page
+  // Instagram et cette fiche Google Business sont la même maison — le signal
+  // le plus fort pour qu'une recherche sur « benka » tombe sur vous.
+  // ex. ['https://www.instagram.com/benkashoes/','https://www.facebook.com/benkashoes']
+  reseaux:[],
   // Adresse du script qui dépose les commandes dans votre tableur.
   // Vide = le client reçoit un récapitulatif à vous envoyer lui-même.
   // Comment l'obtenir : integrations/LISEZMOI.md

@@ -36,6 +36,15 @@ Boutique de mocassins-mules en daim, première en liège estampée benka. Site s
 - Coupe annotée de la semelle, guide des pointures en millimètres, photos d'atelier, thème clair/sombre.
 - Espace commandes : chiffre d'affaires, commandes à traiter, panier moyen, suivi des statuts, saisie manuelle, édition des prix et du stock, sauvegarde JSON, et **export Excel** — un vrai `.xlsx` fabriqué dans le navigateur, sans bibliothèque (`src/scripts/09b-export-excel.js`). Dates et montants typés, en-tête figé, filtre posé. Le CSV reste disponible, mais il se répartit mal dans un Excel français et lit les montants comme du texte.
 
+- **Référencement** : les données structurées (organisation, site, boutique,
+  les trois produits, les questions fréquentes) sont **générées depuis le
+  catalogue** par `seo.py` — un prix recopié à la main finit par mentir.
+  Les orthographes du nom (benka, benka shoes, benkashoes…) y sont déclarées
+  en `alternateName`, et la collection figure désormais dans le HTML servi :
+  `#grid` était vide sans JavaScript, donc invisible pour un visiteur qui l'a
+  coupé comme pour un robot qui n'en exécute pas. Marche à suivre et état
+  réel dans [REFERENCEMENT.md](REFERENCEMENT.md).
+
 ## Comment le code est rangé
 
 Il n'y a plus de fichier unique : `build.sh` assemble le site à partir de
@@ -72,13 +81,19 @@ src/
     15-demarrage.js      l'amorçage
 ```
 
-Trois outils accompagnent l'assemblage :
+Quatre outils accompagnent l'assemblage :
 
+- **`seo.py`** fabrique les données structurées et le repli sans script à
+  partir du catalogue, pour que ni Google ni un visiteur sans JavaScript ne
+  voient un prix périmé ou une collection vide.
 - **`minifier.py`** allège le fichier livré sans jamais toucher aux sources.
   Chaque traitement est choisi pour ne rien pouvoir casser — le détail est en
   tête du fichier.
 - **`csp.py`** scelle chaque script en ligne par son empreinte SHA-256 et
-  n'ouvre `connect-src` que si le tableur est configuré.
+  n'ouvre `connect-src` que si le tableur est configuré. Les blocs
+  `application/ld+json` en sont exclus : ils ne s'exécutent pas, les sceller
+  ne protégeait rien et faisait changer la politique à chaque retouche du
+  catalogue.
 - **`verif-catalogue.py`** compare le catalogue du site à celui du script du
   tableur. Deux catalogues, c'est deux occasions de diverger — et un prix
   changé d'un seul côté ferait facturer autre chose que l'affiché.

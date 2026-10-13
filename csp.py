@@ -14,9 +14,16 @@ import base64, hashlib, io, re, sys
 CHEMIN = sys.argv[1]
 h = io.open(CHEMIN, encoding='utf-8').read()
 
+# Un bloc application/ld+json n'est pas exécuté : le navigateur ne consulte
+# jamais script-src pour lui. Le sceller ne protégeait rien et faisait changer
+# la politique de sécurité à chaque retouche du catalogue.
+DONNEES = re.compile(r'type\s*=\s*["\']application/(ld\+json|json)["\']', re.I)
+
 empreintes = []
-for m in re.finditer(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>', h, re.S):
-    d = hashlib.sha256(m.group(1).encode('utf-8')).digest()
+for m in re.finditer(r'<script(?![^>]*\bsrc=)([^>]*)>(.*?)</script>', h, re.S):
+    if DONNEES.search(m.group(1)):
+        continue
+    d = hashlib.sha256(m.group(2).encode('utf-8')).digest()
     empreintes.append("'sha256-" + base64.b64encode(d).decode('ascii') + "'")
 
 if not empreintes:
