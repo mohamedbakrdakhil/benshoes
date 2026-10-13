@@ -23,6 +23,11 @@ URL="${SITE_URL:-https://www.benkashoes.ma/}"
 TITRE="Benkashoes — mocassins-mules en daim, atelier marocain"
 DESC="Benkashoes — mocassins-mules en daim de veau, première en liège estampée, doublure cuir pleine fleur. Trois modèles, huit coloris, pointures 37 à 41. Livraison au Maroc, offerte dès 400 DH, ressemelage en atelier."
 PARTAGE="assets/marque/partage-1200x630.jpg"
+# Jeton de propriété Search Console. Il vit dans .google-verif, pas dans une
+# variable passée à la main : Google retire le statut de propriétaire si la
+# preuve disparaît de la page, et un build lancé sans la variable l'aurait
+# effacée en silence. GOOGLE_VERIF reste accepté pour le remplacer ponctuellement.
+[ -z "${GOOGLE_VERIF:-}" ] && [ -f .google-verif ] && GOOGLE_VERIF="$(cat .google-verif)"
 if [ -n "${GOOGLE_VERIF:-}" ]; then
   VERIF="<meta name=\"google-site-verification\" content=\"$GOOGLE_VERIF\">
 "
@@ -167,6 +172,10 @@ SITEMAP
 cp -f robots.txt sitemap.xml public/ 2>/dev/null || true
 for f in *.txt; do
   case "$f" in robots.txt) ;; *) cp -f "$f" public/ 2>/dev/null || true ;; esac
+done
+# fichier de preuve de propriété Google, à ne jamais supprimer
+for f in google*.html; do
+  [ -f "$f" ] && cp -f "$f" public/ 2>/dev/null || true
 done
 rm -rf public/assets && cp -R assets public/assets 2>/dev/null || true
 printf '  %-18s %s Ko (gzip %s Ko) — canonique : %s\n' "index.html" \
