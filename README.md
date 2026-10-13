@@ -1,6 +1,6 @@
 # Benkashoes
 
-Boutique de mocassins-mules en daim, première en liège estampée benka. Site statique, un seul fichier, sans dépendance ni build complexe.
+Boutique de **mocassins-mules en daim de veau**, première en liège estampée benka. Atelier marocain : trois modèles, huit cuirs, pointures 37 à 41. Site statique assemblé depuis des modules, sans aucune dépendance.
 
 **En ligne :** https://www.benkashoes.ma/
 **Espace atelier :** https://www.benkashoes.ma/#admin
