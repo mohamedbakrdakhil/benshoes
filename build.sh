@@ -161,7 +161,13 @@ cat > sitemap.xml <<SITEMAP
 </urlset>
 SITEMAP
 
+# La clé IndexNow doit être servie à la racine pour que les moteurs qui
+# l'utilisent (Bing, Yandex, DuckDuckGo…) acceptent nos annonces d'adresse.
+# Google, lui, ne s'en sert pas : voir REFERENCEMENT.md.
 cp -f robots.txt sitemap.xml public/ 2>/dev/null || true
+for f in *.txt; do
+  case "$f" in robots.txt) ;; *) cp -f "$f" public/ 2>/dev/null || true ;; esac
+done
 rm -rf public/assets && cp -R assets public/assets 2>/dev/null || true
 printf '  %-18s %s Ko (gzip %s Ko) — canonique : %s\n' "index.html" \
   "$(( $(wc -c < index.html) / 1024 ))" "$(( $(gzip -9 -c index.html | wc -c) / 1024 ))" "$URL"
