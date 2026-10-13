@@ -60,6 +60,41 @@ function pane(cls,w,ht,tf,inner){
   if(f!==1){w/=f;ht/=f;tf+=` scale(${f})`;}
   if(K!==1){w*=K;ht*=K;tf=tf.replace(/(-?[\d.]+)px/g,(m,v)=>(v*K).toFixed(1)+'px');}
   return `<div class="pane ${cls}"${f!==1?` style="--f:${f};`:' style="'}width:${w}px;height:${ht}px;margin-left:${-w/2}px;margin-top:${-ht/2}px;transform:${tf}">${inner||''}</div>`;}
+/* Une silhouette humaine, en un seul SVG. Les jambes et les bras sont dans
+   leurs propres groupes pour que la CSS leur donne le pas. */
+function silhouetteSVG(){
+  return '<svg class="sil" viewBox="0 0 70 184" preserveAspectRatio="xMidYMax meet" aria-hidden="true">'
+    +'<circle cx="35" cy="17" r="13"/>'
+    +'<path d="M35 32c-12 0-20 8-21 19l-2 27h10l1-17v23h24v-23l1 17h10l-2-27c-1-11-9-19-21-19z"/>'
+    +'<g class="br b1"><path d="M15 52l-6 36 8 2 6-35z"/></g>'
+    +'<g class="br b2"><path d="M55 52l6 36-8 2-6-35z"/></g>'
+    +'<g class="jb j1"><path d="M26 84l-3 47 2 46h10l1-46 2-47z"/></g>'
+    +'<g class="jb j2"><path d="M44 84l3 47-2 46h-10l-1-46-2-47z"/></g>'
+    +'</svg>';
+}
+/* Buste de couturière sur son pied. */
+function mannequinSVG(id){
+  // Le dégradé donne le galbe : sans lui, la forme reste une découpe plate.
+  return '<svg class="man" viewBox="0 0 80 200" preserveAspectRatio="xMidYMax meet" aria-hidden="true">'
+    +'<defs><linearGradient id="g'+id+'" x1="0" y1="0" x2="1" y2="0">'
+    +'<stop offset="0" stop-color="#6d5a49"/><stop offset=".42" stop-color="#9d8871"/>'
+    +'<stop offset="1" stop-color="#53432f"/></linearGradient></defs>'
+    +'<path fill="url(#g'+id+')" d="M36 6h8v10c13 3 21 13 22 27 1 13-4 24-7 32'
+    +'-2 6-2 10-1 15l2 13H20l2-13c1-5 1-9-1-15-3-8-8-19-7-32 1-14 9-24 22-27z"/>'
+    +'<rect class="pied" x="37.5" y="100" width="5" height="74"/>'
+    +'<ellipse class="pied" cx="40" cy="179" rx="23" ry="6"/>'
+    +'</svg>';
+}
+/* Un passant : le moteur réécrira sa position à chaque image, on garde donc
+   ses paramètres sur l'élément lui-même. */
+function passant(cls,w,ht,x,y,z0,z1,vitesse,phase,ry){
+  const W=w*K, H=ht*K;
+  return `<div class="pane pane-gens ${cls} passant" data-x="${x}" data-y="${y}" data-z0="${z0}"`
+    +` data-z1="${z1}" data-v="${vitesse}" data-t="${phase}" data-ry="${ry||0}"`
+    +` style="width:${W}px;height:${H}px;margin-left:${-W/2}px;margin-top:${-H/2}px;`
+    +`transform:translate3d(${(x*K).toFixed(1)}px,${(y*K).toFixed(1)}px,${(z0*K).toFixed(1)}px) rotateY(${ry||0}deg)">`
+    +silhouetteSVG()+'</div>';
+}
 function niche(p,left,w,ht,top,plate,col){
   if(K!==1){left*=K;w*=K;ht*=K;top*=K;}
   const corps=`${visuel(p,col||p.colors[0],true)}<b>${p.name}</b><span>${(COLORS[col||p.colors[0]]||{}).n||''}</span>`;
@@ -119,6 +154,19 @@ function buildWorld(){
     .forEach(([lx,lz,ry])=>fes.push(pane('pane-lampe',58,80,`translate3d(${lx}px,-470px,${lz}px) rotateY(${ry}deg)`)));
   // le toit de claies au-dessus de la ruelle
   fes.push(pane('pane-claie',2*F.HW+40,rl,`translate3d(0px,${F.HAUT}px,${rc}px) rotateX(-90deg)`));
+  // Des passants dans la derb. Ils marchent le long de la rue, à contresens
+  // de la caméra pour la plupart : c'est ce qui donne l'impression que la
+  // ville vit pendant qu'on la traverse.
+  // Tous tournés vers la caméra : un plan de dos est effacé par
+  // backface-visibility, et le sens de marche se lit au déplacement.
+  const foule = RICHE
+    ? [[-230,2300,-900,.055,0  ],[ 250,-900,2300,.042,.35],
+       [ 120,2100,-700,.068,.62],[-290,-800,2200,.037,.18],
+       [  40,1700,-900,.050,.80]]
+    : [[-230,2300,-900,.055,0  ],[ 250,-900,2300,.042,.35]];
+  foule.forEach(([px,z0,z1,v,ph])=>
+    fes.push(passant('ombre',150,370,px,F.SOL-185,z0,z1,v,ph,0)));
+
   // les tanneries de Chouara : la nappe de cuves, et de quoi fermer la vue
   fes.push(pane('pane-cuves',1000,780,`translate3d(1000px,${F.SOL-4}px,${F.ZT}px) rotateX(90deg)`));
   fes.push(pane('pane-chaux',1060,1020,`translate3d(1530px,-190px,${F.ZT}px) rotateY(-90deg)`));
@@ -191,6 +239,27 @@ function buildWorld(){
   salle.push(pane('pane-mouchara',420,620,`translate3d(${V.SX0+8}px,-230px,-3700px) rotateY(90deg)`));
   salle.push(pane('pane-mouchara',420,620,`translate3d(${V.SX0+8}px,-230px,-4900px) rotateY(90deg)`));
   [-3900,-4700].forEach(lz=>salle.push(pane('pane-lampe',66,90,`translate3d(1700px,-690px,${lz}px)`)));
+  // Flaques de lumière au sol, sous chaque lanterne du mur. Un seul plan
+  // chacune, et la salle cesse d'être éclairée uniformément.
+  [-3500,-4300,-5100].forEach(lz=>
+    salle.push(pane('pane-flaque',760,760,`translate3d(2180px,${V.FY-6}px,${lz}px) rotateX(90deg)`)));
+  // Mannequins de couturière, posés devant le mur. Deux plans croisés chacun :
+  // de trois quarts, on ne voit jamais une silhouette plate.
+  // Un seul plan par mannequin, face à la caméra : dans la salle le regard
+  // ne tourne que de 62° à 90°, le plan reste de face. Le plan croisé que
+  // j'avais ajouté ne faisait qu'un fantôme en double exposition.
+  const mans = RICHE ? [[1880,-3300],[1840,-4450],[1910,-5400]] : [[1880,-3600],[1860,-5150]];
+  mans.forEach(([mx,mz],i)=>{
+    salle.push(pane('pane-podtop',260,260,`translate3d(${mx}px,${V.FY-12}px,${mz}px) rotateX(90deg)`));
+    salle.push(pane('pane-mannequin',200,420,`translate3d(${mx}px,${V.FY-222}px,${mz}px) rotateY(-90deg)`,mannequinSVG(i)));
+  });
+  // Deux clients qui longent le mur, lentement.
+  if(RICHE){
+    salle.push(passant('client',150,370,1480,V.FY-185,-3200,-5600,.030,.1,-90));
+    salle.push(passant('client',150,370,1560,V.FY-185,-5600,-3200,.024,.55,-90));
+  }else{
+    salle.push(passant('client',150,370,1520,V.FY-185,-3200,-5600,.030,.1,-90));
+  }
   // banc central, parallèle au mur
   if(RICHE){
     salle.push(pane('pane-podium',2200,150,`translate3d(1950px,${V.FY-75}px,-4300px) rotateY(-90deg)`));
@@ -203,6 +272,38 @@ function buildWorld(){
 
   w.innerHTML=[['fes',fes],['seuil',seuil],['allee',allee],['salle',salle]]
     .map(([n,a])=>`<div class="zone" data-z="${n}">${a.join('')}</div>`).join('');
+}
+
+/* Les passants avancent avec le temps, pas avec le défilement : la rue vit
+   même quand on s'arrête de faire défiler. Une seule tâche pour tout le
+   monde, et seulement quand la scène est à portée d'écran — ailleurs elle
+   rend la main et le moteur s'endort. */
+function animerPassants(world){
+  const gens=[...world.querySelectorAll('.passant')].map(el=>({
+    el, x:+el.dataset.x, y:+el.dataset.y, z0:+el.dataset.z0, z1:+el.dataset.z1,
+    v:+el.dataset.v, t:+el.dataset.t, ry:+el.dataset.ry }));
+  if(!gens.length)return;
+  // Un observateur suffit : il ne coûte rien tant que rien ne traverse le
+  // bord de l'écran, là où un sondage à chaque image coûterait tout le temps.
+  const sec=world.closest('.visite')||world.parentElement;
+  if(self.IntersectionObserver&&sec){
+    new IntersectionObserver(e=>world.classList.toggle('vit',e[0].isIntersecting),
+      {rootMargin:'25% 0px'}).observe(sec);
+  }else world.classList.add('vit');
+  let horloge=0;
+  avancer((dt,sy)=>{
+    if(sy<GEO.vTop-GEO.vh || sy>GEO.vTop+GEO.vSpan+GEO.vh*0.6) return false;
+    horloge+=dt;
+    for(let i=0;i<gens.length;i++){
+      const g=gens[i];
+      const u=(horloge*g.v+g.t)%1;                    // 0 → 1, puis on repart
+      const z=g.z0+(g.z1-g.z0)*u;
+      const bob=Math.sin(horloge*5.7+g.t*6.3)*2.5;     // le pas fait monter le corps
+      g.el.style.transform='translate3d('+(g.x*K).toFixed(1)+'px,'
+        +((g.y+bob)*K).toFixed(1)+'px,'+(z*K).toFixed(1)+'px) rotateY('+g.ry+'deg)';
+    }
+    return true;
+  });
 }
 
 function cr(a,b,c,d,t){const t2=t*t,t3=t2*t;
@@ -255,6 +356,7 @@ function initVisite(){
     for(let i=0;i<zel.length;i++) if(zel[i]) zel[i].style.display=(m>>i&1)?'':'none';
   }
   majZones(0);
+  animerPassants(world);
   const cam=echantillon(0); let roll=0, prevYaw=cam.yaw, capPrec=-1, hintPrec=-1;
   avancer((dt,sy)=>{
     const p=borne((sy-GEO.vTop)/GEO.vSpan,0,1);

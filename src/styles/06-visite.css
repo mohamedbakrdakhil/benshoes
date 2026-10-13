@@ -160,6 +160,36 @@
     #1d1209 calc(42px/var(--f)) calc(62px/var(--f))),
   #150c07}
 
+/* ---- les gens et les mannequins ----
+   Une silhouette tient dans un seul plan : le SVG est dessiné à l'intérieur,
+   il ne crée pas de calque supplémentaire. Le pas est une animation CSS sur
+   les jambes et les bras — elle tourne sur le compositeur, sans une ligne de
+   JavaScript. Seul le déplacement le long de la rue est piloté par le moteur. */
+.pane-gens{background:none}
+.sil{width:100%;height:100%;display:block;overflow:visible}
+/* Le pas ne tourne que lorsque la scène approche de l'écran : inutile de
+   faire marcher des gens pendant qu'on lit le bas de la page. */
+.sil g.jb,.sil g.br{transform-box:view-box;animation:marche 1.1s ease-in-out infinite;
+  animation-play-state:paused}
+.world.vit .sil g.jb,.world.vit .sil g.br{animation-play-state:running}
+.sil g.jb{transform-origin:35px 84px}
+/* Le bras balance moins que la jambe — sinon la démarche devient raide. */
+.sil g.br{transform-origin:35px 56px;animation-name:balance}
+.sil g.j2,.sil g.b1{animation-delay:-.55s}
+@keyframes marche{0%,100%{transform:rotate(10deg)}50%{transform:rotate(-10deg)}}
+@keyframes balance{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+/* les passants de la médina se découpent en ombre sur la rue éclairée */
+.pane-gens.ombre .sil{fill:#120a06;opacity:.82}
+.pane-gens.client .sil{fill:#2a1710;opacity:.7}
+
+/* mannequin de couturière : buste sur pied, immobile */
+.pane-mannequin{background:none;opacity:.88}
+.man{width:100%;height:100%;display:block}
+.man .pied{fill:#3b2d20}
+
+/* flaque de lumière au sol, sous chaque lanterne */
+.pane-flaque{background:radial-gradient(closest-side,rgba(246,206,150,.3),rgba(246,206,150,.08) 55%,transparent 72%)}
+
 /* moucharabieh : claustra de cèdre tourné */
 .pane-mouchara{background:
   repeating-linear-gradient(45deg,rgba(74,42,22,.96) 0 calc(7px/var(--f)),transparent calc(7px/var(--f)) calc(26px/var(--f))),

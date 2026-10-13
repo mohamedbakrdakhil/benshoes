@@ -9,6 +9,13 @@ Boutique de mocassins-mules en daim, première en liège estampée benka. Site s
 
 - Trois modèles — Opus (299 DH), Stepy (259 DH), Western (359 DH) — en huit cuirs, pointures 37 à 41, illustrés en SVG généré.
 - Une visite en 3D au défilement, en neuf chapitres : **Fès d'abord** — la porte au lever du jour, la derb et ses zelliges sous la claie de roseau, les cuves des tanneries de Chouara — puis la façade benka au bout de la rue, l'allée, et le mur des quatorze cuirs. Tout est dessiné en dégradés CSS : pas une image à télécharger.
+- Des passants marchent dans la derb et deux clients longent le mur du
+  show-room, où trois mannequins de couturière attendent devant les vitrines.
+  Une silhouette tient dans **un seul plan** : le SVG est dessiné dedans, et le
+  pas est une animation CSS sur les jambes — elle tourne sur le compositeur,
+  sans une ligne de JavaScript. Seul le déplacement le long de la rue est
+  piloté par le moteur, et la marche se met en pause dès que la visite quitte
+  l'écran.
 - Le décor est groupé par quartier (`ZONES`). Un quartier hors de portée de la caméra est retiré du document : il ne coûte plus un seul calque graphique. C'est ce qui permet de doubler le décor en divisant la mémoire par quatre — 82 Mo au plus fort contre 320 avant, 19 Mo sur téléphone contre 47.
 - Un plan sans contenu et trop grand est dessiné réduit puis agrandi par la transformation (`pane()`, facteur `--f`). Au-delà d'environ deux millions de pixels, le navigateur renonce à peindre un dégradé et n'en dessine qu'une bande : c'est ce qui tronquait les zelliges de la porte.
 - Filtres par cuir, fiche produit, choix de pointure avec stock réel, panier, commande en trois étapes.
