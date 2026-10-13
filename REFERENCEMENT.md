@@ -1,26 +1,42 @@
 # Référencement
 
-## L'état réel, au 13 octobre 2026
+## L'état réel, au 13 octobre 2026 (18 h)
 
-Le site **n'est pas encore dans l'index de Google**. Une recherche sur
-« benkashoes » ne renvoie rien qui concerne l'atelier.
-
-Ce n'est pas un problème de mots-clés : c'est un problème de découverte. Le
-domaine est neuf et aucun site au monde ne pointe vers lui. Google ne le
-connaît pas, donc il ne peut pas le classer — ni premier, ni dernier.
-
-Techniquement tout est en ordre et vérifié :
+Le site est **déclaré et validé dans la Search Console**, le plan du site est
+soumis et lu, et l'indexation est demandée.
 
 | Contrôle | État |
 |---|---|
-| `https://benkashoes.ma` → `https://www.benkashoes.ma` | 301, correct |
-| `robots.txt` accessible | 200, autorise tout |
-| `sitemap.xml` accessible | 200, daté à chaque build |
-| En-tête `X-Robots-Tag: noindex` | absent, donc rien ne bloque |
-| Balise canonique | pointe sur `www`, cohérente avec la redirection |
-| DNS | résout vers GitHub Pages |
+| Propriété `https://www.benkashoes.ma/` | **validée** (fichier HTML) |
+| Plan du site | **envoyé**, lu le 13 oct., 1 page découverte |
+| Indexation | **demandée** |
+| Test en direct Googlebot | « Google a accès à cette URL » |
+| Exploration autorisée | oui |
+| Récupération de page | réussie |
+| Indexation autorisée | oui |
+| Canonique déclarée | `https://www.benkashoes.ma/` |
+| Extraits de produits | **3 éléments valides** |
+| Fiches de marchand | **3 éléments valides** |
+| `https://benkashoes.ma` → `www` | 301, correct |
+| En-tête `X-Robots-Tag: noindex` | absent |
 
-Autrement dit : la porte est ouverte, personne n'est encore entré.
+Google indique la page comme « Détectée, actuellement non indexée » : c'est
+l'état normal d'une adresse tout juste découverte. L'exploration suit.
+
+**Deux avertissements non critiques** sur chaque produit : champs `review` et
+`aggregateRating` absents. C'est délibéré. Les remplir signifierait inventer
+des avis et des notes que la boutique n'a pas encore ; Google l'interdit et
+sanctionne la page entière. Ils viendront avec les premiers vrais avis.
+
+### Les deux preuves de propriété — ne pas les supprimer
+
+- `googleda42fe0b92307fea.html` à la racine du dépôt
+- la balise méta, dont le jeton vit dans `.google-verif` et que `build.sh`
+  repose à chaque construction
+
+Google retire le statut de propriétaire si la preuve disparaît. Le jeton est
+dans un fichier et non dans une variable d'environnement précisément pour
+qu'un build distrait ne l'efface pas en silence.
 
 ## Ce qui a été fait sur le site
 
