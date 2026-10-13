@@ -9,15 +9,28 @@ Boutique de mocassins-mules en daim, première en liège estampée benka. Site s
 
 - Trois modèles — Opus (299 DH), Stepy (259 DH), Western (359 DH) — en huit cuirs, pointures 37 à 41, illustrés en SVG généré.
 - Une visite en 3D au défilement, en neuf chapitres : **Fès d'abord** — la porte au lever du jour, la derb et ses zelliges sous la claie de roseau, les cuves des tanneries de Chouara — puis la façade benka au bout de la rue, l'allée, et le mur des quatorze cuirs. Tout est dessiné en dégradés CSS : pas une image à télécharger.
-- Des passants marchent dans la derb et deux clients longent le mur du
-  show-room, où trois mannequins de couturière attendent devant les vitrines.
-  Une silhouette tient dans **un seul plan** : le SVG est dessiné dedans, et le
-  pas est une animation CSS sur les jambes — elle tourne sur le compositeur,
-  sans une ligne de JavaScript. Seul le déplacement le long de la rue est
-  piloté par le moteur, et la marche se met en pause dès que la visite quitte
-  l'écran.
+- **Le show-room tient sur deux niveaux**, d'inspiration gréco-italienne : rez-de-chaussée
+  au mur des quatorze cuirs, entablement, puis une loggia d'arcs romains fermée
+  par une balustrade. Une colonnade de fûts cannelés scande la salle — par paires
+  aux deux extrémités, jamais devant les niches : la marchandise passe avant
+  l'architecture. Vitrines de verre éclairées, mannequins de couturière, sol de
+  marbre veiné, bandeaux de LED chaudes sous la coursive et froides sous le plafond.
+- Des passants marchent dans la derb et des clientes traversent le show-room,
+  sac au bras. Quatre silhouettes distinctes (robe, manteau, tailleur, costume),
+  chacune dans **un seul plan** : le SVG est dessiné dedans, et le pas est une
+  animation CSS sur les jambes et les bras — elle tourne sur le compositeur, sans
+  une ligne de JavaScript. Seul le déplacement est piloté par le moteur, et la
+  marche se met en pause dès que la visite quitte l'écran.
+  Dehors les silhouettes sont des ombres à contre-jour ; dedans les LED les
+  prennent de face, et elles se détachent en clair — peintes sombres comme
+  celles de la rue, elles disparaissaient purement et simplement sur le bois.
 - Le décor est groupé par quartier (`ZONES`). Un quartier hors de portée de la caméra est retiré du document : il ne coûte plus un seul calque graphique. C'est ce qui permet de doubler le décor en divisant la mémoire par quatre — 82 Mo au plus fort contre 320 avant, 19 Mo sur téléphone contre 47.
 - Un plan sans contenu et trop grand est dessiné réduit puis agrandi par la transformation (`pane()`, facteur `--f`). Au-delà d'environ deux millions de pixels, le navigateur renonce à peindre un dégradé et n'en dessine qu'une bande : c'est ce qui tronquait les zelliges de la porte.
+- Les lueurs (`box-shadow` des néons) se comptent en pixels d'écran, pas en unités
+  du monde. Le script publie donc l'échelle de la scène au CSS (`--k`) pour que
+  les halos la suivent : sur téléphone, où le monde est réduit de moitié, un
+  bandeau de 13 px disparaissait sous 46 px de lueur et le haut de la salle
+  virait au blanc.
 - Filtres par cuir, fiche produit, choix de pointure avec stock réel, panier, commande en trois étapes.
 - Menu de sections sur téléphone : sous 860 px la barre de navigation disparaissait sans rien à la place.
 - Coupe annotée de la semelle, guide des pointures en millimètres, photos d'atelier, thème clair/sombre.

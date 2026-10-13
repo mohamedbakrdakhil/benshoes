@@ -180,12 +180,89 @@
 @keyframes balance{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
 /* les passants de la médina se découpent en ombre sur la rue éclairée */
 .pane-gens.ombre .sil{fill:#120a06;opacity:.82}
-.pane-gens.client .sil{fill:#2a1710;opacity:.7}
+/* Les clientes, elles, sont DANS la lumière : les LED de la salle les
+   prennent de face. Les peindre en sombre comme les ombres de la rue les
+   effaçait complètement sur le bois brun. Elles se détachent donc en clair,
+   visage et chevelure distincts. */
+.pane-gens.client .sil{fill:#8a6f5c;opacity:.97}
+.pane-gens.client .sil circle{fill:#caa184}
+.pane-gens.client .sil .ch{fill:#2b1b14}
 
 /* mannequin de couturière : buste sur pied, immobile */
 .pane-mannequin{background:none;opacity:.88}
 .man{width:100%;height:100%;display:block}
 .man .pied{fill:#3b2d20}
+
+/* ---- l'étage : architecture gréco-romaine ----
+   Marbre veiné, colonnes cannelées, balustres, arcs en plein cintre. Tout en
+   dégradés : chaque surface reste un seul plan, donc un seul calque. Les
+   motifs se divisent par --f, le facteur d'agrandissement posé par pane(). */
+
+/* travertin veiné : trois veines obliques sur un fond chaud */
+.pane-marbre{background:
+  repeating-linear-gradient(114deg,transparent 0 calc(180px/var(--f)),
+    rgba(255,252,245,.3) calc(180px/var(--f)) calc(186px/var(--f)),
+    transparent calc(186px/var(--f)) calc(430px/var(--f))),
+  repeating-linear-gradient(96deg,transparent 0 calc(120px/var(--f)),
+    rgba(126,104,82,.22) calc(120px/var(--f)) calc(125px/var(--f)),
+    transparent calc(125px/var(--f)) calc(360px/var(--f))),
+  repeating-linear-gradient(134deg,transparent 0 calc(250px/var(--f)),
+    rgba(96,78,60,.16) calc(250px/var(--f)) calc(258px/var(--f)),
+    transparent calc(258px/var(--f)) calc(600px/var(--f))),
+  linear-gradient(176deg,#ded2bd,#c3b49c 58%,#a8906d 100%)}
+/* Sol : marbre sombre poli. Les colonnes claires s'y détachent, et la salle
+   garde sa pénombre — un sol crème aurait écrasé l'éclairage des vitrines. */
+.pane-marbre.sol{background:
+  repeating-linear-gradient(114deg,transparent 0 calc(200px/var(--f)),
+    rgba(226,214,192,.16) calc(200px/var(--f)) calc(206px/var(--f)),
+    transparent calc(206px/var(--f)) calc(470px/var(--f))),
+  repeating-linear-gradient(97deg,transparent 0 calc(140px/var(--f)),
+    rgba(198,180,154,.1) calc(140px/var(--f)) calc(145px/var(--f)),
+    transparent calc(145px/var(--f)) calc(400px/var(--f))),
+  radial-gradient(62% 36% at 50% 42%,rgba(255,214,160,.14),transparent 72%),
+  linear-gradient(178deg,#2b2019,#1a110c 60%,#120b07)}
+
+/* fût cannelé : le dégradé horizontal fait le galbe, le motif fait les cannelures */
+.pane-colonne{background:
+  repeating-linear-gradient(90deg,
+    rgba(0,0,0,.30) 0 calc(3px/var(--f)),
+    rgba(255,244,222,.09) calc(3px/var(--f)) calc(10px/var(--f)),
+    rgba(0,0,0,.05) calc(10px/var(--f)) calc(28px/var(--f))),
+  linear-gradient(90deg,#1b140e,#6f5d46 22%,#a89073 44%,#7b6750 66%,#191208)}
+/* chapiteau et base : un bloc évasé */
+.pane-chapiteau{background:linear-gradient(90deg,#2f251b,#d2c2a6 40%,#efe6d4 50%,#bba98e 64%,#2d231a);
+  clip-path:polygon(0 100%,8% 32%,0 0,100% 0,92% 32%,100% 100%);filter:brightness(.78)}
+.pane-socle{background:linear-gradient(90deg,#2f251b,#c9b99e 42%,#e3d8c4 52%,#b2a086 66%,#2c221a);
+  clip-path:polygon(0 100%,7% 0,93% 0,100% 100%)}
+
+/* balustres de l'étage : pleins et vides alternés, rampe pleine au-dessus */
+.pane-balustres{background:
+  repeating-linear-gradient(90deg,
+    #a08a6c 0 calc(13px/var(--f)),
+    rgba(30,22,14,.7) calc(13px/var(--f)) calc(20px/var(--f)),
+    transparent calc(20px/var(--f)) calc(112px/var(--f)))}
+.pane-rampe{background:linear-gradient(180deg,#bfa98a,#9d8769 60%,#6b5a44)}
+
+/* arc en plein cintre, pour les niches de l'étage */
+.arc-romain{position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+  border:var(--e,16px) solid #d9cab0;border-bottom:0;
+  border-radius:50% 50% 0 0/100% 100% 0 0;
+  box-shadow:0 0 34px rgba(240,228,200,.3),inset 0 0 26px rgba(0,0,0,.3)}
+
+/* vitrine de milieu de salle : une boîte de verre sur son socle */
+.pane-verre{background:
+  linear-gradient(112deg,rgba(226,243,255,.16),rgba(255,255,255,.04) 42%,rgba(206,230,252,.18));
+  border:1px solid rgba(226,243,255,.34);
+  box-shadow:inset 0 0 calc(40px/var(--f)) rgba(186,216,244,.14)}
+
+/* bandeau de LED : plus fin et plus net que les corniches existantes */
+/* Les lueurs suivent l'échelle du monde (--k, posée par le script) : sinon
+   le halo garde sa taille en pixels pendant que la salle rétrécit de moitié,
+   et il mange le décor sur un téléphone. */
+.pane-led{background:linear-gradient(180deg,rgba(255,244,222,.25),#fff6e4 42%,#ffeccb 58%,rgba(255,236,203,.2));
+  box-shadow:0 0 calc(40px*var(--k,1)) calc(9px*var(--k,1)) rgba(255,228,180,.44)}
+.pane-led.froide{background:linear-gradient(180deg,rgba(226,243,255,.25),#f2fbff 45%,#d9efff 60%,rgba(217,239,255,.2));
+  box-shadow:0 0 calc(38px*var(--k,1)) calc(9px*var(--k,1)) rgba(190,226,255,.4)}
 
 /* flaque de lumière au sol, sous chaque lanterne */
 .pane-flaque{background:radial-gradient(closest-side,rgba(246,206,150,.3),rgba(246,206,150,.08) 55%,transparent 72%)}

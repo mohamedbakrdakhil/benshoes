@@ -2,28 +2,35 @@
    Allée, puis grand showroom : mur de présentation de 2 800 px sur deux
    rangées, banc central, plafond rehaussé, corniche lumineuse. */
 const VIS={HW:520,FY:320,CY:-520,FZ:-1100,Z1:-4700,
-           SX:2600,SZ0:-2900,SZ1:-5700,SCY:-820,SX0:520};
+           SX:2600,SZ0:-2900,SZ1:-5700,SCY:-820,SX0:520,
+           // SCY est désormais la ligne du premier étage ; SCY2 est le plafond.
+           SCY2:-1900};
 /* Fès, avant la boutique. Le cuir vient de là : on part devant la porte au
    lever du jour, on passe sous l'arche, on longe la derb et ses zelliges, on
    jette un œil aux cuves des tanneries, et la ruelle débouche sur la façade
    benka. Même monde, même caméra — la scène est simplement plus longue. */
 const FES={HW:430,SOL:320,HAUT:-820,ZP:2450,ZR0:2430,ZR1:-1060,ZT:1500};
+/* Cinquième colonne : l'inclinaison. La salle fait maintenant deux niveaux,
+   et une caméra qui reste à l'horizontale n'en montre jamais le second. */
 const CAM=[
-  [0,     0, 4500,  0],   // devant la porte, la ville dort encore
-  [.07,   0, 3900,  0],
-  [.14,   0, 3150,  0],   // l'arche grandit
-  [.21,   0, 2420,  0],   // on passe dessous
-  [.28,   0, 1950,  9],   // la derb
-  [.34,   0, 1480, 17],   // le regard glisse vers les cuves
-  [.40,   0, 1000,  6],
-  [.46,   0,  420,  0],   // la façade benka, bout de rue
-  [.53,   0, -820,  0],
-  [.61,   0,-1750,  0],
-  [.70,   0,-2550,  0],
-  [.76, 260,-2950, 62],
-  [.83,1150,-3550, 88],
-  [.91,1190,-3950, 90],
-  [1,  1210,-4300, 90]];
+  [0,     0, 4500,  0,  0],   // devant la porte, la ville dort encore
+  [.07,   0, 3900,  0,  0],
+  [.14,   0, 3150,  0, -3],   // on lève un peu les yeux vers l'arche
+  [.21,   0, 2420,  0,  0],   // on passe dessous
+  [.28,   0, 1950,  9,  0],   // la derb
+  [.34,   0, 1480, 17,  0],   // le regard glisse vers les cuves
+  [.40,   0, 1000,  6,  0],
+  [.46,   0,  420,  0,  0],   // la façade benka, bout de rue
+  [.53,   0, -820,  0,  0],
+  [.61,   0,-1750,  0,  0],
+  [.70,   0,-2550,  0,  0],
+  [.76, 260,-2950, 62,  0],
+  [.83,1150,-3550, 88,  0],
+  [.90,1120,-3900, 90,  2],
+  // On recule au lieu d'avancer : à un mètre du mur, deux niveaux ne tiennent
+  // pas dans le cadre. En s'éloignant, la salle se découvre entière.
+  [.96, 900,-4150, 90,  8],
+  [1,   820,-4280, 90, 11]];
 /* Les plans sont groupés par quartier. Un quartier loin de la caméra est
    démonté : son contenu ne coûte plus un seul calque graphique. C'est ce qui
    permet de doubler le décor sans dépasser la charge d'avant. Les marges sont
@@ -62,15 +69,49 @@ function pane(cls,w,ht,tf,inner){
   return `<div class="pane ${cls}"${f!==1?` style="--f:${f};`:' style="'}width:${w}px;height:${ht}px;margin-left:${-w/2}px;margin-top:${-ht/2}px;transform:${tf}">${inner||''}</div>`;}
 /* Une silhouette humaine, en un seul SVG. Les jambes et les bras sont dans
    leurs propres groupes pour que la CSS leur donne le pas. */
-function silhouetteSVG(){
+/* Quatre silhouettes, pas une. Une foule faite du même gabarit répété se
+   voit tout de suite ; quatre coupes différentes suffisent à faire une rue.
+   Les jambes et les bras sont dans leurs groupes pour que la CSS marche. */
+const SILHOUETTES = {
+  // robe midi, cheveux longs, sac à main au creux du coude
+  robe:'<circle cx="35" cy="18" r="12"/>'
+    +'<path class="ch" d="M22 14c0-9 5-13 13-13s13 4 13 13c0 7-2 11-4 13l-2-9c-3 2-11 3-16 0l-2 9c-2-2-2-6-2-13z"/>'
+    +'<path d="M35 31c-9 0-15 5-16 13l-3 24 7 2 2-13 1 14h18l1-14 2 13 7-2-3-24c-1-8-7-13-16-13z"/>'
+    +'<path d="M24 71h22l6 46H18z"/>'
+    +'<g class="br b1"><path d="M19 49l-5 30 6 2 5-29z"/>'
+      +'<path d="M11 76h14v13H11z" opacity=".88"/><path d="M14 72h8v5h-8z"/></g>'
+    +'<g class="br b2"><path d="M51 49l5 30-6 2-5-29z"/></g>'
+    +'<g class="jb j1"><path d="M28 117l-2 32 1 33h7l1-33 1-32z"/></g>'
+    +'<g class="jb j2"><path d="M42 117l2 32-1 33h-7l-1-33-1-32z"/></g>',
+  // manteau long, sac de courses à bout de bras
+  manteau:'<circle cx="35" cy="17" r="12"/>'
+    +'<path class="ch" d="M23 15c1-9 6-13 12-13s11 4 12 13c0 5-1 8-2 10l-3-10c-4 2-10 2-14 0l-3 10c-1-2-2-5-2-10z"/>'
+    +'<path d="M35 30c-10 0-17 6-18 15l-2 22 7 2 2-11v66h22V58l2 11 7-2-2-22c-1-9-8-15-18-15z"/>'
+    +'<g class="br b1"><path d="M18 48l-4 32 6 1 4-31z"/>'
+      +'<path d="M12 81h15v20H12z" opacity=".9"/><path d="M16 77h7v5h-7z"/></g>'
+    +'<g class="br b2"><path d="M52 48l4 32-6 1-4-31z"/></g>'
+    +'<g class="jb j1"><path d="M28 124l-2 27 1 33h7l1-33 1-27z"/></g>'
+    +'<g class="jb j2"><path d="M42 124l2 27-1 33h-7l-1-33-1-27z"/></g>',
+  // tailleur, sac en bandoulière
+  tailleur:'<circle cx="35" cy="17" r="12"/>'
+    +'<path class="ch" d="M24 13c0-8 5-12 11-12s11 4 11 12c0 4-1 7-2 8l-2-8c-4 2-10 2-14 0l-2 8c-1-1-2-4-2-8z"/>'
+    +'<path d="M35 30c-11 0-18 6-19 15l-2 23 8 2 2-12v27h22V58l2 12 8-2-2-23c-1-9-8-15-19-15z"/>'
+    +'<path d="M26 34l24 40-4 3-24-40z" opacity=".85"/><path d="M44 72h12v15H44z" opacity=".9"/>'
+    +'<g class="br b1"><path d="M17 49l-5 31 6 2 5-30z"/></g>'
+    +'<g class="br b2"><path d="M53 49l5 31-6 2-5-30z"/></g>'
+    +'<g class="jb j1"><path d="M27 85l-2 44 1 36h8l1-36 1-44z"/></g>'
+    +'<g class="jb j2"><path d="M43 85l2 44-1 36h-8l-1-36-1-44z"/></g>',
+  // costume
+  costume:'<circle cx="35" cy="16" r="12"/>'
+    +'<path d="M35 29c-12 0-20 7-21 17l-2 25 9 2 2-15v24h24V58l2 15 9-2-2-25c-1-10-9-17-21-17z"/>'
+    +'<g class="br b1"><path d="M15 50l-6 32 7 2 6-31z"/></g>'
+    +'<g class="br b2"><path d="M55 50l6 32-7 2-6-31z"/></g>'
+    +'<g class="jb j1"><path d="M26 82l-2 46 1 38h9l1-38 2-46z"/></g>'
+    +'<g class="jb j2"><path d="M44 82l2 46-1 38h-9l-1-38-2-46z"/></g>'
+};
+function silhouetteSVG(type){
   return '<svg class="sil" viewBox="0 0 70 184" preserveAspectRatio="xMidYMax meet" aria-hidden="true">'
-    +'<circle cx="35" cy="17" r="13"/>'
-    +'<path d="M35 32c-12 0-20 8-21 19l-2 27h10l1-17v23h24v-23l1 17h10l-2-27c-1-11-9-19-21-19z"/>'
-    +'<g class="br b1"><path d="M15 52l-6 36 8 2 6-35z"/></g>'
-    +'<g class="br b2"><path d="M55 52l6 36-8 2-6-35z"/></g>'
-    +'<g class="jb j1"><path d="M26 84l-3 47 2 46h10l1-46 2-47z"/></g>'
-    +'<g class="jb j2"><path d="M44 84l3 47-2 46h-10l-1-46-2-47z"/></g>'
-    +'</svg>';
+    +(SILHOUETTES[type]||SILHOUETTES.costume)+'</svg>';
 }
 /* Buste de couturière sur son pied. */
 function mannequinSVG(id){
@@ -85,15 +126,23 @@ function mannequinSVG(id){
     +'<ellipse class="pied" cx="40" cy="179" rx="23" ry="6"/>'
     +'</svg>';
 }
+/* Une travée d'arcade, dessinée à l'intérieur d'un mur. L'arc est une
+   bordure à grand rayon : un seul élément, pas un calque de plus. */
+function arcade(left,w,ht,top){
+  if(K!==1){left*=K;w*=K;ht*=K;top*=K;}
+  return `<div class="arc-romain" style="--e:${Math.round(w*0.09)}px;left:${left+w/2}px;`
+    +`bottom:auto;top:${top}px;width:${w}px;height:${ht}px;transform:translateX(-50%)"></div>`;
+}
+
 /* Un passant : le moteur réécrira sa position à chaque image, on garde donc
    ses paramètres sur l'élément lui-même. */
-function passant(cls,w,ht,x,y,z0,z1,vitesse,phase,ry){
+function passant(cls,w,ht,x,y,z0,z1,vitesse,phase,ry,type){
   const W=w*K, H=ht*K;
   return `<div class="pane pane-gens ${cls} passant" data-x="${x}" data-y="${y}" data-z0="${z0}"`
     +` data-z1="${z1}" data-v="${vitesse}" data-t="${phase}" data-ry="${ry||0}"`
     +` style="width:${W}px;height:${H}px;margin-left:${-W/2}px;margin-top:${-H/2}px;`
     +`transform:translate3d(${(x*K).toFixed(1)}px,${(y*K).toFixed(1)}px,${(z0*K).toFixed(1)}px) rotateY(${ry||0}deg)">`
-    +silhouetteSVG()+'</div>';
+    +silhouetteSVG(type)+'</div>';
 }
 function niche(p,left,w,ht,top,plate,col){
   if(K!==1){left*=K;w*=K;ht*=K;top*=K;}
@@ -118,6 +167,11 @@ function construirePlans(){
 function buildWorld(){
   const w=$('#world'); if(!w)return;
   if(MODE2D){construirePlans();return;}
+  /* Les halos (box-shadow des néons) se comptent en pixels d'écran, pas en
+     unités du monde : à l'échelle 0,5 du téléphone un bandeau de 13 px se
+     retrouvait noyé sous 46 px de lueur, et le haut de la salle virait au
+     blanc. On publie l'échelle au CSS pour que les lueurs la suivent. */
+  w.style.setProperty('--k',K);
   const V=VIS,F=FES,H=850,CYm=(V.CY+V.FY)/2;
   const fes=[],seuil=[],allee=[],salle=[];
   const kx=v=>Math.round(v*K);
@@ -160,12 +214,12 @@ function buildWorld(){
   // Tous tournés vers la caméra : un plan de dos est effacé par
   // backface-visibility, et le sens de marche se lit au déplacement.
   const foule = RICHE
-    ? [[-230,2300,-900,.055,0  ],[ 250,-900,2300,.042,.35],
-       [ 120,2100,-700,.068,.62],[-290,-800,2200,.037,.18],
-       [  40,1700,-900,.050,.80]]
-    : [[-230,2300,-900,.055,0  ],[ 250,-900,2300,.042,.35]];
-  foule.forEach(([px,z0,z1,v,ph])=>
-    fes.push(passant('ombre',150,370,px,F.SOL-185,z0,z1,v,ph,0)));
+    ? [[-230,2300,-900,.055,0  ,'robe'],[ 250,-900,2300,.042,.35,'manteau'],
+       [ 120,2100,-700,.068,.62,'costume'],[-290,-800,2200,.037,.18,'tailleur'],
+       [  40,1700,-900,.050,.80,'robe']]
+    : [[-230,2300,-900,.055,0  ,'robe'],[ 250,-900,2300,.042,.35,'manteau']];
+  foule.forEach(([px,z0,z1,v,ph,t])=>
+    fes.push(passant('ombre',150,370,px,F.SOL-185,z0,z1,v,ph,0,t)));
 
   // les tanneries de Chouara : la nappe de cuves, et de quoi fermer la vue
   fes.push(pane('pane-cuves',1000,780,`translate3d(1000px,${F.SOL-4}px,${F.ZT}px) rotateX(90deg)`));
@@ -210,9 +264,10 @@ function buildWorld(){
 
   /* =============== la grande salle =============== */
   const SH=V.FY-V.SCY, SZc=(V.SZ0+V.SZ1)/2, SL=V.SZ0-V.SZ1, SYm=(V.SCY+V.FY)/2;
-  salle.push(pane('pane-floor',2800,3400,`translate3d(1400px,${V.FY}px,-4300px) rotateX(90deg)`));
+  salle.push(pane('pane-marbre sol',2800,3400,`translate3d(1400px,${V.FY}px,-4300px) rotateX(90deg)`));
   salle.push(pane('pane-tapis',760,2600,`translate3d(1760px,${V.FY-3}px,-4300px) rotateX(90deg)`));
-  salle.push(pane('pane-ceil',PETIT?1900:2100,PETIT?2600:3000,`translate3d(1560px,${V.SCY}px,-4300px) rotateX(-90deg)`));
+  // Le plafond remonte d'un étage : la salle fait désormais 2470 de haut.
+  salle.push(pane('pane-ceil',PETIT?1900:2200,PETIT?2600:3100,`translate3d(1560px,${V.SCY2}px,-4300px) rotateX(-90deg)`));
   const nb=PETIT?8:VITRINES.length, cols=PETIT?4:7, cw=230, gap=30, ch=PETIT?360:420;
   const emprise=cols*cw+(cols-1)*gap, marge=(SL-emprise)/2;
   let mi='';
@@ -221,12 +276,44 @@ function buildWorld(){
     mi+=niche(p,marge+(i%cols)*(cw+gap),cw,ch,i<cols?120:120+ch+45,true,c);
   }
   salle.push(pane('pane-wall',SL,SH,`translate3d(${V.SX}px,${SYm}px,${SZc}px) rotateY(-90deg)`,mi));
+
+  /* ---- l'étage ---- */
+  const ENT=-880, HAUT=V.SCY2;                 // entablement, puis plafond
+  const SH2=ENT-HAUT, SY2=(ENT+HAUT)/2;        // hauteur et milieu du mur haut
+  // Entablement : la ligne qui sépare les deux niveaux.
+  salle.push(pane('pane-chapiteau',SL,130,`translate3d(${V.SX-30}px,${ENT+10}px,${SZc}px) rotateY(-90deg)`));
+  // Mur du premier, percé d'une loggia à arcs romains.
+  let arcs='';
+  const na=PETIT?3:5, aw=Math.round(SL/(na+1.4)), amarge=(SL-na*aw-(na-1)*90)/2;
+  // Les arcs se tiennent dans la moitié basse de l'étage : plus haut, le
+  // cadre les coupait.
+  for(let i=0;i<na;i++) arcs+=arcade(amarge+i*(aw+90),aw,Math.round(SH2*0.50),Math.round(SH2*0.42));
+  salle.push(pane('pane-wall',SL,SH2,`translate3d(${V.SX}px,${SY2}px,${SZc}px) rotateY(-90deg)`,arcs));
+  // Balustrade de la coursive, devant la loggia.
+  salle.push(pane('pane-balustres',SL,250,`translate3d(${V.SX-170}px,${ENT-135}px,${SZc}px) rotateY(-90deg)`));
+  salle.push(pane('pane-rampe',SL,46,`translate3d(${V.SX-170}px,${ENT-275}px,${SZc}px) rotateY(-90deg)`));
+  salle.push(pane('pane-rampe',SL,36,`translate3d(${V.SX-170}px,${ENT-8}px,${SZc}px) rotateY(-90deg)`));
+  // Bandeaux de LED : sous la balustrade, et sous le plafond.
+  salle.push(pane('pane-led',SL,26,`translate3d(${V.SX-186}px,${ENT+34}px,${SZc}px) rotateY(-90deg)`));
+  salle.push(pane('pane-led froide',SL,22,`translate3d(${V.SX-40}px,${HAUT+70}px,${SZc}px) rotateY(-90deg)`));
+  /* Colonnade. Les fûts se tiennent aux deux extrémités du mur, par paires,
+     jamais devant les niches : la marchandise passe avant l'architecture.
+     Les niches occupent le centre du mur, de -5195 à -3405 au bureau et de
+     -4805 à -3795 sur téléphone ; les fûts restent en dehors. */
+  const cz = PETIT ? [-3550,-5050] : [-3310,-3020,-5290,-5580];
+  cz.forEach(z=>{
+    salle.push(pane('pane-colonne',140,1150,`translate3d(2300px,${V.FY-625}px,${z}px) rotateY(-90deg)`));
+    salle.push(pane('pane-chapiteau',185,110,`translate3d(2300px,${V.FY-1255}px,${z}px) rotateY(-90deg)`));
+    salle.push(pane('pane-socle',185,90,`translate3d(2300px,${V.FY-45}px,${z}px) rotateY(-90deg)`));
+  });
   salle.push(pane('pane-zellige',SL,125,`translate3d(${V.SX-8}px,${V.FY-62}px,${SZc}px) rotateY(-90deg)`));
   salle.push(pane('pane-wall',2080,SH,`translate3d(1560px,${SYm}px,${V.SZ1-100}px)`));
+  salle.push(pane('pane-wall',2080,SH2,`translate3d(1560px,${SY2}px,${V.SZ1-100}px)`));
   // Côté entrée : sans ce mur, le virage ouvrait sur le vide derrière la caméra.
   // Le demi-tour est indispensable — un plan montre sa face avant vers +z, et
   // backface-visibility:hidden le rend invisible quand on le regarde de dos.
   salle.push(pane('pane-wall',2080,SH,`translate3d(1560px,${SYm}px,${V.SZ0}px) rotateY(180deg)`));
+  salle.push(pane('pane-wall',2080,SH2,`translate3d(1560px,${SY2}px,${V.SZ0}px) rotateY(180deg)`));
   salle.push(pane('pane-zellige fin bas',2080,125,`translate3d(1560px,${V.FY-62}px,${V.SZ0-8}px) rotateY(180deg)`));
   // et le retour du mur proche, qui ferme l'angle au fond
   salle.push(pane('pane-wall',1100,SH,`translate3d(${V.SX0}px,${SYm}px,-5190px) rotateY(90deg)`));
@@ -248,17 +335,38 @@ function buildWorld(){
   // Un seul plan par mannequin, face à la caméra : dans la salle le regard
   // ne tourne que de 62° à 90°, le plan reste de face. Le plan croisé que
   // j'avais ajouté ne faisait qu'un fantôme en double exposition.
-  const mans = RICHE ? [[1880,-3300],[1840,-4450],[1910,-5400]] : [[1880,-3600],[1860,-5150]];
+  // Mannequins et vitrines se tiennent aux deux bouts de la salle : au milieu,
+  // là où la caméra passe, le mur de la collection reste entièrement dégagé.
+  const mans = RICHE ? [[1800,-3180],[1830,-5560]] : [[1810,-3250],[1830,-5480]];
   mans.forEach(([mx,mz],i)=>{
     salle.push(pane('pane-podtop',260,260,`translate3d(${mx}px,${V.FY-12}px,${mz}px) rotateX(90deg)`));
     salle.push(pane('pane-mannequin',200,420,`translate3d(${mx}px,${V.FY-222}px,${mz}px) rotateY(-90deg)`,mannequinSVG(i)));
   });
+  // Vitrines au milieu de la salle : socle, boîte de verre, et la paire
+  // dedans. Trois plans chacune — on circule autour, ce n'est plus seulement
+  // un mur qu'on regarde.
+  const vz = PETIT ? [-3560,-5280] : [-3620,-5120];
+  vz.forEach((z,i)=>{
+    const p=CATALOG[i%CATALOG.length];
+    salle.push(pane('pane-podium',240,300,`translate3d(1790px,${V.FY-150}px,${z}px) rotateY(-90deg)`));
+    salle.push(pane('pane-podtop',240,240,`translate3d(1790px,${V.FY-300}px,${z}px) rotateX(90deg)`));
+    salle.push(pane('pane-prop',160,200,`translate3d(1790px,${V.FY-400}px,${z}px) rotateY(-90deg)`,
+      visuel(p,p.colors[0],true)));
+    salle.push(pane('pane-verre',240,340,`translate3d(1790px,${V.FY-470}px,${z}px) rotateY(-90deg)`));
+    salle.push(pane('pane-led',190,12,`translate3d(1790px,${V.FY-645}px,${z}px) rotateY(-90deg)`));
+  });
+
   // Deux clients qui longent le mur, lentement.
   if(RICHE){
-    salle.push(passant('client',150,370,1480,V.FY-185,-3200,-5600,.030,.1,-90));
-    salle.push(passant('client',150,370,1560,V.FY-185,-5600,-3200,.024,.55,-90));
+    salle.push(passant('client',150,370,1420,V.FY-185,-3150,-5600,.030,.10,-90,'robe'));
+    salle.push(passant('client',150,370,1530,V.FY-185,-5600,-3150,.024,.55,-90,'manteau'));
+    salle.push(passant('client',150,370,2130,V.FY-185,-5500,-3300,.019,.78,-90,'tailleur'));
   }else{
-    salle.push(passant('client',150,370,1520,V.FY-185,-3200,-5600,.030,.1,-90));
+    /* Sur téléphone la salle gardait une seule cliente : la pièce paraissait
+       vide. Deux silhouettes coûtent moins d'un mégaoctet à l'échelle 0,5 —
+       et c'est l'écran sur lequel la boutique se visite le plus. */
+    salle.push(passant('client',150,370,1470,V.FY-185,-3150,-5600,.030,.10,-90,'robe'));
+    salle.push(passant('client',150,370,1600,V.FY-185,-5600,-3150,.023,.58,-90,'manteau'));
   }
   // banc central, parallèle au mur
   if(RICHE){
@@ -312,7 +420,8 @@ function echantillon(p){
   let i=0; while(i<CAM.length-2&&p>CAM[i+1][0])i++;
   const A=CAM[i],B=CAM[i+1],P=CAM[Math.max(0,i-1)],N=CAM[Math.min(CAM.length-1,i+2)];
   const t=borne((p-A[0])/((B[0]-A[0])||1),0,1);
-  return {x:cr(P[1],A[1],B[1],N[1],t), z:cr(P[2],A[2],B[2],N[2],t), yaw:cr(P[3],A[3],B[3],N[3],t)};
+  return {x:cr(P[1],A[1],B[1],N[1],t), z:cr(P[2],A[2],B[2],N[2],t),
+          yaw:cr(P[3],A[3],B[3],N[3],t), pit:cr(P[4],A[4],B[4],N[4],t)};
 }
 function initVisite(){
   const sec=$('#visite'),world=$('#world'); if(!sec||!world)return;
@@ -358,6 +467,7 @@ function initVisite(){
   majZones(0);
   animerPassants(world);
   const cam=echantillon(0); let roll=0, prevYaw=cam.yaw, capPrec=-1, hintPrec=-1;
+  cam.pit=cam.pit||0;
   avancer((dt,sy)=>{
     const p=borne((sy-GEO.vTop)/GEO.vSpan,0,1);
     const proche=sy>GEO.vTop-GEO.vh*1.4 && sy<GEO.vTop+GEO.vSpan+GEO.vh*0.6;
@@ -365,17 +475,20 @@ function initVisite(){
     const c=echantillon(p);
     const k=1-Math.pow(.0012,dt);
     cam.x+=(c.x-cam.x)*k; cam.z+=(c.z-cam.z)*k; cam.yaw+=(c.yaw-cam.yaw)*k;
+    cam.pit+=(c.pit-cam.pit)*k;
     const d=cam.yaw-prevYaw; prevYaw=cam.yaw;
     roll+=(borne(-d*2.6,-6,6)-roll)*Math.min(1,dt*7);
     const bob=Math.sin(p*46)*7;
-    world.style.transform=`rotateZ(${roll.toFixed(2)}deg) rotateY(${cam.yaw.toFixed(2)}deg) `
+    world.style.transform=`rotateZ(${roll.toFixed(2)}deg) rotateX(${cam.pit.toFixed(2)}deg) `
+      +`rotateY(${cam.yaw.toFixed(2)}deg) `
       +`translate3d(${(-cam.x*K).toFixed(1)}px,${(-bob*K).toFixed(1)}px,${(-cam.z*K).toFixed(1)}px)`;
     let vu=-1; for(let i=0;i<caps.length;i++) if(p>=caps[i].a&&p<caps[i].b) vu=i;
     if(vu!==capPrec){capPrec=vu; for(let i=0;i<caps.length;i++) caps[i].el.style.opacity=i===vu?'1':'0';}
     if(bar)bar.style.width=(p*100).toFixed(1)+'%';
     const hv=p>.03?0:1;
     if(hint&&hv!==hintPrec){hintPrec=hv;hint.style.opacity=hv;hint.style.visibility=p>.12?'hidden':'visible';}
-    return proche || Math.abs(c.x-cam.x)+Math.abs(c.z-cam.z)+Math.abs(c.yaw-cam.yaw)>.4 || Math.abs(roll)>.05;
+    return proche || Math.abs(c.x-cam.x)+Math.abs(c.z-cam.z)+Math.abs(c.yaw-cam.yaw)
+      +Math.abs(c.pit-cam.pit)>.4 || Math.abs(roll)>.05;
   });
 }
 
