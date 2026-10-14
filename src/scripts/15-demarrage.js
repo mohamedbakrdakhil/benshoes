@@ -9,6 +9,7 @@ function degrader(raison){
 try{
   renderStatic();
   initMotion();initVisite();initAtelier();initNav();initCounters();initProgress();
+  fondVideo();
   avancer(tacheRevelations);revelations();
 }catch(err){ degrader(err&&err.message||err); }
 // garde-fou : si les scènes n'ont pas de hauteur (unité svh refusée, 3D

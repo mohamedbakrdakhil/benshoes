@@ -132,8 +132,18 @@ if command -v python3 >/dev/null 2>&1; then python3 verif-catalogue.py; fi
 if command -v python3 >/dev/null 2>&1; then python3 minifier.py index.html; fi
 
 # ---------- 6. politique de sécurité : chaque script scellé par son empreinte ----------
-if command -v python3 >/dev/null 2>&1 && python3 csp.py index.html; then
-  :
+# Deux échecs très différents dormaient sous la même branche : python3
+# réellement absent, et csp.py qui plante. Le second repliait la politique sur
+# 'unsafe-inline' en annonçant « python3 absent » — un mensonge qui annulait la
+# protection contre l'injection de script sans que personne le remarque. Un
+# outil qui plante arrête désormais la livraison.
+if command -v python3 >/dev/null 2>&1; then
+  if ! python3 csp.py index.html; then
+    echo "ERREUR : csp.py a échoué. Rien n'est livré."
+    echo "         Replier ici autoriserait 'unsafe-inline' et rouvrirait la"
+    echo "         porte à l'injection de script. Corrigez csp.py d'abord."
+    exit 1
+  fi
 else
   echo "  python3 absent : politique de repli (scripts en ligne autorisés)"
   POLITIQUE="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; media-src 'none'; worker-src 'none'; upgrade-insecure-requests"

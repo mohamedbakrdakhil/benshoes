@@ -102,3 +102,57 @@ function tacheRevelations(dt,sy){
 }
 function bumpCart(){const b=$('#cartbtn');if(!b||!MOTION)return;b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump');}
 
+
+/* ===================== vidéos de fond =====================
+   Une vidéo de fond est la chose la plus lourde qu'on puisse poser sur une
+   page. Ce site transfère 55 Ko ; une boucle de dix secondes en pèse deux à
+   quatre mille. Au Maroc, où la plupart des clientes arrivent en 4G avec un
+   forfait compté, l'envoyer sans condition reviendrait à faire payer le décor
+   à celles qui viennent acheter.
+
+   D'où les garde-fous. Rien ne se télécharge si :
+     — l'écran est étroit (téléphone) ;
+     — le navigateur annonce une connexion lente ou le mode économie de données ;
+     — le système demande à réduire les animations ;
+     — la section n'est pas encore approchée à l'écran.
+
+   L'affiche, elle, est une image ordinaire : elle s'affiche tout de suite et
+   c'est elle que Google mesure. La vidéo se fond par-dessus quand elle peut
+   jouer — jamais avant, pour ne pas décaler la mise en page. */
+function fondVideo(){
+  if(typeof VIDEOS!=='object'||!VIDEOS) return;
+  const noms=Object.keys(VIDEOS); if(!noms.length) return;
+
+  const co=navigator.connection||{};
+  const lente=co.saveData===true||/^(slow-)?2g$/.test(co.effectiveType||'')||co.effectiveType==='3g';
+  const etroit=matchMedia('(max-width:900px)').matches;
+
+  noms.forEach(id=>{
+    const sec=document.getElementById(id), base=VIDEOS[id];
+    if(!sec||!base) return;
+
+    // L'affiche d'abord, toujours : c'est le décor visible, vidéo ou pas.
+    const couche=document.createElement('div');
+    couche.className='fond-video';
+    couche.style.backgroundImage=`url("${base}-affiche.jpg")`;
+    sec.prepend(couche);
+    if(getComputedStyle(sec).position==='static') sec.style.position='relative';
+
+    if(etroit||lente||!MOTION) return;   // l'affiche suffira
+
+    // La vidéo n'est demandée qu'à l'approche de la section.
+    const io=new IntersectionObserver(e=>{
+      if(!e[0].isIntersecting) return;
+      io.disconnect();
+      const v=document.createElement('video');
+      v.muted=true; v.loop=true; v.playsInline=true; v.preload='none';
+      v.setAttribute('aria-hidden','true'); v.tabIndex=-1;
+      v.src=base+'.mp4';
+      // oncanplay et non onloadstart : on ne révèle que ce qui peut tourner.
+      v.addEventListener('canplay',()=>{couche.appendChild(v);requestAnimationFrame(()=>v.classList.add('vu'));},{once:true});
+      v.addEventListener('error',()=>v.remove(),{once:true});
+      v.load(); v.play().catch(()=>{});   // un refus d'autoplay laisse l'affiche
+    },{rootMargin:'300px'});
+    io.observe(sec);
+  });
+}

@@ -40,6 +40,10 @@ if re.search(r"tableur:\s*'https://script\.google\.com/[^']+'", h):
     destinations += ['https://script.google.com', 'https://script.googleusercontent.com']
     print('  tableur configuré : connect-src ouvert vers Apps Script')
 
+# media-src reste fermé tant qu'aucune vidéo n'est déclarée. Une politique
+# ouverte « au cas où » est une permission qu'on oublie d'avoir donnée.
+videos = bool(re.search(r'const VIDEOS=\{\s*\w', h))
+
 politique = '; '.join([
     "default-src 'self'",
     "base-uri 'none'",
@@ -50,7 +54,7 @@ politique = '; '.join([
     "font-src 'self'",
     "img-src 'self' data:",
     'connect-src ' + ' '.join(destinations),
-    "media-src 'none'",
+    "media-src " + ("'self'" if videos else "'none'"),
     "worker-src 'none'",
     'upgrade-insecure-requests',
 ])
@@ -58,3 +62,5 @@ politique = '; '.join([
 assert '@@CSP@@' in h, 'csp.py : repère @@CSP@@ absent du HTML'
 io.open(CHEMIN, 'w', encoding='utf-8').write(h.replace('@@CSP@@', politique))
 print('  politique de sécurité : %d script(s) en ligne scellé(s) par empreinte' % len(empreintes))
+if videos:
+    print('  vidéo déclarée : media-src ouvert au site lui-même')

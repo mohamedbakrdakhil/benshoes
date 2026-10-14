@@ -99,3 +99,14 @@
   .hero-glow{display:none}
 }
 
+
+/* Couche de fond vidéo : l'affiche est peinte immédiatement, la vidéo se
+   fond par-dessus quand elle peut jouer. Les deux occupent exactement la
+   même boîte — aucun décalage de mise en page, donc aucun coût en CLS. */
+.fond-video{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+  background-size:cover;background-position:50% 50%}
+.fond-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:0;transition:opacity .9s ease}
+.fond-video video.vu{opacity:1}
+/* Le contenu de la section passe devant la couche. */
+.fond-video~*{position:relative;z-index:1}

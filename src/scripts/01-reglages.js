@@ -19,6 +19,21 @@ const SHOP={
 /* Logo et photos. Laisser vide = illustration vectorielle et logo typographique.
    Déposer les fichiers dans assets/ puis renseigner ici — voir assets/README.md */
 const BRAND={logo:'',logoClair:''};
+/* Vidéos de fond. Laisser vide = aucune vidéo, aucun octet téléchargé.
+
+   Chaque entrée associe l'identifiant d'une section du site au nom de base
+   des fichiers, SANS extension :
+
+     VIDEOS={ atelier:'assets/videos/montage' }
+
+   attend  assets/videos/montage.mp4  et  assets/videos/montage-affiche.jpg
+
+   L'affiche est obligatoire. C'est elle qui s'affiche tout de suite ; la
+   vidéo ne se télécharge qu'ensuite, et seulement si les conditions sont
+   réunies (voir fondVideo() dans 10-revelations.js). Sans affiche, la
+   section resterait noire le temps du chargement. */
+const VIDEOS={};
+
 /* Surcharge manuelle, pour une photo isolée qui ne suit pas la convention de
    nommage. Le cas normal passe par assets/produits/ et images.py. */
 const PHOTOS={/* 'opus':{_:'assets/produits/opus.jpg'} */};
