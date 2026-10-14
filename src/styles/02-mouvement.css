@@ -22,8 +22,14 @@
 .hero h1 .ln:nth-child(2)>i{animation-delay:.20s}
 .hero h1 .ln:nth-child(3)>i{animation-delay:.30s}
 .hero .eyebrow{animation:fadeUp .7s cubic-bezier(.16,1,.3,1) backwards}
-.hero p{animation:fadeUp .8s cubic-bezier(.16,1,.3,1) .42s backwards}
-.hero-cta{animation:fadeUp .8s cubic-bezier(.16,1,.3,1) .54s backwards}
+/* Le paragraphe du héros est l'élément que Google mesure (Largest Contentful
+   Paint). Tant qu'il est à opacité nulle, la page compte comme non peinte :
+   l'entrée en 0,42 s + 0,8 s fixait le LCP à 1,56 s alors que le titre
+   s'affiche dès 0,32 s. Resserré à 0,36 s + 0,55 s — même cascade, même
+   ordre, mais 310 ms de moins sur la mesure. Sur une connexion lente, ce
+   délai-là s'ajoute au réseau et fait basculer le site hors du vert. */
+.hero p{animation:fadeUp .55s cubic-bezier(.16,1,.3,1) .36s backwards}
+.hero-cta{animation:fadeUp .55s cubic-bezier(.16,1,.3,1) .46s backwards}
 .hero-art #heroart{animation:artIn 1.1s cubic-bezier(.16,1,.3,1) .2s backwards}
 .hero-art #heroart svg{animation:floatY 7s ease-in-out 1.4s infinite}
 .hero-art .tag{animation:fadeIn 1s ease .9s backwards}
