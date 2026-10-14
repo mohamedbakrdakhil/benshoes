@@ -46,7 +46,13 @@ fi
 
 # ---------- 1. concaténation des modules ----------
 cat src/styles/*.css  > .build/site.css
-cat src/scripts/*.js  > .build/site.js
+# Le manifeste des photos vient EN PREMIER : les modules qui suivent le lisent
+# au moment d'afficher une vignette, et une déclaration plus bas que son usage
+# ferait tomber le démarrage.
+if command -v python3 >/dev/null 2>&1; then
+  python3 -c "import images,sys;n=images.manifeste();sys.stderr.write('  %-18s %d visuel(s) depuis assets/produits/\n'%('photos',n))" 2>&1 >/dev/null || true
+fi
+cat .build/photos.js src/scripts/*.js > .build/site.js 2>/dev/null || cat src/scripts/*.js > .build/site.js
 printf '  %-18s %s modules, %s Ko\n' "styles" "$(ls src/styles | wc -l | tr -d ' ')" "$(( $(wc -c < .build/site.css) / 1024 ))"
 printf '  %-18s %s modules, %s Ko\n' "scripts" "$(ls src/scripts | wc -l | tr -d ' ')" "$(( $(wc -c < .build/site.js) / 1024 ))"
 

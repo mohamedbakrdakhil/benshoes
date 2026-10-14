@@ -19,12 +19,33 @@ const SHOP={
 /* Logo et photos. Laisser vide = illustration vectorielle et logo typographique.
    Déposer les fichiers dans assets/ puis renseigner ici — voir assets/README.md */
 const BRAND={logo:'',logoClair:''};
-const PHOTOS={/* 'opus':{_:'assets/produits/opus.jpg', noir:'assets/produits/opus-noir.jpg'} */};
-function photoDe(id,c){const e=PHOTOS[id];return (e&&(e[c]||e._))||'';}
+/* Surcharge manuelle, pour une photo isolée qui ne suit pas la convention de
+   nommage. Le cas normal passe par assets/produits/ et images.py. */
+const PHOTOS={/* 'opus':{_:'assets/produits/opus.jpg'} */};
+
+/* PHOTOS_AUTO est écrit au build par images.py en lisant assets/produits/.
+   Déposer une photo, lancer images.py, et elle est servie : rien à tenir à
+   jour ici, donc pas de vignette qui pointe vers un fichier disparu. */
+function photoDe(id,c){
+  const m=PHOTOS[id], manuel=m&&(m[c]||m._);
+  if(manuel) return {brut:manuel};
+  const a=(typeof PHOTOS_AUTO!=='undefined'&&PHOTOS_AUTO[id])||null;
+  return (a&&(a[c]||a._))||null;
+}
+const jeuSrc=(base,larg,ext)=>larg.map(w=>`${base}-${w}.${ext} ${w}w`).join(',');
 function visuel(p,c,lite){
-  const src=photoDe(p.id,c);
-  if(src) return `<img class="pv" src="${src}" alt="${p.name} — ${(COLORS[c]||{}).n||''}" loading="lazy" decoding="async">`;
-  return sandal(p.style,c,p.platform,lite);
+  const ph=photoDe(p.id,c);
+  if(!ph) return sandal(p.style,c,p.platform,lite);
+  const alt=att(`${p.name} — ${(COLORS[c]||{}).n||''}`);
+  if(ph.brut) return `<img class="pv" src="${ph.brut}" alt="${alt}" loading="lazy" decoding="async">`;
+  // « sizes » dit au navigateur la place réelle de l'image AVANT de la
+  // choisir : sans lui il prend la plus large et télécharge pour rien.
+  const places=lite?'(max-width:860px) 42vw, 280px':'(max-width:860px) 88vw, 560px';
+  const repli=ph.j[ph.j.length-1];
+  return '<picture>'
+    +(ph.p.length?`<source type="image/webp" srcset="${jeuSrc(ph.b,ph.p,'webp')}" sizes="${places}">`:'')
+    +`<img class="pv" src="${ph.b}-${repli}.jpg" srcset="${jeuSrc(ph.b,ph.j,'jpg')}" sizes="${places}"`
+    +` alt="${alt}" loading="lazy" decoding="async"></picture>`;
 }
 // Le logo benka, redessiné : mot rond et gras, empreinte de pied en appui.
 // Si un vrai fichier est fourni dans BRAND.logo, il prend le dessus.
