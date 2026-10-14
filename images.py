@@ -28,9 +28,14 @@ try:
 except ImportError:
     sys.exit("images.py : le module Pillow est absent (pip3 install Pillow)")
 
-LARGEURS = (320, 640, 960)
-QUALITE_WEBP = 82
-QUALITE_JPEG = 84
+LARGEURS = (320, 480, 640, 960)
+
+# La qualité suit la taille d'affichage. Une vignette de 160 px à l'écran n'a
+# aucun besoin de la finesse d'une photo plein cadre, et une photo portée —
+# parquet, marbre, tissu — coûte trois fois le prix d'un packshot sur fond uni
+# à qualité égale. Sans ce dégradé, la grille réclamait 419 Ko sur téléphone.
+QUALITE = {320: (68, 72), 480: (72, 76), 640: (76, 80), 960: (82, 85)}
+DEFAUT = (82, 85)
 
 
 def derivees(chemin, carre=False, largeurs=LARGEURS, vers=None):
@@ -55,8 +60,9 @@ def derivees(chemin, carre=False, largeurs=LARGEURS, vers=None):
             continue                      # ne jamais agrandir : ça ne fait que du flou lourd
         h = round(src.height * w / src.width)
         im = src.resize((w, h), Image.LANCZOS)
-        for ext, opts in (('webp', dict(quality=QUALITE_WEBP, method=6)),
-                          ('jpg', dict(quality=QUALITE_JPEG, optimize=True,
+        qw, qj = QUALITE.get(w, DEFAUT)
+        for ext, opts in (('webp', dict(quality=qw, method=6)),
+                          ('jpg', dict(quality=qj, optimize=True,
                                        progressive=True))):
             sortie = '%s-%d.%s' % (base, w, ext)
             im.save(sortie, **opts)
