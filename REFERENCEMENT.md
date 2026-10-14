@@ -61,6 +61,43 @@ qu'un build distrait ne l'efface pas en silence.
   `og:locale` en `fr_MA`, carte Twitter en grand format.
 - Le plan du site est daté du jour à chaque build et déclare l'image.
 
+## Core Web Vitals
+
+Mesurés sur le site en ligne, dans un navigateur réellement au premier plan
+(une mesure prise dans un onglet d'arrière-plan donne un FCP faux : Chrome y
+diffère la première peinture).
+
+| Métrique | Valeur | Seuil « bon » |
+|---|---|---|
+| FCP | 124–476 ms | < 1800 ms |
+| **LCP** | **1068–1088 ms** | < 2500 ms |
+| CLS | 0 | < 0,1 |
+| Tâches longues | aucune | — |
+| Blocage total | 0 ms | < 200 ms |
+| Transfert | 55 Ko (190 Ko décompressés) | — |
+| Requêtes | 5 | — |
+
+### Ce qui fixe le LCP : l'entrée du héros, pas le réseau
+
+L'élément que Google mesure est le **paragraphe du héros**. Tant qu'il est à
+opacité nulle, la page compte comme non peinte. Son animation d'entrée valait
+donc directement des millisecondes de classement :
+
+| | Avant | Après |
+|---|---|---|
+| `.hero p` | `.8s` après `.42s` | `.55s` après `.36s` |
+| Fin de l'entrée | 1,22 s | 0,91 s |
+| Écart LCP − FCP mesuré | 1236 ms | **945 ms** |
+
+La cascade est intacte — surtitre, les trois lignes du titre, le paragraphe,
+les boutons — chacun démarre toujours après le précédent.
+
+Sur une machine rapide le LCP passait déjà. Le calcul change sur une 4G
+marocaine en cache froid : ce délai-là s'ajoute au temps réseau au lieu de s'y
+cacher. **Toute animation d'entrée posée sur un gros bloc de texte au-dessus
+de la ligne de flottaison se paie en LCP** — c'est la règle à retenir avant
+d'en ajouter une.
+
 ## IndexNow : les moteurs qu'on peut prévenir sans compte
 
 Google n'accepte pas qu'on lui annonce une adresse : il faut passer par la
