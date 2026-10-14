@@ -1,4 +1,20 @@
 /* ======================= fiche produit ======================= */
+
+/* Toutes les photos du coloris choisi, empilées dans la fiche.
+
+   Empilées plutôt qu'en carrousel : un carrousel demande un état, des
+   flèches, des points, du clavier et du tactile — et cache la moitié des
+   photos derrière un geste que beaucoup ne font pas. Ici tout est visible en
+   faisant défiler, ce que tout le monde sait faire. Les images suivantes sont
+   différées : seule la première coûte quelque chose à l'ouverture. */
+function galerie(p,c){
+  const n=nbPhotos(p.id,c);
+  if(n<=1) return `<div class="sheet-art">${visuel(p,c)}</div>`;
+  let h='';
+  for(let i=0;i<n;i++) h+=`<div class="sheet-art">${visuel(p,c,false,i)}</div>`;
+  return `<div class="galerie">${h}</div>`;
+}
+
 function sheetHTML(){
   const p=prod(S.sheet.id),c=S.sheet.c,si=S.sheet.s;
   const st=si==null?null:stockOf(p,SIZES.indexOf(si));
@@ -6,7 +22,7 @@ function sheetHTML(){
     <div class="panel-hd"><span class="eyebrow">${p.sub}</span><h3 style="flex:0"></h3>
       <button class="close" data-act="closep" style="margin-left:auto" aria-label="Fermer">✕</button></div>
     <div class="panel-bd">
-      <div class="sheet-art">${visuel(p,c)}</div>
+      ${galerie(p,c)}
       <div class="sheet-top"><h2>${p.name}</h2><span class="sheet-price num">${fmt(priceOf(p))}</span></div>
       <p class="serif">${p.blurb}</p>
       <div class="fld"><div class="fld-lab"><span class="t">Cuir</span><span class="v">${COLORS[c].n}</span></div>
@@ -23,7 +39,7 @@ function sheetHTML(){
     </div>
     <div class="panel-ft">
       <button class="btn btn-pri" data-act="add" ${si&&st>0?'':'disabled'} style="justify-content:center">${si?`Ajouter au panier — ${fmt(priceOf(p))}`:'Choisissez une pointure'}</button>
-      <p class="note" style="text-align:center">Livraison 48 h · offerte dès ${fmt(SHIPFREE)} · essai 30 jours</p>
+      <p class="note" style="text-align:center">Expédition 48 h · ${LIVR_PHRASE()} · essai 30 jours</p>
     </div></div>`;
 }
 
@@ -36,7 +52,7 @@ function sheetTab(p){
     <li><span>Protection</span><span>Spray imperméabilisant, 2 fois l\u2019an</span></li></ul>`;
   if(tab==='livraison') return `<p class="serif" style="padding-top:16px">Expédition le jour même pour toute commande confirmée avant 14 h. Vous réglez à la livraison ou par virement : le paiement en ligne n\u2019est pas encore branché sur la boutique.</p>
     <ul class="spec"><li><span>Délai</span><span>48 h partout au Maroc</span></li>
-    <li><span>Frais de port</span><span>${fmt(SHIPCOST)}, offerts dès ${fmt(SHIPFREE)}</span></li>
+    <li><span>Frais de port</span><span>${SHIPCOST===0||SHIPFREE===0?'offerts':`${fmt(SHIPCOST)}, offerts dès ${fmt(SHIPFREE)}`}</span></li>
     <li><span>Paiement</span><span>À la livraison ou par virement</span></li>
     <li><span>Retour</span><span>30 jours, frais à notre charge</span></li>
     <li><span>Ressemelage</span><span>80 DH, sans limite de durée</span></li></ul>`;

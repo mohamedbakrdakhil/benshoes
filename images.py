@@ -33,8 +33,11 @@ QUALITE_WEBP = 82
 QUALITE_JPEG = 84
 
 
-def derivees(chemin, carre=False, largeurs=LARGEURS):
+def derivees(chemin, carre=False, largeurs=LARGEURS, vers=None):
     base, _ = os.path.splitext(chemin)
+    if vers:
+        os.makedirs(vers, exist_ok=True)
+        base = os.path.join(vers, os.path.basename(base))
     src = Image.open(chemin)
     # Une photo de téléphone porte son orientation dans les métadonnées EXIF :
     # sans ce redressement, elle s'affiche couchée dans le navigateur.
@@ -63,6 +66,11 @@ def derivees(chemin, carre=False, largeurs=LARGEURS):
 
 def main(args):
     carre = '--carre' in args
+    vers = None
+    if '--vers' in args:
+        i = args.index('--vers')
+        vers = args[i + 1]
+        args = args[:i] + args[i + 2:]
     fichiers = [a for a in args if not a.startswith('--')]
     if not fichiers:
         sys.exit(__doc__.strip().splitlines()[0])
@@ -75,7 +83,7 @@ def main(args):
         avant = os.path.getsize(f)
         total_avant += avant
         print('\n%s  (%d Ko)' % (f, avant // 1024))
-        for sortie, taille, w, h in derivees(f, carre):
+        for sortie, taille, w, h in derivees(f, carre, vers=vers):
             total_apres += taille
             print('  %-44s %4d Ko   %dx%d' % (sortie, taille // 1024, w, h))
     if total_avant:
@@ -85,8 +93,6 @@ def main(args):
     print('  manifeste : %d visuel(s) déclaré(s)' % n)
 
 
-if __name__ == '__main__':
-    main(sys.argv[1:])
 
 
 # ---------------------------------------------------------------------------
@@ -101,20 +107,39 @@ if __name__ == '__main__':
 #   opus-640.webp          →  modèle « opus », tous coloris confondus
 # ---------------------------------------------------------------------------
 def manifeste(dossier='assets/produits', sortie='.build/photos.js'):
+    """Deux conventions de nommage cohabitent :
+
+        opus-beige-3-640.webp   galerie : modèle, coloris, 3e photo, 640 px
+        opus-beige-640.webp     photo unique pour ce coloris
+        opus-640.webp           photo unique, tous coloris confondus
+
+    La galerie est lue d'abord : « opus-beige-3-640 » se terminant par deux
+    nombres, la lire avec l'ancien motif donnerait un coloris « 3 ».
+    """
     import json, re, collections
     if not os.path.isdir(dossier):
         return 0
-    # Les largeurs sont suivies PAR FORMAT. Un fichier laissé d'une ancienne
-    # exportation — un 800 en JPEG sans son WebP — ferait sinon réclamer au
-    # navigateur une adresse qui n'existe pas.
+    GALERIE = re.compile(r'^([a-z0-9]+)-([a-z0-9]+)-(\d+)-(\d+)\.(webp|jpg)$')
+    SIMPLE = re.compile(r'^([a-z0-9]+)(?:-([a-z0-9]+))?-(\d+)\.(webp|jpg)$')
+
     trouve = collections.defaultdict(lambda: collections.defaultdict(
-        lambda: {'webp': set(), 'jpg': set()}))
+        lambda: {'webp': set(), 'jpg': set(), 'n': set()}))
     for f in sorted(os.listdir(dossier)):
-        m = re.match(r'^([a-z0-9]+)(?:-([a-z0-9]+))?-(\d+)\.(webp|jpg)$', f)
-        if not m:
-            continue
-        modele, coloris, w, ext = m.group(1), m.group(2) or '_', int(m.group(3)), m.group(4)
-        trouve[modele][coloris][ext].add(w)
+        m = GALERIE.match(f)
+        if m:
+            modele, coloris, idx, w, ext = (m.group(1), m.group(2),
+                                            int(m.group(3)), int(m.group(4)),
+                                            m.group(5))
+        else:
+            m = SIMPLE.match(f)
+            if not m:
+                continue
+            modele, coloris, idx, w, ext = (m.group(1), m.group(2) or '_', 0,
+                                            int(m.group(3)), m.group(4))
+        e = trouve[modele][coloris]
+        e[ext].add(w)
+        e['n'].add(idx)
+
     out = {}
     for modele, cols in trouve.items():
         for coloris, e in cols.items():
@@ -122,10 +147,17 @@ def manifeste(dossier='assets/produits', sortie='.build/photos.js'):
                 continue                  # le JPEG est le repli obligatoire
             base = '%s/%s' % (dossier, modele if coloris == '_'
                               else '%s-%s' % (modele, coloris))
-            out.setdefault(modele, {})[coloris] = {
-                'b': base, 'j': sorted(e['jpg']), 'p': sorted(e['webp'])}
+            entree = {'b': base, 'j': sorted(e['jpg']), 'p': sorted(e['webp'])}
+            idx = sorted(i for i in e['n'] if i)
+            if idx:
+                entree['n'] = idx          # galerie : numéros disponibles
+            out.setdefault(modele, {})[coloris] = entree
     os.makedirs(os.path.dirname(sortie), exist_ok=True)
     io.open(sortie, 'w', encoding='utf-8').write(
         'const PHOTOS_AUTO=' + json.dumps(out, ensure_ascii=False,
                                           separators=(',', ':')) + ';\n')
     return sum(len(c) for c in out.values())
+
+
+if __name__ == '__main__':
+    main(sys.argv[1:])

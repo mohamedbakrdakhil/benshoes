@@ -53,7 +53,7 @@ function cartHTML(){
         <div><h4>${p.name}</h4><div class="meta">${COLORS[it.c].n} · Pointure ${it.s}</div>
           <div class="qty"><button data-act="qty" data-n="${n}" data-d="-1" aria-label="Retirer un">−</button><span class="num">${it.q}</span><button data-act="qty" data-n="${n}" data-d="1" aria-label="Ajouter un">+</button></div></div>
         <div class="right"><b class="num">${fmt(priceOf(p)*it.q)}</b><button class="lnk" data-act="rm" data-n="${n}">Retirer</button></div></div>`;}).join('')
-      +`<p class="note" style="margin-top:16px">${sub>=SHIPFREE?'Livraison offerte sur cette commande.':`Encore ${fmt(SHIPFREE-sub)} pour la livraison offerte.`}</p>`;
+      +`<p class="note" style="margin-top:16px">${SHIPFREE===0||SHIPCOST===0?'Livraison offerte, partout au Maroc.':(sub>=SHIPFREE?'Livraison offerte sur cette commande.':`Encore ${fmt(SHIPFREE-sub)} pour la livraison offerte.`)}</p>`;
     foot=`<div class="totals"><div><span>Sous-total</span><span class="num">${fmt(sub)}</span></div>
       <div><span>Livraison</span><span class="num">${ship?fmt(ship):'Offerte'}</span></div>
       <div class="grand"><span>Total</span><span class="num">${fmt(sub+ship)}</span></div></div>

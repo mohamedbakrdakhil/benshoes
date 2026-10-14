@@ -7,14 +7,21 @@ const COLORS={
   marron:{n:'Marron',c:'#6b4529',d:'#45290f'},
   taupe:{n:'Marron taupe',c:'#837567',d:'#5e5347'},
   tabac:{n:'Tabac',c:'#9a6433',d:'#6c4318'},
-  burgundy:{n:'Burgundy',c:'#6d1a1f',d:'#420d11'},
+  rose:{n:'Rose',c:'#b85c6b',d:'#8e4150'},
   gris:{n:'Gris',c:'#7e8389',d:'#575c61'},
   marine:{n:'Marine',c:'#27374f',d:'#16202f'}
 };
 const FAMS=[['tous','Tous les modèles']];
+/* Les coloris listés sous chaque modèle sont exactement ceux dont l'atelier a
+   envoyé les photos. Un coloris annoncé sans photo s'afficherait en dessin au
+   milieu des autres : une boutique à moitié photographiée fait plus de mal que
+   sept coloris bien montrés.
+
+   Ne rien glisser entre « price: » et « colors: » — seo.py et
+   verif-catalogue.py lisent ce bloc à l'expression régulière. */
 const CATALOG=[
-  {id:'opus',hold:4,use:'Tous les jours',name:'Opus',sub:'Mocassin-mule à bride penny',fam:'penny',style:'penny',price:299,
-   colors:['burgundy','noir','beige','marron','taupe','tabac','gris','marine'],
+  {id:'opus',hold:4,use:'Tous les jours',name:'Opus',sub:'Mocassin-mule à bride penny',fam:'penny',style:'penny',price:259,
+   colors:['beige','gris','marine','rose','marron','tabac','noir'],
    stock:[9,16,21,18,11],flag:'Le plus porté',
    blurb:"La bride penny ajourée, posée sur un daim souple monté à la main sur forme. Talon ouvert : on l’enfile d’un geste, il tient par le cou-de-pied. Huit cuirs au choix, c’est le modèle sur lequel l’atelier a bâti sa réputation.",
    spec:[['Tige','Daim de veau, monté sur forme'],['Bride','Penny ajourée, surpiquée main'],['Première','Liège estampé benka'],['Semelle','Gomme souple, cousue']]},
@@ -41,8 +48,10 @@ const FAQ=[
  ['Puis-je payer en ligne ?',
   "Pas encore. Vous composez votre panier, le site vous donne une référence, et vous envoyez le récapitulatif à l\u2019atelier par WhatsApp ou par e-mail. On confirme la disponibilité dans votre pointure, puis vous réglez à la livraison ou par virement."],
  ['Livrez-vous en dehors du Maroc ?',
-  "Oui, sur demande. L\u2019expédition sous 48 h et la livraison offerte au-delà de 400 DH ne valent que pour le Maroc. Pour l\u2019étranger, indiquez votre pays dans le formulaire : on vous envoie un devis de port avant de confirmer la commande."]
+  "Oui, sur demande. L\u2019expédition sous 48 h et la livraison offerte ne valent que pour le Maroc. Pour l\u2019étranger, indiquez votre pays dans le formulaire : on vous envoie un devis de port avant de confirmer la commande."]
 ];
 const STATUS={nouvelle:'Nouvelle',confirmee:'Confirmée',expediee:'Expédiée',livree:'Livrée',annulee:'Annulée'};
-const SHIPFREE=400, SHIPCOST=35;
+// Livraison offerte partout au Maroc, sans montant minimum : le seuil de
+// 400 DH n'a plus lieu d'être puisque le port est inclus dans le prix.
+const SHIPFREE=0, SHIPCOST=0;
 

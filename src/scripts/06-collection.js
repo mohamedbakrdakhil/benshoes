@@ -2,7 +2,10 @@
 function renderStatic(){
   $('#herotopo').innerHTML=[1.6,1.3,1.05,.82,.6,.4,.22].map((k,i)=>
     `<g transform="translate(600,310) scale(${k*2.1},${k*1.25}) translate(-100,-230)"><path d="${SOLE}" fill="none" stroke="rgba(207,149,73,${(.3-i*.03).toFixed(2)})" stroke-width="${(1.6/k).toFixed(2)}"/></g>`).join('');
-  $('#heroart').innerHTML=visuel(prod('opus'),'burgundy');
+  // Le héros garde l'illustration : les photos de l'atelier portent leur
+  // décor (canapé, parquet, marbre), qui ferait une boîte claire au milieu du
+  // bordeaux. Pour y mettre la vraie chaussure il faudrait un détourage.
+  $('#heroart').innerHTML=visuel(prod('opus'),'rose');
   poserLogo();
   $('#anatfig').innerHTML=anatomySVG();
   $('#filters').innerHTML=FAMS.map(([k,l])=>`<button class="chip" data-act="fam" data-k="${k}" aria-pressed="${S.filter===k}">${l}</button>`).join('')

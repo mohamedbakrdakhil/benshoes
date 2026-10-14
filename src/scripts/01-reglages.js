@@ -48,18 +48,24 @@ function photoDe(id,c){
   return (a&&(a[c]||a._))||null;
 }
 const jeuSrc=(base,larg,ext)=>larg.map(w=>`${base}-${w}.${ext} ${w}w`).join(',');
-function visuel(p,c,lite){
+/* Un coloris peut avoir plusieurs photos : les fichiers portent alors leur
+   numéro (opus-beige-3-640.webp). Sans ce calcul, le site réclamait
+   opus-beige-640.webp, qui n'existe pas, et la vignette restait vide. */
+const basePhoto=(ph,i)=>ph.n&&ph.n.length?`${ph.b}-${ph.n[Math.min(i||0,ph.n.length-1)]}`:ph.b;
+function nbPhotos(id,c){const ph=photoDe(id,c);return ph&&ph.n?ph.n.length:(ph?1:0);}
+function visuel(p,c,lite,i){
   const ph=photoDe(p.id,c);
   if(!ph) return sandal(p.style,c,p.platform,lite);
   const alt=att(`${p.name} — ${(COLORS[c]||{}).n||''}`);
   if(ph.brut) return `<img class="pv" src="${ph.brut}" alt="${alt}" loading="lazy" decoding="async">`;
+  const B=basePhoto(ph,i);
   // « sizes » dit au navigateur la place réelle de l'image AVANT de la
   // choisir : sans lui il prend la plus large et télécharge pour rien.
   const places=lite?'(max-width:860px) 42vw, 280px':'(max-width:860px) 88vw, 560px';
   const repli=ph.j[ph.j.length-1];
   return '<picture>'
-    +(ph.p.length?`<source type="image/webp" srcset="${jeuSrc(ph.b,ph.p,'webp')}" sizes="${places}">`:'')
-    +`<img class="pv" src="${ph.b}-${repli}.jpg" srcset="${jeuSrc(ph.b,ph.j,'jpg')}" sizes="${places}"`
+    +(ph.p.length?`<source type="image/webp" srcset="${jeuSrc(B,ph.p,'webp')}" sizes="${places}">`:'')
+    +`<img class="pv" src="${B}-${repli}.jpg" srcset="${jeuSrc(B,ph.j,'jpg')}" sizes="${places}"`
     +` alt="${alt}" loading="lazy" decoding="async"></picture>`;
 }
 // Le logo benka, redessiné : mot rond et gras, empreinte de pied en appui.

@@ -94,3 +94,10 @@ label.f.bad input{border-color:var(--bad)}
 .repli-catalogue h3{margin:0 0 6px;font-size:18px}
 .repli-catalogue p{margin:0 0 8px;font-size:14px;line-height:1.55;color:var(--fg-soft)}
 .repli-catalogue strong{color:var(--fg)}
+
+/* Galerie de la fiche : toutes les photos du coloris, les unes sous les
+   autres. Le panneau défile déjà — inutile d'inventer un carrousel pour
+   cacher ce qu'on peut montrer. */
+.galerie{display:grid;gap:10px;margin-bottom:20px}
+.galerie .sheet-art{margin-bottom:0}
+.galerie .sheet-art:first-child{aspect-ratio:1/1.08}

@@ -32,15 +32,15 @@ var MAX_PAR_HEURE = 40;
    TOUJOURS celui d'ici, jamais celui annoncé par le navigateur. */
 
 var CATALOGUE = {
-  opus:    { nom: 'Opus',    prix: 299, coloris: ['burgundy','noir','beige','marron','taupe','tabac','gris','marine'] },
+  opus:    { nom: 'Opus',    prix: 259, coloris: ['beige','gris','marine','rose','marron','tabac','noir'] },
   stepy:   { nom: 'Stepy',   prix: 259, coloris: ['beige','noir','marron','gris','marine'] },
   western: { nom: 'Western', prix: 359, coloris: ['noir'] }
 };
 var COLORIS = { noir:'Noir', beige:'Beige', marron:'Marron', taupe:'Marron taupe',
-                tabac:'Tabac', burgundy:'Burgundy', gris:'Gris', marine:'Marine' };
+                tabac:'Tabac', rose:'Rose', gris:'Gris', marine:'Marine' };
 var POINTURES   = [37,38,39,40,41];
-var LIVR_OFFERTE = 400;   // à partir de ce montant
-var LIVR_PRIX    = 35;
+var LIVR_OFFERTE = 0;     // livraison offerte sans minimum
+var LIVR_PRIX    = 0;
 
 var COLONNES = ['Reçue le','Référence','Statut','Nom','Téléphone','E-mail','Adresse',
                 'Code postal','Ville','Pays','Articles','Sous-total','Livraison',
