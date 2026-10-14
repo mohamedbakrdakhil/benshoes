@@ -23,18 +23,8 @@ const CATALOG=[
   {id:'opus',hold:4,use:'Tous les jours',name:'Opus',sub:'Mocassin-mule à bride penny',fam:'penny',style:'penny',price:259,
    colors:['beige','gris','marine','rose','marron','tabac','noir'],
    stock:[9,16,21,18,11],flag:'Le plus porté',
-   blurb:"La bride penny ajourée, posée sur un daim souple monté à la main sur forme. Talon ouvert : on l’enfile d’un geste, il tient par le cou-de-pied. Huit cuirs au choix, c’est le modèle sur lequel l’atelier a bâti sa réputation.",
-   spec:[['Tige','Daim de veau, monté sur forme'],['Bride','Penny ajourée, surpiquée main'],['Première','Liège estampé benka'],['Semelle','Gomme souple, cousue']]},
-  {id:'stepy',hold:3,use:'À enfiler',name:'Stepy',sub:'Mocassin-mule à bande pleine',fam:'bande',style:'plain',price:259,
-   colors:['beige','noir','marron','gris','marine'],
-   stock:[7,13,17,14,8],flag:'Entrée de collection',
-   blurb:"La même mule, bande pleine au lieu de la bride ajourée. Ligne plus nette, moins de couture apparente, un prix plus doux. Cinq cuirs, le même montage et la même première en liège.",
-   spec:[['Tige','Daim de veau, monté sur forme'],['Bande','Pleine, bord franc'],['Première','Liège estampé benka'],['Semelle','Gomme souple, cousue']]},
-  {id:'western',hold:5,use:'Pièce travaillée',name:'Western',sub:'Mocassin-mule surpiqué',fam:'surpique',style:'western',price:359,
-   colors:['noir'],
-   stock:[4,7,9,8,5],flag:'Série limitée',
-   blurb:"Bride large à double surpiqûre et crantage latéral, inspirée des bottes de l’Ouest. C’est la pièce la plus travaillée de l’atelier : trois passages de machine là où les autres en demandent un.",
-   spec:[['Tige','Daim de veau, monté sur forme'],['Bride','Large, double surpiqûre, crantée'],['Première','Liège estampé benka'],['Semelle','Gomme souple, cousue']]}
+   blurb:"La bride penny ajourée, posée sur un daim souple monté à la main sur forme. Talon ouvert : on l’enfile d’un geste, il tient par le cou-de-pied. Sept daims au choix, du beige au noir, c’est le modèle sur lequel l’atelier a bâti sa réputation.",
+   spec:[['Tige','Daim de veau, monté sur forme'],['Bride','Penny ajourée, surpiquée main'],['Première','Liège estampé benka'],['Semelle','Gomme souple, cousue']]}
 ];
 const FAQ=[
  ['Comment choisir ma pointure ?',

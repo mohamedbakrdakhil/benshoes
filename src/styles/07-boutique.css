@@ -99,5 +99,32 @@ label.f.bad input{border-color:var(--bad)}
    autres. Le panneau défile déjà — inutile d'inventer un carrousel pour
    cacher ce qu'on peut montrer. */
 .galerie{display:grid;gap:10px;margin-bottom:20px}
-.galerie .sheet-art{margin-bottom:0}
-.galerie .sheet-art:first-child{aspect-ratio:1/1.08}
+/* Dans une galerie empilée, la photo prend la largeur et sa hauteur suit.
+   Le cadre de la fiche unique impose un rapport d'image (1/.92) qui, combiné
+   à une image en hauteur:100%, faisait grossir le cadre au-delà de sa
+   colonne : la photo passait par-dessus le texte. */
+.galerie .sheet-art{margin-bottom:0;aspect-ratio:auto;height:auto;
+  padding:0;border:0;background:var(--surface-2);overflow:hidden;border-radius:var(--r)}
+.galerie .sheet-art .pv{width:100%;height:auto;max-width:100%;object-fit:cover;display:block}
+
+/* Fiche produit en plein écran. Le panneau latéral laissait la grille
+   visible derrière, à moitié assombrie : la photo du produit, qui est
+   l'argument de vente, n'occupait qu'un tiers de l'écran. */
+.panel.plein{left:0;right:0;width:100%;border:0;
+  animation:montee .32s cubic-bezier(.16,1,.3,1)}
+@keyframes montee{from{opacity:0;transform:translateY(22px)}}
+@media(prefers-reduced-motion:reduce){.panel.plein{animation:none}}
+.panel.plein .panel-bd{padding:clamp(16px,4vw,40px)}
+/* Au-delà du téléphone, la fiche se lit en deux colonnes : les photos à
+   gauche, le choix du cuir et de la pointure à droite, sans défiler. */
+@media(min-width:900px){
+  .panel.plein .panel-bd{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
+    gap:clamp(24px,3vw,46px);align-items:start;max-width:1280px;margin-inline:auto;width:100%}
+  /* La colonne autant que la ligne : sans grid-column, la galerie était
+     placée automatiquement et venait chevaucher le texte. */
+  .panel.plein .galerie,.panel.plein>.panel-bd>.sheet-art{
+    grid-column:1;grid-row:1/span 40;margin-bottom:0;min-width:0}
+  .panel.plein .panel-bd>*:not(.galerie):not(.sheet-art){grid-column:2;min-width:0}
+}
+.panel.plein .panel-ft{max-width:1280px;margin-inline:auto;width:100%}
+.panel.plein .panel-hd{max-width:1280px;margin-inline:auto;width:100%}

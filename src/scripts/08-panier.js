@@ -43,7 +43,7 @@ function cartHTML(){
       <button class="btn btn-pri" data-act="place" style="justify-content:center">Valider la commande</button>
       <button class="btn btn-out btn-sm" data-act="back" style="justify-content:center">Retour au panier</button>`;
   } else if(!S.cart.length){
-    body=`<div class="empty"><h4>Votre panier est vide</h4><p>Trois modèles, huit cuirs — commencez par la bride, la couleur et la pointure viennent après.</p>
+    body=`<div class="empty"><h4>Votre panier est vide</h4><p>Sept cuirs, une seule coupe — choisissez la couleur, la pointure vient après.</p>
       <a class="btn btn-out btn-sm" href="#modeles" data-act="closep" style="margin-top:18px">Voir la collection</a></div>`;
     foot='';
   } else {

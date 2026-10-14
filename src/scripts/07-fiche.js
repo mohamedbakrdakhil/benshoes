@@ -18,7 +18,7 @@ function galerie(p,c){
 function sheetHTML(){
   const p=prod(S.sheet.id),c=S.sheet.c,si=S.sheet.s;
   const st=si==null?null:stockOf(p,SIZES.indexOf(si));
-  return `<div class="panel right wide" role="dialog" aria-modal="true" aria-label="${p.name}">
+  return `<div class="panel plein" role="dialog" aria-modal="true" aria-label="${p.name}">
     <div class="panel-hd"><span class="eyebrow">${p.sub}</span><h3 style="flex:0"></h3>
       <button class="close" data-act="closep" style="margin-left:auto" aria-label="Fermer">✕</button></div>
     <div class="panel-bd">

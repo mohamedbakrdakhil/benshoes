@@ -249,14 +249,16 @@ function buildWorld(){
   let li=''; CATALOG.forEach((p,k)=>{li+=niche(p,420+k*900,420,430,200);});
   allee.push(pane('pane-wall',3400,H,`translate3d(${-V.HW}px,${CYm}px,-3000px) rotateY(90deg)`,li));
   allee.push(pane('pane-zellige fin bas',3400,125,`translate3d(${-V.HW+6}px,${V.FY-62}px,-3000px) rotateY(90deg)`));
-  let ri=''; [0,1].forEach(k=>{ri+=niche(CATALOG[k],300+k*620,400,430,200,false,CATALOG[k].colors[1]||CATALOG[k].colors[0]);});
+  // modulo et non indice fixe : le catalogue peut n'avoir qu'un modèle.
+  let ri=''; [0,1].forEach(k=>{const q=CATALOG[k%CATALOG.length];
+    ri+=niche(q,300+k*620,400,430,200,false,q.colors[(k+1)%q.colors.length]);});
   allee.push(pane('pane-wall',1500,H,`translate3d(${V.HW}px,${CYm}px,-2050px) rotateY(-90deg)`,ri));
   allee.push(pane('pane-zellige fin bas',1500,125,`translate3d(${V.HW-6}px,${V.FY-62}px,-2050px) rotateY(-90deg)`));
   allee.push(pane('pane-wall',1040,H,`translate3d(0px,${CYm}px,${V.Z1}px)`));
   allee.push(pane('pane-strip',170,3000,`translate3d(0px,${V.CY+16}px,-2900px) rotateX(-90deg)`));
   if(RICHE) for(let i=0;i<5;i++) allee.push(pane('pane-beam',1040,46,`translate3d(0px,${V.CY+34}px,${-1500-i*680}px) rotateX(-90deg)`));
   if(RICHE) [[-300,-2050],[300,-2850]].forEach(([px,pz],i)=>{
-    const p=CATALOG[i===0?0:2];
+    const p=CATALOG[(i===0?0:2)%CATALOG.length];
     allee.push(pane('pane-podium',300,250,`translate3d(${px}px,${V.FY-125}px,${pz+150}px)`));
     allee.push(pane('pane-podtop',300,300,`translate3d(${px}px,${V.FY-250}px,${pz}px) rotateX(90deg)`));
     allee.push(pane('pane-prop',200,290,`translate3d(${px}px,${V.FY-395}px,${pz}px)`,visuel(p,p.colors[0],true)));
@@ -373,7 +375,7 @@ function buildWorld(){
     salle.push(pane('pane-podium',2200,150,`translate3d(1950px,${V.FY-75}px,-4300px) rotateY(-90deg)`));
     salle.push(pane('pane-podtop',300,2200,`translate3d(2100px,${V.FY-150}px,-4300px) rotateX(90deg)`));
     [[-3600,0],[-4150,1],[-4700,2],[-5200,0]].forEach(([pz,k])=>{
-      const p=CATALOG[k];
+      const p=CATALOG[k%CATALOG.length];
       salle.push(pane('pane-prop',190,270,`translate3d(2100px,${V.FY-285}px,${pz}px) rotateY(-90deg)`,visuel(p,p.colors[0],true)));
     });
   }

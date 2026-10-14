@@ -32,9 +32,7 @@ var MAX_PAR_HEURE = 40;
    TOUJOURS celui d'ici, jamais celui annoncé par le navigateur. */
 
 var CATALOGUE = {
-  opus:    { nom: 'Opus',    prix: 259, coloris: ['beige','gris','marine','rose','marron','tabac','noir'] },
-  stepy:   { nom: 'Stepy',   prix: 259, coloris: ['beige','noir','marron','gris','marine'] },
-  western: { nom: 'Western', prix: 359, coloris: ['noir'] }
+  opus:    { nom: 'Opus',    prix: 259, coloris: ['beige','gris','marine','rose','marron','tabac','noir'] }
 };
 var COLORIS = { noir:'Noir', beige:'Beige', marron:'Marron', taupe:'Marron taupe',
                 tabac:'Tabac', rose:'Rose', gris:'Gris', marine:'Marine' };

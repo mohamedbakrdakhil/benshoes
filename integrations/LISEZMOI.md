@@ -113,7 +113,7 @@ hostile :
 | | |
 |---|---|
 | **Prix** | recalculés dans le script, à partir de son propre catalogue. Ce que le navigateur annonce n'est jamais lu. |
-| **Modèle, coloris, pointure** | vérifiés contre le catalogue. Un Western en marine est refusé : il n'existe pas. |
+| **Modèle, coloris, pointure** | vérifiés contre le catalogue. Un Opus en burgundy est refusé : ce coloris n'existe pas. |
 | **Quantités** | bornées à 10 par ligne, 20 lignes par commande. |
 | **Textes** | coupés (80 caractères pour un nom, 200 pour une adresse) et débarrassés des caractères de commande. |
 | **Formules** | une cellule qui commence par `=`, `+`, `-` ou `@` est préfixée d'une apostrophe. Sans cela, un client nommé `=IMPORTXML(...)` ferait sortir le contenu de votre feuille vers son serveur à la seconde où vous l'ouvrez. |

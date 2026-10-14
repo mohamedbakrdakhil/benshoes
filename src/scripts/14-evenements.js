@@ -2,7 +2,7 @@
 function draw(){
   const adm=location.hash==='#admin';
   $('#shopview').hidden=adm;$('#admview').hidden=!adm;
-  if(adm)$('#admview').innerHTML=admHTML();else{renderGrid();renderCmp();revelations();}
+  if(adm)$('#admview').innerHTML=admHTML();else{renderGrid();revelations();}
   poserLogo();
   const o=$('#overlays');
   o.innerHTML=S.panel==='sheet'?sheetHTML():S.panel==='cart'?cartHTML():S.panel==='manual'?manualHTML():'';
