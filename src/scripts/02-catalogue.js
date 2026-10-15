@@ -7,7 +7,7 @@ const COLORS={
   marron:{n:'Marron',c:'#6b4529',d:'#45290f'},
   taupe:{n:'Marron taupe',c:'#837567',d:'#5e5347'},
   tabac:{n:'Tabac',c:'#9a6433',d:'#6c4318'},
-  rose:{n:'Rose',c:'#b85c6b',d:'#8e4150'},
+  burgundy:{n:'Burgundy',c:'#8e3b40',d:'#5e2126'},
   gris:{n:'Gris',c:'#7e8389',d:'#575c61'},
   marine:{n:'Marine',c:'#27374f',d:'#16202f'}
 };
@@ -21,9 +21,9 @@ const FAMS=[['tous','Tous les modèles']];
    verif-catalogue.py lisent ce bloc à l'expression régulière. */
 const CATALOG=[
   {id:'opus',hold:4,use:'Tous les jours',name:'Opus',sub:'Mocassin-mule à bride penny',fam:'penny',style:'penny',price:259,
-   colors:['beige','gris','marine','rose','marron','tabac','noir'],
+   colors:['beige','taupe','marron','tabac','burgundy','gris','marine','noir'],
    stock:[9,16,21,18,11],flag:'Le plus porté',
-   blurb:"La bride penny ajourée, posée sur un daim souple monté à la main sur forme. Talon ouvert : on l’enfile d’un geste, il tient par le cou-de-pied. Sept daims au choix, du beige au noir, c’est le modèle sur lequel l’atelier a bâti sa réputation.",
+   blurb:"La bride penny ajourée, posée sur un daim souple monté à la main sur forme. Talon ouvert : on l’enfile d’un geste, il tient par le cou-de-pied. Huit daims au choix, du beige au noir, c’est le modèle sur lequel l’atelier a bâti sa réputation.",
    spec:[['Tige','Daim de veau, monté sur forme'],['Bride','Penny ajourée, surpiquée main'],['Première','Liège estampé benka'],['Semelle','Gomme souple, cousue']]}
 ];
 const FAQ=[

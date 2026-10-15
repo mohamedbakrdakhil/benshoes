@@ -108,10 +108,10 @@ def feuille(lignes, largeurs=None, fige=None, filtre=None, validations=(), haute
 
 CATALOGUE = [
     ('Opus',    259, 'Mocassin-mule à bride penny',
-     ['beige','gris','marine','rose','marron','tabac','noir']),
+     ['beige','taupe','marron','tabac','burgundy','gris','marine','noir']),
 ]
-COLORIS = {'noir':'Noir','beige':'Beige','marron':'Marron',
-           'tabac':'Tabac','rose':'Rose','gris':'Gris','marine':'Marine'}
+COLORIS = {'noir':'Noir','beige':'Beige','marron':'Marron','taupe':'Marron taupe',
+           'tabac':'Tabac','burgundy':'Burgundy','gris':'Gris','marine':'Marine'}
 POINTURES = [37, 38, 39, 40, 41]
 STATUTS = 'Nouvelle,Confirmée,Expédiée,Livrée,Annulée'
 P = LIGNES_UTILES + 1                       # dernière ligne du journal

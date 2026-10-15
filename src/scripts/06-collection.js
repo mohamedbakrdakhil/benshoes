@@ -5,7 +5,14 @@ function renderStatic(){
   // Le héros garde l'illustration : les photos de l'atelier portent leur
   // décor (canapé, parquet, marbre), qui ferait une boîte claire au milieu du
   // bordeaux. Pour y mettre la vraie chaussure il faudrait un détourage.
-  $('#heroart').innerHTML=visuel(prod('opus'),'rose');
+  // Jamais un nom de coloris en dur : il a déjà fallu corriger ici deux fois
+  // après un renommage (burgundy, puis rose), et chaque fois le héros est
+  // reparti en dessin avec des couleurs indéfinies sans que rien n'alerte.
+  // Le premier coloris du modèle existe toujours, par construction.
+  const vedette=CATALOG[0];
+  $('#heroart').innerHTML=visuel(vedette,vedette.colors[0]);
+  const etiq=document.querySelector('.hero-art .tag');
+  if(etiq) etiq.innerHTML=`${vedette.name} · ${COLORS[vedette.colors[0]].n}<br>Pointures ${SIZES[0]} → ${SIZES[SIZES.length-1]}`;
   poserLogo();
   $('#anatfig').innerHTML=anatomySVG();
   $('#filters').innerHTML=FAMS.map(([k,l])=>`<button class="chip" data-act="fam" data-k="${k}" aria-pressed="${S.filter===k}">${l}</button>`).join('')

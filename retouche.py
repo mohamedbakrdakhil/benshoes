@@ -27,41 +27,42 @@ except ImportError:
     sys.exit("retouche.py : le module Pillow est absent (pip3 install Pillow)")
 
 
-def fond_studio(im, marge=0.045, texture_max=4.0, satur_max=8.0,
-                clair_min=170):
-    """Les quatre coins sont-ils un fond de studio ?
+def fond_studio(im, marge=0.05, satur_max=15.0, clair_min=170):
+    """Les coins hauts sont-ils un fond de studio ?
 
-    Mesuré sur les vingt photos de l'atelier avant d'écrire la règle. La
-    luminosité et son écart entre coins se chevauchent entre studio et photo
-    portée — ils ne décident rien. Deux mesures, elles, séparent sans
-    ambiguïté :
+    Règle refaite sur les 24 photos de l'atelier, packshots du catalogue
+    compris. Deux corrections par rapport à la première version :
 
-        texture (écart-type du coin)   studio 0,9–1,2   portée 7,6–34,1
-        saturation du coin             studio 0,0–0,7   portée 34,8–117,5
+    Les coins HAUTS seulement. Sur un fond en gorge, le bas du cadre est la
+    table : un bord, une ombre portée, une couture du papier. Quatre
+    packshots sur huit y avaient un coin chargé et passaient pour des photos
+    de décor.
 
-    Un fond de studio est lisse et neutre ; un parquet est texturé et coloré.
-    Les seuils sont posés loin des deux nuages, pas à la frontière.
+    La saturation seule décide. La texture, qui séparait nettement sur les
+    photos portées, se chevauche dès qu'un pied ou son ombre atteint un coin
+    (packshot marron 45,3 contre photo portée 3,6). La saturation, elle,
+    garde un fossé net :
+
+        saturation des coins hauts   packshot 1,2–8,5   portée 29,3–224,7
+
+    Le seuil est posé à 15, au milieu du fossé, pas à sa bordure. Une erreur
+    ici ne coûte qu'un fond relevé ou non : c'est cosmétique, jamais faux.
 
     Renvoie la luminosité moyenne du fond, ou None si ce n'est pas un studio.
     """
     from PIL import ImageStat
     w, h = im.size
     cw, ch = round(w * marge), round(h * marge)
-    coins = [im.crop((0, 0, cw, ch)), im.crop((w - cw, 0, w, ch)),
-             im.crop((0, h - ch, cw, h)), im.crop((w - cw, h - ch, w, h))]
-    clair, texture, satur = [], [], []
-    for k in coins:
-        g = ImageStat.Stat(k.convert('L'))
-        clair.append(g.mean[0])
-        texture.append(g.stddev[0])
+    hauts = [im.crop((0, 0, cw, ch)), im.crop((w - cw, 0, w, ch))]
+    clair, satur = [], []
+    for k in hauts:
+        clair.append(ImageStat.Stat(k.convert('L')).mean[0])
         satur.append(ImageStat.Stat(k.convert('HSV')).mean[1])
-    if max(texture) > texture_max:
-        return None                      # décor : parquet, marbre, tissu
     if max(satur) > satur_max:
-        return None                      # fond coloré : ce n'est pas un studio
+        return None                      # fond coloré : décor, pas studio
     if min(clair) < clair_min:
         return None                      # fond sombre : on ne le relève pas
-    return sum(clair) / 4
+    return sum(clair) / 2
 
 
 def relever_fond(im, niveau):
