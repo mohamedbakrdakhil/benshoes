@@ -154,9 +154,22 @@ def manifeste(dossier='assets/produits', sortie='.build/photos.js'):
             base = '%s/%s' % (dossier, modele if coloris == '_'
                               else '%s-%s' % (modele, coloris))
             entree = {'b': base, 'j': sorted(e['jpg']), 'p': sorted(e['webp'])}
+            # La proportion, pour que le navigateur réserve la place de
+            # l'image AVANT de la charger. Sans elle, une image différée a
+            # une hauteur nulle, ne descend donc jamais dans le champ de
+            # vision, et n'est jamais chargée : elle reste invisible pour
+            # toujours. C'est ce qui vidait la galerie de la fiche produit.
             idx = sorted(i for i in e['n'] if i)
             if idx:
                 entree['n'] = idx          # galerie : numéros disponibles
+            # Le fichier témoin porte son numéro quand c'est une galerie.
+            prefixe = '%s-%d' % (base, idx[0]) if idx else base
+            try:
+                with Image.open('%s-%d.jpg' % (prefixe, sorted(e['jpg'])[0])) as t:
+                    entree['w'], entree['h'] = t.size
+            except Exception as err:
+                sys.stderr.write('  images : proportion illisible pour %s (%s)\n'
+                                 % (prefixe, err))
             out.setdefault(modele, {})[coloris] = entree
     os.makedirs(os.path.dirname(sortie), exist_ok=True)
     io.open(sortie, 'w', encoding='utf-8').write(

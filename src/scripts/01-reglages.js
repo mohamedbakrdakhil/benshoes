@@ -61,12 +61,32 @@ function visuel(p,c,lite,i){
   const B=basePhoto(ph,i);
   // « sizes » dit au navigateur la place réelle de l'image AVANT de la
   // choisir : sans lui il prend la plus large et télécharge pour rien.
-  const places=lite?'(max-width:860px) 42vw, 280px':'(max-width:860px) 88vw, 560px';
+  /* Mesuré, pas supposé : sur téléphone la grille est à une colonne et la
+     vignette occupe 293 px sur 375, soit 78 % — pas les 42 % que j'avais
+     écrits en imaginant deux colonnes. Un « sizes » faux fait choisir au
+     navigateur une image trop lourde ou trop floue. */
+  const places=lite?'(max-width:860px) 80vw, 300px':'(max-width:860px) 92vw, 480px';
+  /* Un <img> seul, jamais un <picture>.
+
+     Le <picture> servait à offrir le WebP avec un repli JPEG. Il créait des
+     lignes de grille parasites et faussait toute hauteur exprimée en
+     pourcentage : les chaussures du show-room tombaient à 23 px dans une
+     niche de 150, et la galerie de la fiche naissait à hauteur nulle, donc
+     ne se chargeait jamais. Deux pannes pour un seul confort.
+
+     Ici le srcset ne liste que du WebP et le src pointe le JPEG. Tout
+     navigateur qui comprend srcset — donc tout ce qui est sorti depuis 2020
+     — prend le WebP ; les plus anciens ignorent srcset et reçoivent le
+     JPEG. Même résultat, sans boîte intermédiaire.
+
+     width/height déclarés : le navigateur réserve la place avant d'avoir
+     l'image. Sans eux, une image différée naît à hauteur nulle, ne descend
+     jamais dans le champ de vision, et ne se charge donc jamais. */
+  const dim=ph.w&&ph.h?` width="${ph.w}" height="${ph.h}"`:'';
   const repli=ph.j[ph.j.length-1];
-  return '<picture>'
-    +(ph.p.length?`<source type="image/webp" srcset="${jeuSrc(B,ph.p,'webp')}" sizes="${places}">`:'')
-    +`<img class="pv" src="${B}-${repli}.jpg" srcset="${jeuSrc(B,ph.j,'jpg')}" sizes="${places}"`
-    +` alt="${alt}" loading="lazy" decoding="async"></picture>`;
+  const jeu=ph.p.length?jeuSrc(B,ph.p,'webp'):jeuSrc(B,ph.j,'jpg');
+  return `<img class="pv"${dim} src="${B}-${repli}.jpg" srcset="${jeu}" sizes="${places}"`
+    +` alt="${alt}" loading="lazy" decoding="async">`;
 }
 // Le logo benka, redessiné : mot rond et gras, empreinte de pied en appui.
 // Si un vrai fichier est fourni dans BRAND.logo, il prend le dessus.

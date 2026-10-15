@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; script-src 'self' 'sha256-qUmPXh1SN7OoiJpBYOJdP874n4RT+M0Y8ijvNlz6B74='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; script-src 'self' 'sha256-nYQklms6mJEzogUzFtrmFcC3sGlRYCQ5hRkil4zgg0E='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
 <meta name="benka-api" content="oui">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Benkashoes — mocassins-mules en daim, atelier marocain</title>
@@ -248,7 +248,7 @@
 </div>
 <div id="admview" hidden></div>
 <div id="overlays"></div>
-<script>const PHOTOS_AUTO={"opus":{"beige":{"b":"assets/produits/opus-beige","j":[320,480,640,960],"p":[320,480,640,960],"n":[1,2,3,4,5]},"burgundy":{"b":"assets/produits/opus-burgundy","j":[320,480,640,960],"p":[320,480,640,960],"n":[1,2,3]},"gris":{"b":"assets/produits/opus-gris","j":[320,480,640,960],"p":[320,480,640,960],"n":[1,2,3,4,5]},"marine":{"b":"assets/produits/opus-marine","j":[320,480,640,960],"p":[320,480,640,960],"n":[1,2,3,4,5]},"marron":{"b":"assets/produits/opus-marron","j":[320,480,640,960],"p":[320,480,640,960],"n":[1]},"noir":{"b":"assets/produits/opus-noir","j":[320,480,640,960],"p":[320,480,640,960],"n":[1,2]},"tabac":{"b":"assets/produits/opus-tabac","j":[320,480,640,960],"p":[320,480,640,960],"n":[1,2]},"taupe":{"b":"assets/produits/opus-taupe","j":[320,480,640,960],"p":[320,480,640,960],"n":[1]}}};
+<script>const PHOTOS_AUTO={"opus":{"beige":{"b":"assets/produits/opus-beige","j":[320,480,640,960],"p":[320,480,640,960],"n":[1,2,3,4,5],"w":320,"h":424},"burgundy":{"b":"assets/produits/opus-burgundy","j":[320,480,640,960],"p":[320,480,640,960],"n":[1,2,3],"w":320,"h":424},"gris":{"b":"assets/produits/opus-gris","j":[320,480,640,960],"p":[320,480,640,960],"n":[1,2,3,4,5],"w":320,"h":427},"marine":{"b":"assets/produits/opus-marine","j":[320,480,640,960],"p":[320,480,640,960],"n":[1,2,3,4,5],"w":320,"h":423},"marron":{"b":"assets/produits/opus-marron","j":[320,480,640,960],"p":[320,480,640,960],"n":[1],"w":320,"h":429},"noir":{"b":"assets/produits/opus-noir","j":[320,480,640,960],"p":[320,480,640,960],"n":[1,2],"w":320,"h":422},"tabac":{"b":"assets/produits/opus-tabac","j":[320,480,640,960],"p":[320,480,640,960],"n":[1,2],"w":320,"h":423},"taupe":{"b":"assets/produits/opus-taupe","j":[320,480,640,960],"p":[320,480,640,960],"n":[1],"w":320,"h":425}}};
 const SHOP={
   email:'contact@benkashoes.ma',   // votre vraie adresse e-mail
   phone:'',                       // ex. '+212 6 12 34 56 78'  (vide = masqué)
@@ -276,12 +276,12 @@ function visuel(p,c,lite,i){
   const alt=att(`${p.name} — ${(COLORS[c]||{}).n||''}`);
   if(ph.brut) return `<img class="pv" src="${ph.brut}" alt="${alt}" loading="lazy" decoding="async">`;
   const B=basePhoto(ph,i);
-  const places=lite?'(max-width:860px) 42vw, 280px':'(max-width:860px) 88vw, 560px';
+  const places=lite?'(max-width:860px) 80vw, 300px':'(max-width:860px) 92vw, 480px';
+  const dim=ph.w&&ph.h?` width="${ph.w}" height="${ph.h}"`:'';
   const repli=ph.j[ph.j.length-1];
-  return '<picture>'
-    +(ph.p.length?`<source type="image/webp" srcset="${jeuSrc(B,ph.p,'webp')}" sizes="${places}">`:'')
-    +`<img class="pv" src="${B}-${repli}.jpg" srcset="${jeuSrc(B,ph.j,'jpg')}" sizes="${places}"`
-    +` alt="${alt}" loading="lazy" decoding="async"></picture>`;
+  const jeu=ph.p.length?jeuSrc(B,ph.p,'webp'):jeuSrc(B,ph.j,'jpg');
+  return `<img class="pv"${dim} src="${B}-${repli}.jpg" srcset="${jeu}" sizes="${places}"`
+    +` alt="${alt}" loading="lazy" decoding="async">`;
 }
 function logoHTML(){
   return '<span class="logo" role="img" aria-label="benka">'
