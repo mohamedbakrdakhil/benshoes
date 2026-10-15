@@ -32,7 +32,7 @@ const BRAND={logo:'',logoClair:''};
    vidéo ne se télécharge qu'ensuite, et seulement si les conditions sont
    réunies (voir fondVideo() dans 10-revelations.js). Sans affiche, la
    section resterait noire le temps du chargement. */
-const VIDEOS={};
+const VIDEOS={top:'assets/videos/collection'};
 
 /* Surcharge manuelle, pour une photo isolée qui ne suit pas la convention de
    nommage. Le cas normal passe par assets/produits/ et images.py. */

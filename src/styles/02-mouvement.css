@@ -110,3 +110,34 @@
 .fond-video video.vu{opacity:1}
 /* Le contenu de la section passe devant la couche. */
 .fond-video~*{position:relative;z-index:1}
+
+/* Le héros par-dessus la boucle de collection.
+   --------------------------------------------
+   La lisibilité est acquise à la fabrication, pas ici : boucle.py pose la
+   paire sur un fond bordeaux déjà sombre, et le pixel le plus clair de
+   toute la boucle tient 6,7:1 de contraste avec du texte blanc — la norme
+   en demande 4,5:1. Le voile ci-dessous ne rattrape donc rien, il creuse :
+   un peu plus de nuit à gauche, où vit le titre, et au pied du bandeau.
+   Un voile plat sur toute la largeur éteindrait le cuir, qui est le seul
+   sujet de la vidéo. */
+.hero .fond-video::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(97deg,rgba(0,0,0,.50) 0%,rgba(0,0,0,.26) 40%,
+    rgba(0,0,0,.04) 68%,rgba(0,0,0,.20) 100%),
+    linear-gradient(to top,rgba(0,0,0,.32),transparent 42%)}
+/* Sous 900 px le héros passe sur une colonne et la vidéo ne se télécharge
+   jamais : il ne reste que l'affiche, sous un texte qui court sur toute la
+   largeur. Un dégradé latéral n'a plus de sens, il faut voiler par le haut. */
+@media(max-width:900px){
+  .hero .fond-video::after{
+    background:linear-gradient(to bottom,rgba(0,0,0,.52) 0%,rgba(0,0,0,.30) 44%,
+      rgba(0,0,0,.46) 100%)}
+}
+/* Les courbes de niveau du héros étaient le décor de fond quand il n'y en
+   avait pas d'autre. Avec la vidéo derrière, elles deviennent du bruit. */
+.hero.a-fond .hero-topo{opacity:.14}
+/* L'étiquette du modèle vivait sur un aplat bordeaux, où un rose pâle
+   suffisait. Posée sur la boucle, elle tombe par moments sur le cuir clair
+   d'un beige ou d'un gris : 2,6:1, illisible. Elle prend donc son propre
+   fond dès qu'il y a une vidéo derrière — et seulement dans ce cas. */
+.hero.a-fond .hero-art .tag{color:var(--band-fg);background:rgba(14,6,4,.62);
+  padding:7px 11px;border-radius:9px;bottom:0}

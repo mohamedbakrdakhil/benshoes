@@ -132,10 +132,22 @@ function fondVideo(){
     if(!sec||!base) return;
 
     // L'affiche d'abord, toujours : c'est le décor visible, vidéo ou pas.
+    // Sur une colonne étroite, une affiche large est agrandie et rognée des
+    // trois quarts — il n'en reste qu'un gros plan flou. On sert alors
+    // l'affiche verticale si elle existe, en retombant sur la large sinon :
+    // l'image sonde est la même URL que le fond, donc aucun second appel.
+    const large=`${base}-affiche.jpg`, etroite=etroit?`${base}-affiche-etroite.jpg`:'';
     const couche=document.createElement('div');
     couche.className='fond-video';
-    couche.style.backgroundImage=`url("${base}-affiche.jpg")`;
+    couche.style.backgroundImage=`url("${etroite||large}")`;
+    if(etroite){
+      const sonde=new Image();
+      sonde.onerror=()=>{couche.style.backgroundImage=`url("${large}")`;};
+      sonde.src=etroite;
+    }
     sec.prepend(couche);
+    // La section le sait : ses propres décors doivent s'effacer devant.
+    sec.classList.add('a-fond');
     if(getComputedStyle(sec).position==='static') sec.style.position='relative';
 
     if(etroit||lente||!MOTION) return;   // l'affiche suffira

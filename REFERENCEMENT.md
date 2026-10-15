@@ -98,6 +98,35 @@ cacher. **Toute animation d'entrée posée sur un gros bloc de texte au-dessus
 de la ligne de flottaison se paie en LCP** — c'est la règle à retenir avant
 d'en ajouter une.
 
+## La boucle de fond du héros
+
+Ajoutée le 15 octobre 2026. Fabriquée depuis les huit packshots de studio
+par `boucle.py` — aucun service de génération, aucun abonnement, aucune
+image inventée : ce sont les vraies chaussures.
+
+| | Poids | Qui le reçoit |
+|---|---|---|
+| `collection-affiche-etroite.jpg` | 18 Ko | tout écran ≤ 900 px |
+| `collection-affiche.jpg` | 28 Ko | tout écran ≥ 901 px |
+| `collection.mp4` | 303 Ko | écran large **et** connexion rapide **et** animations autorisées |
+
+Trois points qui touchent au classement :
+
+- **L'affiche est préchargée**, et par requête de média : le navigateur ne
+  télécharge que celle de sa largeur, et il la découvre pendant la lecture
+  du HTML, avant même la feuille de style. Mesuré en local : départ à 15 ms,
+  reçue à 20 ms. Sans ce préchargement elle n'était découverte qu'au moment
+  où le script la réclame, c'est-à-dire après tout le reste — et comme elle
+  occupe tout le bandeau, c'est elle que Google prend pour repère.
+- **Aucun décalage de mise en page** : l'affiche et la vidéo occupent la
+  même boîte, en fond, et la vidéo n'apparaît qu'en fondu une fois prête.
+  CLS mesuré à 0, inchangé.
+- **Le LCP reste à vérifier sur le site en ligne**, dans un navigateur
+  réellement au premier plan. Le volet intégré utilisé pendant le
+  développement exécute la page en arrière-plan : il n'enregistre aucune
+  entrée de peinture, ses chiffres ne valent rien. C'est la même précaution
+  que pour les mesures du tableau plus haut.
+
 ## IndexNow : les moteurs qu'on peut prévenir sans compte
 
 Google n'accepte pas qu'on lui annonce une adresse : il faut passer par la
