@@ -246,12 +246,20 @@ function buildWorld(){
   allee.push(pane('pane-floor',1500,4600,`translate3d(0px,${V.FY}px,-1900px) rotateX(90deg)`));
   allee.push(pane('pane-tapis',520,3600,`translate3d(0px,${V.FY-3}px,-2600px) rotateX(90deg)`));
   allee.push(pane('pane-ceil',PETIT?1400:2200,PETIT?3800:6400,`translate3d(0px,${V.CY}px,-2600px) rotateX(-90deg)`));
-  let li=''; CATALOG.forEach((p,k)=>{li+=niche(p,420+k*900,420,430,200);});
+  /* Les alcôves du couloir ne montrent plus de chaussure.
+
+     Elles sont sur les murs latéraux, parallèles à la marche : la caméra les
+     voit toujours de profil, et la photo s'y projetait sur 11 à 17 pixels de
+     large. Une chaussure de quatorze pixels n'est pas une petite chaussure,
+     c'est une niche qui paraît vide. Elles restent comme alcôves éclairées —
+     l'effet de vitrine, sans la promesse qu'on ne peut pas tenir. Les
+     chaussures se regardent au mur du fond, de face. */
+  const alcove=(left,w,ht,top)=>
+    `<div class="niche decor" style="left:${left*K}px;top:${top*K}px;width:${w*K}px;height:${ht*K}px"></div>`;
+  let li=''; [0,1,2].forEach(k=>{li+=alcove(420+k*900,420,430,200);});
   allee.push(pane('pane-wall',3400,H,`translate3d(${-V.HW}px,${CYm}px,-3000px) rotateY(90deg)`,li));
   allee.push(pane('pane-zellige fin bas',3400,125,`translate3d(${-V.HW+6}px,${V.FY-62}px,-3000px) rotateY(90deg)`));
-  // modulo et non indice fixe : le catalogue peut n'avoir qu'un modèle.
-  let ri=''; [0,1].forEach(k=>{const q=CATALOG[k%CATALOG.length];
-    ri+=niche(q,300+k*620,400,430,200,false,q.colors[(k+1)%q.colors.length]);});
+  let ri=''; [0,1].forEach(k=>{ri+=alcove(300+k*620,400,430,200);});
   allee.push(pane('pane-wall',1500,H,`translate3d(${V.HW}px,${CYm}px,-2050px) rotateY(-90deg)`,ri));
   allee.push(pane('pane-zellige fin bas',1500,125,`translate3d(${V.HW-6}px,${V.FY-62}px,-2050px) rotateY(-90deg)`));
   allee.push(pane('pane-wall',1040,H,`translate3d(0px,${CYm}px,${V.Z1}px)`));

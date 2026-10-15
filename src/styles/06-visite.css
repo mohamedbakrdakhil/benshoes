@@ -366,3 +366,11 @@ html.degrade [data-rv]{opacity:1!important;transform:none!important}
   filter:sepia(.16) saturate(.96) brightness(.93) contrast(1.02);
   border-radius:calc(3px/var(--f));
   box-shadow:0 calc(6px/var(--f)) calc(16px/var(--f)) rgba(0,0,0,.4)}
+
+/* Alcôve éclairée du couloir : le creux et la lumière d'une vitrine, sans
+   produit. Vue de profil, une photo n'y occuperait qu'une dizaine de pixels. */
+.niche.decor{background:
+  radial-gradient(120% 70% at 50% 0%,rgba(250,210,180,.26),transparent 68%),
+  linear-gradient(180deg,#48231a,#20100b);
+  border:1px solid #5b2317;
+  box-shadow:inset 0 22px 70px rgba(209,69,44,.34),0 0 50px rgba(0,0,0,.6)}
