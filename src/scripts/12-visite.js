@@ -257,11 +257,10 @@ function buildWorld(){
   allee.push(pane('pane-wall',1040,H,`translate3d(0px,${CYm}px,${V.Z1}px)`));
   allee.push(pane('pane-strip',170,3000,`translate3d(0px,${V.CY+16}px,-2900px) rotateX(-90deg)`));
   if(RICHE) for(let i=0;i<5;i++) allee.push(pane('pane-beam',1040,46,`translate3d(0px,${V.CY+34}px,${-1500-i*680}px) rotateX(-90deg)`));
-  if(RICHE) [[-300,-2050],[300,-2850]].forEach(([px,pz],i)=>{
-    const p=CATALOG[(i===0?0:2)%CATALOG.length];
+  if(RICHE) [[-300,-2050],[300,-2850]].forEach(([px,pz])=>{
     allee.push(pane('pane-podium',300,250,`translate3d(${px}px,${V.FY-125}px,${pz+150}px)`));
     allee.push(pane('pane-podtop',300,300,`translate3d(${px}px,${V.FY-250}px,${pz}px) rotateX(90deg)`));
-    allee.push(pane('pane-prop',200,290,`translate3d(${px}px,${V.FY-395}px,${pz}px)`,visuel(p,p.colors[0],true)));
+    allee.push(pane('pane-boite',230,130,`translate3d(${px}px,${V.FY-315}px,${pz}px)`,'<i></i>'));
   });
 
   /* =============== la grande salle =============== */
@@ -270,12 +269,16 @@ function buildWorld(){
   salle.push(pane('pane-tapis',760,2600,`translate3d(1760px,${V.FY-3}px,-4300px) rotateX(90deg)`));
   // Le plafond remonte d'un étage : la salle fait désormais 2470 de haut.
   salle.push(pane('pane-ceil',PETIT?1900:2200,PETIT?2600:3100,`translate3d(1560px,${V.SCY2}px,-4300px) rotateX(-90deg)`));
-  const nb=PETIT?8:VITRINES.length, cols=PETIT?4:7, cw=230, gap=30, ch=PETIT?360:420;
+  /* Une rangée, une niche par coloris, jamais deux fois la même paire.
+     Avant, le mur comptait deux rangées remplies en bouclant sur la
+     collection : la seconde rangée répétait la première, et les podiums de
+     la salle affichaient tous p.colors[0] — le même beige, six fois. */
+  const nb=VITRINES.length, cols=nb, cw=PETIT?190:230, gap=PETIT?16:30, ch=PETIT?300:420;
   const emprise=cols*cw+(cols-1)*gap, marge=(SL-emprise)/2;
   let mi='';
   for(let i=0;i<nb;i++){
     const [p,c]=VITRINES[i%VITRINES.length];
-    mi+=niche(p,marge+(i%cols)*(cw+gap),cw,ch,i<cols?120:120+ch+45,true,c);
+    mi+=niche(p,marge+i*(cw+gap),cw,ch,170,true,c);
   }
   salle.push(pane('pane-wall',SL,SH,`translate3d(${V.SX}px,${SYm}px,${SZc}px) rotateY(-90deg)`,mi));
 
@@ -348,12 +351,10 @@ function buildWorld(){
   // dedans. Trois plans chacune — on circule autour, ce n'est plus seulement
   // un mur qu'on regarde.
   const vz = PETIT ? [-3560,-5280] : [-3620,-5120];
-  vz.forEach((z,i)=>{
-    const p=CATALOG[i%CATALOG.length];
+  vz.forEach(z=>{
     salle.push(pane('pane-podium',240,300,`translate3d(1790px,${V.FY-150}px,${z}px) rotateY(-90deg)`));
     salle.push(pane('pane-podtop',240,240,`translate3d(1790px,${V.FY-300}px,${z}px) rotateX(90deg)`));
-    salle.push(pane('pane-prop',160,200,`translate3d(1790px,${V.FY-400}px,${z}px) rotateY(-90deg)`,
-      visuel(p,p.colors[0],true)));
+    salle.push(pane('pane-boite',180,105,`translate3d(1790px,${V.FY-352}px,${z}px) rotateY(-90deg)`,'<i></i>'));
     salle.push(pane('pane-verre',240,340,`translate3d(1790px,${V.FY-470}px,${z}px) rotateY(-90deg)`));
     salle.push(pane('pane-led',190,12,`translate3d(1790px,${V.FY-645}px,${z}px) rotateY(-90deg)`));
   });
@@ -374,9 +375,13 @@ function buildWorld(){
   if(RICHE){
     salle.push(pane('pane-podium',2200,150,`translate3d(1950px,${V.FY-75}px,-4300px) rotateY(-90deg)`));
     salle.push(pane('pane-podtop',300,2200,`translate3d(2100px,${V.FY-150}px,-4300px) rotateX(90deg)`));
-    [[-3600,0],[-4150,1],[-4700,2],[-5200,0]].forEach(([pz,k])=>{
-      const p=CATALOG[k%CATALOG.length];
-      salle.push(pane('pane-prop',190,270,`translate3d(2100px,${V.FY-285}px,${pz}px) rotateY(-90deg)`,visuel(p,p.colors[0],true)));
+    // Des boîtes de l'atelier, posées sur le banc. Deux hauteurs pour que la
+    // ligne ne soit pas plate, et aucune paire : les chaussures se regardent
+    // au mur, pas en six exemplaires identiques.
+    [[-3620,2],[-4180,1],[-4720,3],[-5180,1]].forEach(([pz,n])=>{
+      for(let j=0;j<n;j++)
+        salle.push(pane('pane-boite',210,118,
+          `translate3d(2100px,${V.FY-209-j*112}px,${pz}px) rotateY(-90deg)`,'<i></i>'));
     });
   }
 

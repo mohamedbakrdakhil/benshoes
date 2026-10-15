@@ -344,3 +344,25 @@ html.degrade [data-rv]{opacity:1!important;transform:none!important}
   .vcap{position:static;opacity:1!important;padding-block:26px}
 }
 
+
+/* Boîte de l'atelier : carton kraft, pastille ronde au logo. C'est
+   l'emballage réel, celui qu'on voit dans les photos de la collection — il
+   meuble la salle sans répéter une septième fois la même paire. */
+.pane-boite{background:
+  linear-gradient(180deg,rgba(255,255,255,.1) 0 14%,transparent 14%),
+  linear-gradient(90deg,rgba(0,0,0,.22),transparent 18%,transparent 82%,rgba(0,0,0,.28)),
+  linear-gradient(180deg,#b99167,#9d7650 62%,#7d5c3c);
+  box-shadow:0 10px 26px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.22);
+  border-radius:calc(4px/var(--f));display:grid;place-items:center}
+.pane-boite i{width:34%;aspect-ratio:1/.72;border-radius:50%;
+  background:radial-gradient(60% 60% at 50% 38%,#fffaf6,#f0e2d6);
+  box-shadow:inset 0 0 calc(10px/var(--f)) rgba(140,90,60,.3)}
+
+/* Le tirage dans la niche. Les packshots sont pris sur fond blanc de studio :
+   tels quels, ils faisaient une plaque éclatante dans le bois sombre. On les
+   ramène à la lumière de la salle — chaude, un peu basse — et on les cadre
+   comme un tirage posé, pas comme un écran. */
+.niche .pv,.n3 .nb .pv{
+  filter:sepia(.16) saturate(.96) brightness(.93) contrast(1.02);
+  border-radius:calc(3px/var(--f));
+  box-shadow:0 calc(6px/var(--f)) calc(16px/var(--f)) rgba(0,0,0,.4)}
