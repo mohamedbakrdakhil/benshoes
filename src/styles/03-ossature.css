@@ -29,7 +29,14 @@
 .nav a{text-decoration:none;color:var(--fg-soft);padding:4px 0;border-bottom:1px solid transparent}
 .nav a:hover{color:var(--fg);border-color:var(--accent)}
 .hdr-act{display:flex;align-items:center;gap:8px;margin-left:auto;flex:0 0 auto}
-.nav+.hdr-act{margin-left:0}
+/* La barre de liens pousse déjà tout vers la droite : sans cette règle,
+   les boutons prendraient une seconde marge automatique et se décolleraient
+   d'elle. Mais elle ne vaut QUE tant que la barre existe. Sous 861 px elle
+   passe en display:none — et un élément masqué reste un frère dans le
+   document, donc le sélecteur « .nav+.hdr-act » continuait de s'appliquer.
+   Les boutons perdaient leur poussée et se tassaient contre le logo : 64 px
+   de vide à droite pour 20 à gauche, sur le téléphone de la maison. */
+@media(min-width:861px){.nav+.hdr-act{margin-left:0}}
 .icbtn{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
 .icbtn:hover{border-color:var(--line-2)}
 .cartbtn{display:flex;align-items:center;gap:9px;height:38px;padding:0 14px;border-radius:var(--r);background:var(--fg);color:var(--bg);font-size:.8rem;font-weight:600;letter-spacing:.02em}
