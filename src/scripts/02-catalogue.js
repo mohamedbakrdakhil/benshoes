@@ -36,7 +36,7 @@ const FAQ=[
  ['La première en liège change-t-elle avec le temps ?',
   "C\u2019est même le principe. Le liège se tasse sous les points d\u2019appui au fil des ports et finit par garder le creux de votre pied. Au bout de deux ou trois semaines, la première n\u2019est plus plate : elle est à vous. C\u2019est l\u2019empreinte du logo."],
  ['Puis-je payer en ligne ?',
-  "Pas encore. Vous composez votre panier, le site vous donne une référence, et vous envoyez le récapitulatif à l\u2019atelier par WhatsApp ou par e-mail. On confirme la disponibilité dans votre pointure, puis vous réglez à la livraison ou par virement."],
+  "Pas encore. Vous composez votre panier et vous le validez : la commande arrive directement à l\u2019atelier avec une référence. On vous rappelle pour confirmer la disponibilité dans votre pointure, puis vous réglez à la livraison ou par virement."],
  ['Livrez-vous en dehors du Maroc ?',
   "Oui, sur demande. L\u2019expédition sous 48 h et la livraison offerte ne valent que pour le Maroc. Pour l\u2019étranger, indiquez votre pays dans le formulaire : on vous envoie un devis de port avant de confirmer la commande."]
 ];

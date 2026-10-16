@@ -157,7 +157,7 @@ const PLANS=[
   ['assets/atelier/02-800.jpg','Les tiges en daim, avant montage'],
   ['assets/atelier/03-800.jpg','L\u2019établi et les formes'],
   ['assets/atelier/04-800.jpg','Le montage sur forme'],
-  ['assets/produits/mocassin-noir-800.jpg','La collection, prête à partir']
+  ['assets/atelier/rangee-mules-noires-800.jpg','La collection, prête à partir']
 ];
 function construirePlans(){
   const w=$('#world'); if(!w)return;

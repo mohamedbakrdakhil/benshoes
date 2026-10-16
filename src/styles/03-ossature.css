@@ -65,7 +65,12 @@
 /* ---------- hero ---------- */
 .hero{position:relative;background:var(--band-bg);color:var(--band-fg);overflow:hidden}
 .hero-topo{position:absolute;inset:-8% -4%;opacity:.5;pointer-events:none}
-.hero-in{position:relative;display:grid;grid-template-columns:1.08fr .92fr;gap:40px;align-items:center;padding-block:66px 58px}
+/* Une seule colonne depuis que la vignette produit a quitté le héros. Le
+   texte garde la largeur qu'il avait — 39rem, soit la colonne de gauche de
+   l'ancienne grille — pour que le titre tombe toujours sur trois lignes et
+   que la chaussure du fond garde la moitié droite pour elle. */
+.hero-in{position:relative;display:grid;grid-template-columns:minmax(0,1fr);align-items:center;padding-block:66px 58px}
+.hero-in>div{max-width:39rem}
 .hero h1{font-size:clamp(2.7rem,6.6vw,5rem);letter-spacing:-.045em;margin-block:18px 20px}
 .hero h1 em{font-family:var(--fb);font-style:italic;font-weight:300;letter-spacing:-.01em;color:var(--band-accent)}
 .hero p{font-family:var(--fb);font-size:1.12rem;line-height:1.6;color:var(--band-soft);max-width:46ch}
@@ -82,13 +87,10 @@
 .btn-out:hover{border-color:var(--fg)}
 .btn-sm{height:34px;padding:0 13px;font-size:.72rem}
 .btn[disabled]{opacity:.45;cursor:not-allowed}
-.hero-art{position:relative;display:grid;place-items:center;min-height:300px}
-.hero-art svg{width:min(290px,70vw);filter:drop-shadow(0 30px 40px rgba(0,0,0,.45))}
-.hero-art .tag{position:absolute;right:0;bottom:6px;text-align:right;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--band-soft);line-height:1.7}
 .ticker{border-top:1px solid var(--band-line);background:var(--band-bg);color:var(--band-soft)}
 .ticker-in span{display:flex;align-items:center;gap:9px}
 .ticker-in span::before{content:"";width:5px;height:5px;background:var(--accent);border-radius:50%}
-@media(max-width:860px){.hero-in{grid-template-columns:1fr;padding-block:36px;gap:26px}.hero-art{order:-1;min-height:0}.hero-art .tag{display:none}.hero-art svg{height:34vh;width:auto;max-width:60vw}.hero h1{font-size:clamp(2.3rem,10vw,3.4rem)}}
+@media(max-width:860px){.hero-in{padding-block:36px}.hero-in>div{max-width:none}.hero h1{font-size:clamp(2.3rem,10vw,3.4rem)}}
 
 /* ---------- sections ---------- */
 .sec{padding-block:72px}

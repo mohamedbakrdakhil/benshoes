@@ -195,7 +195,7 @@ def repli_html(produits, tailles, liv):
 
     Ce n'est pas une version appauvrie destinée aux robots : c'est ce que voit
     un visiteur dont le navigateur a coupé JavaScript, et il doit y trouver la
-    même chose — les trois modèles, leurs prix, leurs cuirs, les pointures.
+    même chose — le modèle, son prix, ses cuirs, les pointures.
     """
     li = []
     for p in produits:

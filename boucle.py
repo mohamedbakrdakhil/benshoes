@@ -53,14 +53,20 @@ PAIRE    = (0.46, 0.90)
 HAUTEUR  = 0.52
 CENTRE   = (0.60, 0.52)
 # L'affiche du téléphone. Sous 900 px la vidéo ne se télécharge jamais :
-# cette image EST le décor, et c'est elle que Google mesure. Le héros y
-# empile photo produit, titre, paragraphe et boutons sur toute la hauteur —
-# une chaussure nette derrière ne serait que du bruit. Elle reste donc en
-# retrait, haute dans le cadre et à demi effacée.
-ETROIT   = (760, 1340)
-ETR_H    = 0.30
-ETR_C    = (0.52, 0.27)
-ETR_F    = 0.42
+# cette image EST le décor, et c'est elle que Google mesure.
+#
+# Elle était à demi effacée (force 0,42) tant que le héros portait une
+# vignette produit : deux chaussures au même instant, l'une nette dans une
+# carte, l'autre en fond, se gênaient. La vignette est partie, le héros est
+# passé de 958 à 508 px de haut, et le téléphone n'avait soudain plus aucune
+# chaussure au-dessus de la ligne de flottaison. Mesure faite : sous le voile
+# du héros, le pixel le plus clair de cette affiche tient 13:1 de contraste
+# avec du texte blanc, là où la norme demande 4,5. La prudence ne coûtait
+# donc rien au texte et coûtait le produit — la chaussure revient à 0,80.
+ETROIT   = (760, 1150)
+ETR_H    = 0.33
+ETR_C    = (0.52, 0.30)
+ETR_F    = 0.80
 
 
 def prepare(chemin):
