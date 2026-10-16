@@ -137,3 +137,33 @@ L'empreinte — l'ovale du gros orteil et ses quatre points — est le seul
 élément qui tienne, et c'est la marque elle-même. Sa géométrie est relevée
 sur le fichier, pas dessinée à vue : le pied qui servait d'icône jusqu'ici
 faisait décroître les points bien plus vite que la vraie empreinte.
+
+---
+
+## `visite/` — les paires détourées du show-room
+
+Deux fichiers par coloris, `niche-<coloris>-190.png` et `-380.png`, servis
+en `srcset` selon la largeur réelle de la niche (95 px sur téléphone,
+230 px sur ordinateur) — et non selon la largeur de l'écran.
+
+**Pourquoi ils existent.** Le mur de la collection montrait huit fois le
+même packshot, seule la couleur changeant, chacun posé sur le rectangle
+blanc du fond de studio. Dans une niche en bois chaud, ça faisait huit
+autocollants alignés.
+
+Chaque coloris a maintenant **son angle de caméra**, pris dans le plan
+filmé correspondant (`higgsfield-sorties/`, image 5 + 12 × rang) : la vue
+tourne progressivement le long de l'étagère, comme devant de vraies paires
+posées. Le fond est retiré — détourage Higgsfield, 1 crédit par image.
+
+**L'ombre n'est pas dans le fichier**, elle est portée par la CSS en
+`drop-shadow`, qui suit la découpe. Une ombre dessinée dans l'image serait
+un rectangle, et c'est exactement ce que faisait l'ancien `box-shadow` :
+sur une image transparente il cerne la boîte, pas la chaussure.
+
+**Plus léger, aussi** : 147 Ko pour les huit, contre 512 Ko de packshots en
+960 px que la scène chargeait sans en avoir l'usage.
+
+**Pour les refaire** : extraire une image de chaque clip, la passer au
+détoureur, recadrer sur la silhouette, exporter en palette de 128 couleurs.
+Sans le dossier, il faut remettre `visuel()` dans `niche()`.

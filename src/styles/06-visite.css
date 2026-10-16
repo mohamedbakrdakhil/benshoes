@@ -358,14 +358,22 @@ html.degrade [data-rv]{opacity:1!important;transform:none!important}
   background:radial-gradient(60% 60% at 50% 38%,#fffaf6,#f0e2d6);
   box-shadow:inset 0 0 calc(10px/var(--f)) rgba(140,90,60,.3)}
 
-/* Le tirage dans la niche. Les packshots sont pris sur fond blanc de studio :
-   tels quels, ils faisaient une plaque éclatante dans le bois sombre. On les
-   ramène à la lumière de la salle — chaude, un peu basse — et on les cadre
-   comme un tirage posé, pas comme un écran. */
+/* La paire dans la niche. Elle est détourée : plus de carton blanc, elle
+   repose sur la lumière de la niche. D'où deux changements par rapport au
+   tirage rectangulaire d'avant.
+
+   Pas de border-radius ni de box-shadow : l'un et l'autre dessinent le
+   contour de la BOÎTE de l'image, qui est maintenant transparente — on
+   aurait un rectangle d'ombre flottant autour de la chaussure. C'est
+   drop-shadow qu'il faut, le seul qui suive la découpe.
+
+   La teinte, elle, reste : les photos sont prises en lumière de studio, la
+   salle est chaude et un peu basse. Sans ce rappel, les huit paires
+   brilleraient d'un blanc qui n'existe nulle part ailleurs dans la scène. */
 .niche .pv,.n3 .nb .pv{
-  filter:sepia(.16) saturate(.96) brightness(.93) contrast(1.02);
-  border-radius:calc(3px/var(--f));
-  box-shadow:0 calc(6px/var(--f)) calc(16px/var(--f)) rgba(0,0,0,.4)}
+  filter:sepia(.16) saturate(.96) brightness(.93) contrast(1.02)
+         drop-shadow(0 calc(5px/var(--f)) calc(9px/var(--f)) rgba(0,0,0,.6))}
+.pv-decoupe{object-fit:contain}
 
 /* Alcôve éclairée du couloir : le creux et la lumière d'une vitrine, sans
    produit. Vue de profil, une photo n'y occuperait qu'une dizaine de pixels. */

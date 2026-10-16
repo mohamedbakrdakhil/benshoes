@@ -144,9 +144,32 @@ function passant(cls,w,ht,x,y,z0,z1,vitesse,phase,ry,type){
     +`transform:translate3d(${(x*K).toFixed(1)}px,${(y*K).toFixed(1)}px,${(z0*K).toFixed(1)}px) rotateY(${ry||0}deg)">`
     +silhouetteSVG(type)+'</div>';
 }
+/* Le tirage d'une niche : la paire détourée, sans son carton blanc.
+   ----------------------------------------------------------------
+   Le mur montrait huit fois le même packshot, seule la couleur changeant,
+   et chacun posé sur le rectangle blanc du fond de studio. Dans une niche
+   en bois chaud, ça faisait huit autocollants alignés, pas une étagère.
+
+   Chaque coloris a maintenant SON angle de caméra, pris dans le plan filmé
+   qui lui correspond : la vue tourne progressivement le long de l'étagère,
+   comme devant de vraies paires posées. Le fond est retiré, la chaussure
+   repose sur la lumière de la niche, et son ombre est portée par la CSS,
+   qui suit la découpe — une ombre dessinée dans l'image serait un rectangle.
+
+   Plus léger, aussi : 147 Ko pour les huit contre 512 Ko de packshots.
+   Les largeurs suivent celle de la niche (230 px, 95 sur téléphone), pas
+   celle de l'écran : une image de 960 px n'y servait à rien. */
+function photoNiche(col,nom){
+  const b='assets/visite/niche-'+col;
+  return `<img class="pv pv-decoupe" src="${b}-380.png"`
+    +` srcset="${b}-190.png 190w, ${b}-380.png 380w"`
+    +` sizes="(max-width:700px) 95px, 230px" width="380" height="258"`
+    +` alt="${att(nom+' — '+((COLORS[col]||{}).n||col))}" loading="lazy" decoding="async">`;
+}
 function niche(p,left,w,ht,top,plate,col){
   if(K!==1){left*=K;w*=K;ht*=K;top*=K;}
-  const corps=`${visuel(p,col||p.colors[0],true)}<b>${p.name}</b><span>${(COLORS[col||p.colors[0]]||{}).n||''}</span>`;
+  const c=col||p.colors[0];
+  const corps=`${photoNiche(c,p.name)}<b>${p.name}</b><span>${(COLORS[c]||{}).n||''}</span>`;
   if(!RICHE) return `<div class="niche" style="left:${left}px;top:${top}px;width:${w}px;height:${ht}px">${corps}</div>`;
   return `<div class="n3${plate?' plate':''}" style="left:${left}px;top:${top}px;width:${w}px;height:${ht}px">
       <div class="nb">${corps}</div><div class="ns nl"></div><div class="ns nr"></div>
