@@ -98,6 +98,26 @@ cacher. **Toute animation d'entrée posée sur un gros bloc de texte au-dessus
 de la ligne de flottaison se paie en LCP** — c'est la règle à retenir avant
 d'en ajouter une.
 
+## Le vrai logo, et ce qu'il change pour Google
+
+Posé le 16 octobre 2026, depuis le fichier de marque fourni par l'atelier.
+
+- **`Organization.logo` pointe désormais sur un vrai logo**,
+  `benka-carre.png`, 600×600 sur fond blanc. Il pointait sur l'image de
+  partage, qui est une photo de produit. Google attend ici la marque sur
+  fond plein : c'est ce fichier qu'il affiche dans l'encadré de marque à
+  droite des résultats, et c'est un des signaux qui construisent l'entité
+  « Benkashoes ». L'image de partage, elle, reste en `og:image`, où sa place
+  est juste.
+- **La description servie était fausse.** Elle annonçait « trois modèles »
+  et « livraison offerte dès 400 DH », alors que le catalogue est à un
+  modèle et la livraison gratuite pour tout le monde. C'est le texte que
+  Google affiche sous le titre : un client qui lit 400 DH et trouve 259 DH
+  gratuits n'est pas déçu, mais l'inverse arrive aussi, et une description
+  démentie par la page se fait remplacer par un extrait choisi au hasard.
+- **L'icône d'onglet** est l'empreinte de la marque, en adresse de données :
+  459 octets dans l'en-tête, aucune requête.
+
 ## La boucle de fond du héros
 
 Ajoutée le 15 octobre 2026. Fabriquée depuis les huit packshots de studio

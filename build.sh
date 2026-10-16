@@ -21,8 +21,19 @@ set -e
 cd "$(dirname "$0")"
 URL="${SITE_URL:-https://www.benkashoes.ma/}"
 TITRE="Benkashoes — mocassins-mules en daim, atelier marocain"
-DESC="Benkashoes — mocassins-mules en daim de veau, première en liège estampée, doublure cuir pleine fleur. Trois modèles, huit coloris, pointures 37 à 41. Livraison au Maroc, offerte dès 400 DH, ressemelage en atelier."
+DESC="Benkashoes — la mule Opus en daim de veau, première en liège estampée, doublure cuir pleine fleur. Huit coloris, pointures 37 à 41, 259 DH. Livraison offerte partout au Maroc, 30 jours d'essai, ressemelage en atelier."
 PARTAGE="assets/marque/partage-1200x630.jpg"
+# L'icône d'onglet : l'empreinte de la marque, relevée sur le fichier de logo
+# par logo.py, encodée en adresse de données. Le dessin au jugé qu'elle
+# remplace n'avait ni les bonnes proportions ni les bonnes couleurs. Inline
+# plutôt qu'en fichier : c'est une requête de moins avant la première image.
+ICONE=$(python3 - <<'PYICONE' 2>/dev/null || true
+import io, urllib.parse
+s = io.open('assets/marque/benka-icone.svg', encoding='utf-8').read()
+print('data:image/svg+xml,' + urllib.parse.quote(s.replace('"', "'"),
+                                                 safe="/:=' "))
+PYICONE
+)
 # Jeton de propriété Search Console. Il vit dans .google-verif, pas dans une
 # variable passée à la main : Google retire le statut de propriétaire si la
 # preuve disparaît de la page, et un build lancé sans la variable l'aurait
@@ -113,7 +124,7 @@ $VERIF<link rel="preload" as="image" href="assets/videos/collection-affiche.jpg"
 <meta name="twitter:title" content="$TITRE">
 <meta name="twitter:description" content="$DESC">
 <meta name="twitter:image" content="${URL}${PARTAGE}">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2315181b'/%3E%3Cpath d='M16 5c5 0 8 4 8 8 0 5-3 7-3 11 0 2-2 3-5 3s-5-1-5-3c0-4-3-6-3-11 0-4 3-8 8-8z' fill='%23cf9549'/%3E%3C/svg%3E">
+<link rel="icon" href="$ICONE">
 <script type="application/ld+json">$SEO</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html,body{margin:0}body{font:14px system-ui,sans-serif;background:#f3f0ea}

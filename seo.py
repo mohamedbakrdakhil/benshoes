@@ -87,9 +87,12 @@ def graphe(produits, faq, tailles, liv, email, tel, reseaux, desc):
         '@type': 'Organization', '@id': ORG,
         'name': 'Benkashoes', 'alternateName': NOMS, 'url': URL,
         'description': desc,
+        # Le logo, et non l'image de partage : Google veut ici la marque sur
+        # fond plein, et c'est elle qu'il montre dans l'encadré à droite des
+        # résultats. L'image de partage, qui est une photo, reste en og:image.
         'logo': {'@type': 'ImageObject',
-                 'url': URL + 'assets/marque/partage-1200x630.jpg',
-                 'width': 1200, 'height': 630},
+                 'url': URL + 'assets/marque/benka-carre.png',
+                 'width': 600, 'height': 600},
         'image': URL + 'assets/marque/partage-1200x630.jpg',
         'foundingDate': '2019',
         'knowsLanguage': ['fr', 'ar'],

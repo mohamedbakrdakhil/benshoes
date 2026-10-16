@@ -4,7 +4,14 @@
 .brand{display:flex;align-items:baseline;gap:7px;font-family:var(--fd);font-size:1.26rem;letter-spacing:-.03em}
 .brand i{display:block;width:7px;height:7px;background:var(--accent);border-radius:50%;transform:translateY(-3px)}
 .brand small{font-family:var(--fu);font-size:.56rem;letter-spacing:.22em;text-transform:uppercase;color:var(--fg-soft);font-weight:600}
+/* Le logo de marque. La hauteur est fixée ici, la largeur suit la
+   proportion portée par les attributs de l'image — rien ne saute au
+   chargement. Le pied de page le montre plus grand, comme il le faisait
+   déjà du logo typographique. */
 .brand-logo{height:30px;width:auto;display:block}
+.ftr .brand-logo{height:38px}
+@media(max-width:430px){.brand-logo{height:25px}}
+@media(max-width:360px){.brand-logo{height:22px}}
 .logo{display:inline-flex;align-items:flex-end;position:relative;line-height:1;font-size:30px;
   padding-right:.74em;--logo-mot:var(--accent);--logo-pied:#c08f52}
 .logo-mot{font-family:'Baloo 2',var(--fu);font-weight:800;font-size:1em;letter-spacing:-.025em;

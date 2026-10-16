@@ -18,7 +18,12 @@ const SHOP={
 };
 /* Logo et photos. Laisser vide = illustration vectorielle et logo typographique.
    Déposer les fichiers dans assets/ puis renseigner ici — voir assets/README.md */
-const BRAND={logo:'',logoClair:''};
+// Le vrai logo de la marque, détouré par logo.py depuis le fichier d'origine.
+// « larg » et « haut » sont la taille réelle du fichier : sans elles le
+// navigateur ne connaît pas la proportion de l'image, ne réserve pas sa
+// place, et l'en-tête saute au chargement.
+const BRAND={logo:'assets/marque/benka.png',logoClair:'assets/marque/benka-clair.png',
+  larg:440,haut:120};
 /* Vidéos de fond. Laisser vide = aucune vidéo, aucun octet téléchargé.
 
    Chaque entrée associe l'identifiant d'une section du site au nom de base
@@ -100,11 +105,23 @@ function logoHTML(){
     +'<circle cx="34" cy="4" r="2.5"/><circle cx="37.8" cy="1.7" r="1.9"/>'
     +'</svg></span>';
 }
+// Le thème demandé : celui que la cliente a choisi, sinon celui de son système.
+function themeSombre(){
+  const t=document.documentElement.getAttribute('data-theme');
+  return t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+}
 function poserLogo(){
+  // Le logo crème sert dans deux cas sans rapport l'un avec l'autre : sur les
+  // bandeaux bordeaux quel que soit le thème, et partout dès que le thème est
+  // sombre. Le bordeaux de la marque ne tient que 1,85:1 sur le fond #140a08
+  // du thème sombre — illisible. L'ancienne version ne regardait que
+  // l'emplacement : le logo de l'en-tête y disparaissait.
+  const sombre=themeSombre();
   document.querySelectorAll('.brand').forEach(el=>{
-    const clair=!!el.closest('.ftr,.adm-hd,.hero');
+    const clair=sombre||!!el.closest('.ftr,.adm-hd,.hero');
     el.innerHTML=BRAND.logo
-      ? `<img class="brand-logo" src="${(clair&&BRAND.logoClair)||BRAND.logo}" alt="benka">`
+      ? `<img class="brand-logo" src="${(clair&&BRAND.logoClair)||BRAND.logo}"`
+        +` width="${BRAND.larg}" height="${BRAND.haut}" alt="Benkashoes">`
       : logoHTML();
   });
 }

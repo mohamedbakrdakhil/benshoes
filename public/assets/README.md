@@ -67,3 +67,39 @@ chaussure à demi effacée pour ne pas concurrencer le texte empilé par-dessus.
 **Déclarer une autre vidéo** : ajouter l'identifiant de la section dans
 `VIDEOS`, `src/scripts/01-reglages.js`. L'affiche large est obligatoire, la
 verticale facultative — sans elle, la large sert partout.
+
+---
+
+## `marque/` — le logo
+
+Cinq fichiers, tous sortis de `logo.py` depuis `logo-source/benka-logo.png` :
+
+    benka.png          le logotype, bordeaux   — en-tête sur fond clair
+    benka-clair.png    le logotype, crème      — bandeaux bordeaux, thème sombre
+    benka-complet.png  avec « FOOTWEAR »       — impression, réseaux sociaux
+    benka-carre.png    sur fond blanc, 600²    — données structurées Google
+    benka-icone.svg    l'empreinte seule       — icône d'onglet
+
+**Pour les refaire** après une retouche du logo :
+
+```bash
+python3 logo.py && ./build.sh
+```
+
+**Pourquoi deux couleurs et non une.** Le bordeaux de la marque, `#781e16`,
+tient 1,85:1 de contraste sur le fond `#140a08` du thème sombre : il y est
+illisible. `poserLogo()` choisit donc la version crème dans deux cas sans
+rapport — sur les bandeaux bordeaux quel que soit le thème, et partout dès
+que le thème est sombre. Le logo étant une image et non du texte, aucune
+variable CSS ne le suit : le basculement du thème le rappelle lui-même.
+
+**Pourquoi le logotype seul dans l'en-tête.** « FOOTWEAR » mesure 25 px sur
+les 1600 du fichier d'origine. Ramené à une hauteur d'en-tête de 30 px, il
+ferait une bavure d'un pixel et demi. Le verrou entier reste disponible dans
+`benka-complet.png` pour les usages où il a la place d'exister.
+
+**Pourquoi l'empreinte pour l'onglet.** À 32 px un logotype est illisible.
+L'empreinte — l'ovale du gros orteil et ses quatre points — est le seul
+élément qui tienne, et c'est la marque elle-même. Sa géométrie est relevée
+sur le fichier, pas dessinée à vue : le pied qui servait d'icône jusqu'ici
+faisait décroître les points bien plus vite que la vraie empreinte.
