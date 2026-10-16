@@ -85,7 +85,7 @@ def prepare(chemin):
     return photo, tuple(int(round(v)) for v in ImageStat.Stat(coin).mean[:3])
 
 
-def compose(photo, studio, cw, ch, hauteur, centre, force=1.0):
+def compose(photo, studio, cw, ch, hauteur, centre, force=1.0, brut=False):
     """Pose la paire sur un fond bordeaux, fondue dedans par un masque.
 
     Le premier montage recadrait simplement le packshot au format voulu. À
@@ -108,8 +108,11 @@ def compose(photo, studio, cw, ch, hauteur, centre, force=1.0):
     où un sujet net derrière ne serait que du bruit.
     """
     # HAUTEUR vise la PAIRE, pas la bande découpée : la bande porte en plus
-    # la marge d'air, d'où le rapport entre les deux.
-    ph = int(round(ch * hauteur * (PAIRE[1] - PAIRE[0]) / (0.88 - 0.48)))
+    # la marge d'air, d'où le rapport entre les deux. Une image déjà cadrée —
+    # celle d'un clip, par exemple — n'a pas cette marge : `brut` dit alors
+    # de lire HAUTEUR comme la hauteur de l'image elle-même.
+    ph = int(round(ch * hauteur if brut
+                   else ch * hauteur * (PAIRE[1] - PAIRE[0]) / (0.88 - 0.48)))
     pw = int(round(photo.width * ph / float(photo.height)))
     photo = photo.resize((pw, ph), Image.LANCZOS)
     cx, cy = int(round(cw * centre[0])), int(round(ch * centre[1]))
@@ -160,6 +163,90 @@ def plan(im, t):
     return im.crop((x, y, x + cw, y + ch)).resize((L, H), Image.LANCZOS)
 
 
+# ---------------------------------------------------------------------------
+# La variante filmée
+#
+# Les packshots donnent un travelling plat : on agrandit une photo, rien ne
+# tourne. Kling 2.6, nourri du packshot lui-même, rend un vrai mouvement de
+# caméra — la paire se découvre, les volumes tournent.
+#
+# Le modèle n'est là QUE pour le mouvement. Tout le reste — l'assombrissement,
+# le bordeaux, le fondu des bords, l'enchaînement — reste le même code que
+# pour les photos. Et la fidélité a été vérifiée image par image avant d'aller
+# plus loin : Seedance 2.0 Mini refermait le talon de la mule à partir de la
+# troisième seconde, ce qui en faisait un autre produit. Kling tient la fente
+# de la bride, l'ornement, le talon ouvert et le « benka » estampé sur les
+# cinq secondes. On n'en garde que les 68 premières images, là où la dérive
+# est la plus faible.
+# ---------------------------------------------------------------------------
+CLIPS = 'higgsfield-sorties'
+CLIP_H = 0.82              # hauteur de la bande recadrée sur la toile
+CLIP_C = (0.58, 0.53)
+# La bande gardée dans l'image carrée du clip. Les rendus sont cadrés large :
+# la paire tient entre le cinquième et le neuvième dixième de la hauteur, et
+# le reste est du fond de studio. Posé tel quel, ce vide ramenait la
+# chaussure à 30 % de la largeur de la toile et laissait voir le dégradé du
+# fond en auréole autour d'elle. La bande est fixe et non détectée : le fond
+# rendu porte son propre dégradé (209 en haut, 253 en bas), aucun seuil de
+# luminosité ne l'isole proprement. Elle est large — la caméra avance
+# pendant le plan et la paire grandit.
+CLIP_BANDE = (0.14, 0.96)
+
+
+def images_du_clip(chemin, combien, vers):
+    """Extrait les `combien` premières images d'un clip."""
+    shutil.rmtree(vers, ignore_errors=True)
+    os.makedirs(vers)
+    subprocess.check_call(['ffmpeg', '-y', '-loglevel', 'error', '-i', chemin,
+                           '-frames:v', str(combien), '-fps_mode', 'passthrough',
+                           '%s/%%04d.png' % vers])
+    return sorted(os.path.join(vers, f) for f in os.listdir(vers))
+
+
+def traiter(im):
+    """Assombrit et réchauffe, exactement comme pour un packshot."""
+    im = ImageEnhance.Brightness(im.convert('RGB')).enhance(ASSOMBRI)
+    return Image.blend(im, Image.new('RGB', im.size, TEINTE), MELANGE)
+
+
+def depuis_clips(nT, nF, cw, ch, tmp):
+    """Les 8 plans filmés, traités et posés sur le fond bordeaux.
+
+    Renvoie, pour chaque coloris, la liste de ses images composées — dans
+    l'ordre de sa vie entière (entrée en fondu, seul, sortie en fondu).
+    """
+    vie = nT + 2 * nF
+    plans = []
+    for c in ORDRE:
+        clip = os.path.join(CLIPS, 'opus-%s.mp4' % c)
+        if not os.path.isfile(clip):
+            return None
+        brutes = images_du_clip(clip, vie, os.path.join(tmp, 'brut'))
+        if len(brutes) < vie:
+            sys.exit('boucle.py : %s ne donne que %d images sur %d'
+                     % (clip, len(brutes), vie))
+        # Le fond et le masque ne dépendent que de la couleur du studio : on
+        # les calcule une fois par coloris, pas une fois par image.
+        # Le cadre est fixe pour tout le plan : recalculé image par image, il
+        # ferait respirer la chaussure à chaque trame, ce qui se voit.
+        with Image.open(brutes[0]) as t:
+            boite = (0, int(t.height * CLIP_BANDE[0]),
+                     t.width, int(t.height * CLIP_BANDE[1]))
+        suite = []
+        for i, f in enumerate(brutes):
+            im = traiter(Image.open(f).convert('RGB').crop(boite))
+            if i == 0:
+                coin = im.crop((0, 0, im.width // 8, im.height // 8))
+                studio = tuple(int(round(v))
+                               for v in ImageStat.Stat(coin).mean[:3])
+            suite.append(compose(im, studio, cw, ch, CLIP_H, CLIP_C, brut=True))
+        plans.append(suite)
+        print('  %-9s %d images, cadre %dx%d'
+              % (c, len(suite), boite[2] - boite[0], boite[3] - boite[1]))
+    shutil.rmtree(os.path.join(tmp, 'brut'), ignore_errors=True)
+    return plans
+
+
 def main():
     if not os.path.isdir(SOURCE):
         sys.exit('boucle.py : dossier %s introuvable' % SOURCE)
@@ -178,20 +265,31 @@ def main():
 
     nT, nF = int(round(TENUE * FPS)), int(round(FONDU * FPS))
     bloc = nT + nF          # longueur d'un bloc : un coloris prend la main
-    vie = nT + 2 * nF       # longueur de vie d'une photo : entrée + seule + sortie
+    vie = nT + 2 * nF       # vie d'un plan : entrée en fondu, seul, sortie
 
     tmp = '.build/boucle-images'
     shutil.rmtree(tmp, ignore_errors=True)
     os.makedirs(tmp)
 
+    # Les clips filmés s'il y en a, les packshots sinon. Le reste du montage
+    # est identique : c'est la même boucle, avec une autre source d'images.
+    plans = depuis_clips(nT, nF, L, H, tmp)
+    if plans is not None:
+        photos = plans
+        image = lambda i, j: plans[i][j]
+        print('  source : les 8 plans filmés')
+    else:
+        image = lambda i, j: plan(photos[i], j / float(vie - 1))
+        print('  source : les 8 packshots, travelling calculé')
+
     n = 0
-    for i, im in enumerate(photos):
-        prec = photos[i - 1]                 # i=0 reprend la dernière : la boucle ferme
+    for i in range(len(photos)):
+        prec = i - 1                         # i=0 reprend le dernier : la boucle ferme
         for k in range(bloc):
-            cour = plan(im, k / float(vie - 1))
+            cour = image(i, k)
             if k < nF:
                 # Le coloris précédent finit sa course : ses nF dernières images.
-                sort = plan(prec, (nT + nF + k) / float(vie - 1))
+                sort = image(prec, nT + nF + k)
                 # Fondu en cosinus : ni départ ni arrivée brusques.
                 m = (1 - math.cos(math.pi * (k + 1) / nF)) / 2
                 cour = Image.blend(sort, cour, m)

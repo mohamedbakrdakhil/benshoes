@@ -41,9 +41,14 @@ Trois fichiers, tous fabriqués, aucun filmé :
     collection-affiche.jpg         l'affiche large (écrans ≥ 901 px)
     collection-affiche-etroite.jpg l'affiche verticale (téléphones)
 
-Ils sortent de `boucle.py`, qui ne lit que `photos-retouchees/opus-*-1.jpg`
-— les huit packshots de studio. La boucle fait défiler les huit cuirs, du
-beige au noir, en travelling lent, et se referme sur elle-même.
+Ils sortent de `boucle.py`. La boucle fait défiler les huit cuirs, du beige
+au noir, et se referme sur elle-même.
+
+**Deux sources possibles, et l'outil choisit tout seul.** S'il trouve les
+huit clips dans `higgsfield-sorties/`, il les emploie : ce sont de vrais
+mouvements de caméra. Sinon il retombe sur `photos-retouchees/opus-*-1.jpg`
+et calcule un travelling avant sur les packshots — plus plat, mais il ne
+dépend de rien.
 
 **Pour la refaire** après un changement de coloris :
 
@@ -67,6 +72,35 @@ chaussure à demi effacée pour ne pas concurrencer le texte empilé par-dessus.
 **Déclarer une autre vidéo** : ajouter l'identifiant de la section dans
 `VIDEOS`, `src/scripts/01-reglages.js`. L'affiche large est obligatoire, la
 verticale facultative — sans elle, la large sert partout.
+
+---
+
+## `higgsfield-sorties/` — les huit plans filmés
+
+Un clip de 5 s par coloris, rendu par **Kling 2.6** à partir du packshot du
+coloris lui-même. Ils ne partent jamais sur le site : `build.sh` ne publie
+que `assets/`. Ils servent uniquement de matière à `boucle.py`.
+
+**Le modèle ne sert qu'au mouvement.** Tout le reste — l'assombrissement, le
+bordeaux de la marque, le fondu des bords, l'enchaînement — est le même code
+que pour les photos. Le produit montré est celui des packshots.
+
+**La fidélité a été vérifiée, pas supposée.** Un premier essai avec Seedance
+2.0 Mini tenait deux secondes sur cinq : au-delà, la fente de la bride penny
+s'effaçait et le talon de la mule se refermait — ce n'était plus le même
+produit, et une cliente qui commande sur cette image renvoie le colis. Kling
+2.6 tient les cinq secondes sur les huit coloris : talon ouvert, fente,
+ornement à trois carrés, couture d'empeigne, « benka » estampé lisible.
+Contrôlé coloris par coloris, à la première et à la dernière image gardée.
+
+Seules les **68 premières images** de chaque clip servent, soit 2,83 s —
+exactement la durée de vie d'un plan dans la boucle, et la portion où la
+dérive est la plus faible.
+
+**Les refaire coûte des crédits Higgsfield** (10 par coloris, 80 en tout).
+C'est pourquoi les clips sont versionnés malgré leur poids : les perdre
+voudrait dire les racheter. Si le dossier disparaît, `boucle.py` continue de
+fonctionner sur les packshots, sans rien casser.
 
 ---
 

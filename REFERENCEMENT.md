@@ -120,9 +120,16 @@ Posé le 16 octobre 2026, depuis le fichier de marque fourni par l'atelier.
 
 ## La boucle de fond du héros
 
-Ajoutée le 15 octobre 2026. Fabriquée depuis les huit packshots de studio
-par `boucle.py` — aucun service de génération, aucun abonnement, aucune
-image inventée : ce sont les vraies chaussures.
+Ajoutée le 15 octobre 2026, refaite le 16 en plans filmés.
+
+Chaque plan part du packshot de son coloris ; **Kling 2.6 n'apporte que le
+mouvement de caméra**, le produit reste celui des photos. La fidélité a été
+contrôlée coloris par coloris avant d'aller plus loin — un premier modèle
+refermait le talon de la mule après deux secondes, ce qui en faisait un
+autre produit. Détail dans `assets/README.md`.
+
+Si les clips disparaissent, `boucle.py` retombe sur les packshots et calcule
+le travelling lui-même : le site ne dépend d'aucun service.
 
 | | Poids | Qui le reçoit |
 |---|---|---|
