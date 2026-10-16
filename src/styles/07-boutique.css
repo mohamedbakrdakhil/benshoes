@@ -128,3 +128,9 @@ label.f.bad input{border-color:var(--bad)}
 }
 .panel.plein .panel-ft{max-width:1280px;margin-inline:auto;width:100%}
 .panel.plein .panel-hd{max-width:1280px;margin-inline:auto;width:100%}
+
+/* La paire qui tourne, en tête de la galerie de la fiche. Elle occupe la
+   même boîte qu'une photo : ses attributs width/height portent la
+   proportion, donc rien ne saute quand la vidéo remplace l'affiche. */
+.sheet-art.tour{background:#f4ece7;border-radius:var(--r);overflow:hidden}
+.sheet-art.tour video{display:block;width:100%;height:auto}

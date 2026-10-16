@@ -7,12 +7,42 @@
    photos derrière un geste que beaucoup ne font pas. Ici tout est visible en
    faisant défiler, ce que tout le monde sait faire. Les images suivantes sont
    différées : seule la première coûte quelque chose à l'ouverture. */
+/* La paire qui tourne, en tête de la galerie.
+   ------------------------------------------
+   Une cliente qui hésite veut voir la chaussure sous un autre angle — c'est
+   la question que le commerce en ligne laisse sans réponse, et c'est elle
+   qui fait renoncer. Quatre secondes de rotation y répondent avant même
+   qu'elle soit posée.
+
+   L'affiche est la première image du plan : elle s'affiche tout de suite,
+   et c'est tout ce qui part sur le réseau si le système demande moins
+   d'animations ou si la connexion est comptée. La vidéo ne se télécharge
+   qu'ensuite, et seulement pour le coloris ouvert — 50 Ko. */
+function tourHTML(c){
+  const b='assets/produits/tour-'+c;
+  return `<div class="sheet-art tour">
+    <video class="pv" width="600" height="492" poster="${att(b)}.jpg"
+      muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"
+      data-tour="${att(b)}.mp4"></video></div>`;
+}
+/* Appelée après que la fiche est posée dans le document. Les garde-fous sont
+   les mêmes que pour la boucle du héros : rien ne se télécharge si le système
+   réduit les animations ou si le forfait est compté. */
+function lancerTour(){
+  const v=document.querySelector('video[data-tour]');
+  if(!v||v.src) return;
+  const co=navigator.connection||{};
+  if(co.saveData===true||/^(slow-)?2g$/.test(co.effectiveType||'')||!MOTION) return;
+  v.src=v.dataset.tour;
+  v.play().catch(()=>{});
+}
 function galerie(p,c){
   const n=nbPhotos(p.id,c);
-  if(n<=1) return `<div class="sheet-art">${visuel(p,c)}</div>`;
+  const tour=tourHTML(c);
+  if(n<=1) return `<div class="galerie">${tour}<div class="sheet-art">${visuel(p,c)}</div></div>`;
   let h='';
   for(let i=0;i<n;i++) h+=`<div class="sheet-art">${visuel(p,c,false,i)}</div>`;
-  return `<div class="galerie">${h}</div>`;
+  return `<div class="galerie">${tour}${h}</div>`;
 }
 
 function sheetHTML(){

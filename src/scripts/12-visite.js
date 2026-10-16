@@ -27,10 +27,27 @@ const CAM=[
   [.76, 260,-2950, 62,  0],
   [.83,1150,-3550, 88,  0],
   [.90,1120,-3900, 90,  2],
-  // On recule au lieu d'avancer : à un mètre du mur, deux niveaux ne tiennent
-  // pas dans le cadre. En s'éloignant, la salle se découvre entière.
-  [.96, 900,-4150, 90,  8],
-  [1,   820,-4280, 90, 11]];
+  // On recule d'abord : à un mètre du mur, les deux niveaux ne tiennent pas
+  // dans le cadre, et la salle ne se comprend pas. Ce plan large est là pour
+  // ça, et pour ça seulement.
+  [.94, 960,-4130, 90,  7],
+  // Puis on revient. La visite s'arrêtait sur ce plan large, et la
+  // marchandise — le seul but du voyage — y tenait sur 116 pixels par niche :
+  // huit taches de couleur sous une légende qui promettait un mur de cuirs.
+  // On termine donc sur le mur lui-même. Mesuré à l'écran, pas estimé : à
+  // 900 unités une niche fait 137 pixels contre 73 avant, et la rangée des
+  // huit en occupe 1194 sur 1440 — rien n'est coupé, et on voit enfin ce
+  // qu'on est venu voir.
+  // Deux arrivées, parce que deux cadres. Sur ordinateur on revient sur le
+  // mur ; sur téléphone la fenêtre fait moitié moins large et la même
+  // approche y coupait les deux niches des extrémités — le téléphone garde
+  // donc le plan large, qui lui convenait. (`innerWidth` plutôt que PETIT :
+  // cette constante-ci est déclarée plus bas dans le fichier.)
+  ...(innerWidth<700
+      ? [[.96, 900,-4150, 90,  8],
+         [1,   820,-4280, 90, 11]]
+      : [[.97,1380,-4240, 90,  4],
+         [1,  1700,-4300, 90,  2]])];
 /* Les plans sont groupés par quartier. Un quartier loin de la caméra est
    démonté : son contenu ne coûte plus un seul calque graphique. C'est ce qui
    permet de doubler le décor sans dépasser la charge d'avant. Les marges sont
