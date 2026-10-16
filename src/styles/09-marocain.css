@@ -1,0 +1,139 @@
+/* ===================== Marocain assumé =====================
+
+   Le zellige, l'arc en plein cintre et la typographie ronde quittent le
+   show-room pour gagner le site entier.
+
+   Rien de nouveau n'est téléchargé, et c'est volontaire : la palette est
+   celle du zellige de la visite, relevée dans 06-visite.css, et Baloo 2
+   était déjà servie — elle ne servait plus à rien depuis que le vrai logo
+   a remplacé le logotype dessiné. Un style ne vaut pas qu'on fasse payer
+   trois polices de plus à une cliente en 4G.
+
+   Ce module vient en dernier dans la concaténation : il surcharge, il ne
+   réécrit pas. Chaque règle d'avant reste lisible à sa place.
+   =========================================================== */
+
+:root{
+  /* Les quatre couleurs du zellige de la visite. Mesurées sur le motif,
+     pas choisies à l'œil : elles s'accordent déjà au bordeaux de la marque
+     parce qu'elles vivent dans la même scène depuis le début. */
+  /* Deux verts, et la distinction n'est pas cosmétique. --zel-vert est la
+     MATIÈRE : le carreau du motif, le fond d'une puce active, là où c'est
+     du blanc qui se pose dessus. --zel-vert-txt est le TEXTE posé sur le
+     fond de la page. Un seul jeton pour les deux usages ne peut pas marcher
+     en thème sombre : le vert profond du zellige n'y tenait que 3,3:1
+     contre le fond #140a08, sous la barre des 4,5 exigés pour un surtitre
+     de onze pixels. */
+  --zel-vert:#14584f; --zel-vert-2:#0d403a; --zel-vert-txt:#14584f;
+  --zel-ocre:#b4722a; --zel-creme:#e9dfc8;
+  /* La ronde. Baloo 2 n'existe qu'en graisse 800 : les titres sont donc
+     tous gras, et l'interlettrage se desserre — une panse ronde serrée
+     se referme sur elle-même, là où une grotesque étroite supporte le
+     -.045em du héros. */
+  --fr:'Baloo 2',var(--fd);
+  /* L'arc en plein cintre. Deux rayons par coin : le premier en largeur,
+     le second en hauteur, pour une demi-ellipse haute plutôt qu'un
+     demi-cercle — c'est le profil des arcs de la médina, pas celui d'un
+     bouton aux coins arrondis. */
+  --arc:50% 50% var(--r) var(--r) / 26% 26% 0 0;
+}
+/* En thème sombre la matière s'éclaircit un peu — un carreau trop profond
+   se confond avec le fond — et le texte passe au vert d'eau : 5,9:1 sur le
+   fond de page, 5,5:1 sur celui des cartes. Mesuré, pas estimé. */
+:root[data-theme="dark"]{
+  --zel-vert:#1c7066; --zel-vert-2:#10514a; --zel-vert-txt:#2a9d8f;
+  --zel-ocre:#cf9549;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --zel-vert:#1c7066; --zel-vert-2:#10514a; --zel-vert-txt:#2a9d8f;
+  --zel-ocre:#cf9549;
+}}
+
+/* ---- Le motif, en deux dimensions ----------------------------------
+   Même recette que le zellige du show-room : étoile ocre au croisement,
+   damier vert, joints à la chaux. La version 3D divise chaque longueur
+   par --f, le facteur d'échelle des plans ; ici il n'y en a pas, donc le
+   motif est écrit en clair plutôt que d'emprunter des calculs qui
+   n'auraient plus de sens hors de la scène. */
+.zellige-rule{--z:30px;--j:1.5px;height:12px;border-radius:2px;
+  background:
+    repeating-linear-gradient(45deg,var(--zel-creme) 0 var(--j),transparent var(--j) calc(var(--z)/1.414)),
+    repeating-linear-gradient(-45deg,var(--zel-creme) 0 var(--j),transparent var(--j) calc(var(--z)/1.414)),
+    radial-gradient(circle at 0 0,var(--zel-ocre) 0 22%,transparent 23%) 0 0/var(--z) var(--z),
+    radial-gradient(circle at 100% 100%,var(--zel-ocre) 0 22%,transparent 23%) 0 0/var(--z) var(--z),
+    repeating-conic-gradient(from 45deg at 50% 50%,var(--zel-vert) 0 25%,transparent 0 50%) 0 0/var(--z) var(--z),
+    var(--zel-vert-2);
+  opacity:.9}
+
+/* Un filet de zellige sous chaque titre de section. C'est la respiration
+   qui revient d'une section à l'autre et qui fait la signature : répétée,
+   elle devient une grammaire ; posée une seule fois, elle serait un
+   ornement. La largeur est bornée — un filet sur toute la page ferait
+   bandeau, et on en a déjà un au-dessus des statistiques. */
+.sec-head{position:relative;padding-bottom:26px}
+/* La tuile fait la hauteur du filet. Une tuile de 26 px dans un filet de
+   10 n'en montrait qu'un tiers : ni étoile entière, ni damier lisible,
+   juste une bande de taches vertes et oranges. À 15 pour 15, un motif
+   complet se répète sur toute la longueur. */
+.sec-head::after{content:"";position:absolute;left:0;bottom:0;width:min(230px,42%);
+  height:15px;border-radius:2px;--z:15px;
+  background:
+    repeating-linear-gradient(45deg,var(--zel-creme) 0 1px,transparent 1px calc(var(--z)/1.414)),
+    repeating-linear-gradient(-45deg,var(--zel-creme) 0 1px,transparent 1px calc(var(--z)/1.414)),
+    radial-gradient(circle at 0 0,var(--zel-ocre) 0 24%,transparent 25%) 0 0/var(--z) var(--z),
+    radial-gradient(circle at 100% 100%,var(--zel-ocre) 0 24%,transparent 25%) 0 0/var(--z) var(--z),
+    repeating-conic-gradient(from 45deg at 50% 50%,var(--zel-vert) 0 25%,transparent 0 50%) 0 0/var(--z) var(--z),
+    var(--zel-vert-2)}
+
+/* ---- L'arc ----------------------------------------------------------
+   Posé là où il y a une image à encadrer : une chaussure sous un arc se
+   lit comme une pièce exposée dans une niche, ce qui est exactement le
+   propos du show-room. Les deux boîtes ont déjà overflow:hidden, l'arc
+   rogne donc la photo sans qu'on touche à sa mise en page. */
+.card-art{border-radius:var(--arc)}
+/* L'arc rogne le haut de la boîte, et l'étiquette « Épuisé » y vivait : on
+   n'en lisait plus que la fin. Elle descend au pied de la vignette, là où
+   les coins restent droits — et c'est de toute façon là qu'on la cherche
+   sur une fiche produit. */
+.card-flag{top:auto;bottom:0;border-radius:0 calc(var(--r) + 3px) 0 0}
+.at-img{border-radius:var(--arc)}
+.sheet-art.tour{border-radius:var(--arc)}
+/* La vignette de l'anatomie et les alcôves du couloir suivent. */
+.anat-fig{border-radius:var(--arc);overflow:hidden}
+
+/* ---- La ronde -------------------------------------------------------
+   Les titres de section, pas le héros. Le h1 reste en Archivo Black :
+   c'est la voix forte de la marque, c'est lui que Google mesure, et une
+   graisse 800 ronde à 80 px s'empâte. En dessous, Baloo arrondit tout ce
+   qui ponctue la lecture. */
+h2,h3,h4,.vcap h3,.card-name h3{font-family:var(--fr);letter-spacing:-.005em;line-height:1.08}
+.sec-head h2{letter-spacing:-.01em}
+/* Baloo porte ses jambages plus bas qu'Archivo : sans cette reprise, les
+   « g » et les « p » des titres touchaient le filet de zellige. */
+.sec-head h2{padding-bottom:.08em}
+
+/* ---- Le vert, en second ---------------------------------------------
+   Le bordeaux reste la couleur de la marque — il est dans le logo, on n'y
+   touche pas. Le vert du zellige prend le rôle de second : les surtitres,
+   qui ponctuent chaque section, et les détails qui n'engagent pas d'achat.
+   Mesuré : #14584f sur blanc tient 8,3:1, bien au-delà des 4,5 requis. */
+.eyebrow{color:var(--zel-vert-txt)}
+/* Sur les bandeaux sombres le vert disparaîtrait : ils gardent leur rose. */
+.eyebrow.on-band,.ftr .eyebrow,.vcap .k{color:var(--band-accent)}
+.stat .n{color:var(--zel-vert-txt)}
+.anat-item .n{color:var(--zel-ocre)}
+.step .no{color:var(--zel-vert-txt)}
+
+/* ---- Les boutons et les puces ---------------------------------------
+   Le coin arrondi d'un bouton n'est pas un arc, mais il peut en reprendre
+   la douceur sans devenir une pastille. */
+.btn{border-radius:calc(var(--r) + 5px)}
+.chip,.colopt,.sizebtn{border-radius:calc(var(--r) + 4px)}
+.chip[aria-pressed="true"]{background:var(--zel-vert);border-color:var(--zel-vert);color:#fff}
+
+@media(max-width:700px){
+  /* Le filet se raccourcit avec la colonne : à 42 % d'une page étroite il
+     ne montrait plus qu'une étoile et demie, ce qui ne se lit pas. */
+  .sec-head::after{width:min(170px,62%)}
+  .sec-head{padding-bottom:22px}
+}

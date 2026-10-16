@@ -256,3 +256,30 @@ autre chantier.
 `seo.py` relit le catalogue à chaque build. Changer un prix, un coloris ou un
 stock dans `src/scripts/02-catalogue.js` met à jour les données structurées et
 le repli sans script sans rien avoir à retoucher ici.
+
+## Le style marocain, et ce qu'il coûte
+
+Posé le 16 octobre 2026. Zellige, arc en plein cintre, typographie ronde.
+
+**Zéro octet de police en plus.** Baloo 2 était déjà servie — elle ne
+servait plus à rien depuis que le vrai logo a remplacé le logotype dessiné.
+Elle est simplement préchargée maintenant qu'elle porte les titres de
+section (+18 Ko sur le chemin critique, et c'est tout).
+
+**Zéro image.** Le zellige est fait de cinq dégradés CSS empilés, repris du
+show-room. Les arcs sont des `border-radius`. Rien ne se télécharge.
+
+**Les contrastes, mesurés dans les deux thèmes** — c'est ce qui a imposé de
+scinder le vert en deux jetons. Le vert profond du zellige est la matière
+(carreau, fond de puce) ; un second, plus clair en thème sombre, porte le
+texte. Un seul jeton tombait à 3,3:1 sur le fond sombre, sous les 4,5
+exigés pour un surtitre de onze pixels.
+
+| | clair | sombre |
+|---|---|---|
+| Surtitre vert sur la page | 8,3:1 | 5,9:1 |
+| Texte blanc sur puce verte | 8,3:1 | 5,9:1 |
+| Chiffre des statistiques | 7,8:1 | 5,5:1 |
+
+**CLS resté à 0**, aucun débordement horizontal, de 375 à 1440 px.
+

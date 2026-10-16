@@ -108,6 +108,7 @@ $VERIF<link rel="preload" as="image" href="assets/videos/collection-affiche.jpg"
 <link rel="preload" as="image" href="assets/videos/collection-affiche-etroite.jpg" media="(max-width:900px)" fetchpriority="high">
 <link rel="preload" as="font" type="font/woff2" href="assets/polices/archivo.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="assets/polices/archivo-black.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="assets/polices/baloo2.woff2" crossorigin>
 <meta name="theme-color" content="#15181b">
 <link rel="canonical" href="$URL">
 <meta property="og:type" content="website">
