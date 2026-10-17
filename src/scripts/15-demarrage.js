@@ -8,7 +8,12 @@ function degrader(raison){
 }
 try{
   renderStatic();
-  initMotion();initVisite();initAtelier();initNav();initCounters();initProgress();
+  initMotion();initAtelier();initNav();initCounters();initProgress();
+  const experience=$('#visit-details');
+  experience?.addEventListener('toggle',()=>{
+    if(experience.open&&!experience.dataset.ready){experience.dataset.ready='1';initVisite();}
+    mesurer();reveiller();
+  });
   fondVideo();
   avancer(tacheRevelations);revelations();
 }catch(err){ degrader(err&&err.message||err); }
@@ -19,7 +24,7 @@ addEventListener('load',()=>{
   // hauteur, et replier ici viderait le moteur pour le retour à la boutique.
   if(location.hash==='#admin') return;
   const st=$('.visite-stage');
-  if(st && st.getBoundingClientRect().height<260) degrader('scène sans hauteur');
+  if($('#visit-details')?.open && st && st.getBoundingClientRect().height<260) degrader('scène sans hauteur');
 });
 mesurer();
 addEventListener('scroll',reveiller,{passive:true});

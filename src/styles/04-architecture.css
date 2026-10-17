@@ -81,7 +81,7 @@
 .tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-top:22px;position:relative}
 .tabs button{padding:11px 14px;font-size:.78rem;font-weight:600;color:var(--fg-soft);
   border-bottom:2px solid transparent;transition:color .2s,border-color .2s}
-.tabs button[aria-selected="true"]{color:var(--accent-text);border-color:var(--accent)}
+.tabs button[aria-pressed="true"]{color:var(--accent-text);border-color:var(--accent)}
 .tabpane{animation:fadeUp .35s cubic-bezier(.16,1,.3,1)}
 
 /* titres de section : filet qui se trace */

@@ -1,6 +1,6 @@
 /* ======================= boutique ======================= */
 function renderStatic(){
-  $('#herotopo').innerHTML=[1.6,1.3,1.05,.82,.6,.4,.22].map((k,i)=>
+  const topo=$('#herotopo');if(topo)topo.innerHTML=[1.6,1.3,1.05,.82,.6,.4,.22].map((k,i)=>
     `<g transform="translate(600,310) scale(${k*2.1},${k*1.25}) translate(-100,-230)"><path d="${SOLE}" fill="none" stroke="rgba(207,149,73,${(.3-i*.03).toFixed(2)})" stroke-width="${(1.6/k).toFixed(2)}"/></g>`).join('');
   // Le héros garde l'illustration : les photos de l'atelier portent leur
   // décor (canapé, parquet, marbre), qui ferait une boîte claire au milieu du
@@ -44,6 +44,7 @@ function renderGrid(){
     p.colors.filter(c=>!S.colorFilter||c===S.colorFilter).forEach(c=>paires.push([p,c])));
   $('#filters').querySelectorAll('[data-act="fam"]').forEach(b=>b.setAttribute('aria-pressed',S.filter===b.dataset.k));
   $('#filters').querySelectorAll('[data-act="col"]').forEach(b=>b.setAttribute('aria-pressed',S.colorFilter===b.dataset.k));
+  const count=$('#collection-count');if(count)count.textContent=paires.length+' coloris'+(S.colorFilter?' · '+COLORS[S.colorFilter].n:'');
   if(!paires.length){$('#grid').innerHTML=`<div class="empty" style="grid-column:1/-1;background:var(--surface)"><h4>Aucun cuir dans cette combinaison</h4><p>Essayez une autre couleur ou revenez à tous les cuirs.</p></div>`;return;}
   $('#grid').innerHTML=paires.map(([p,c],i)=>{
     const out=totStock(p)===0;
@@ -51,13 +52,21 @@ function renderGrid(){
     const ruban=out?`<span class="card-flag out">Épuisé</span>`
                    :(i===0&&p.flag?`<span class="card-flag">${p.flag}</span>`:'');
     return `<button class="card" data-act="open" data-id="${p.id}" data-c="${c}">
-      <div class="card-art">${ruban}${visuel(p,c)}</div>
-      <div><div class="card-name"><h3>${p.name} · ${COLORS[c].n}</h3><span class="p num">${fmt(priceOf(p))}</span></div>
+      <div class="card-art">${ruban}${visuel(p,c)}<span class="card-discover">Découvrir <span aria-hidden="true">↗</span></span></div>
+      <div><div class="card-name"><h3>${p.name} <span>${COLORS[c].n}</span></h3><span class="p num">${fmt(priceOf(p))}</span></div>
       <div class="card-meta"><span>${p.sub}</span><span class="dots"><i style="background:linear-gradient(135deg,${COLORS[c].c},${COLORS[c].d})"></i></span></div></div>
     </button>`;}).join('');
+}
+// Le stock est partagé entre les coloris d'un même modèle et d'une même taille.
+function quantitePointure(id,size){return S.cart.filter(i=>i.id===id&&i.s===size).reduce((n,i)=>n+i.q,0);}
+function panierValide(){
+  if(!S.cart.length){toast('Votre panier est vide');return false;}
+  for(const i of S.cart){const p=prod(i.id);
+    if(!p||quantitePointure(i.id,i.s)>stockOf(p,SIZES.indexOf(i.s))){toast('La quantité demandée dépasse le stock disponible. Ajustez le panier.');return false;}}
+  return true;
 }
 function cartCount(){return S.cart.reduce((a,i)=>a+i.q,0);}
 function cartSub(){return S.cart.reduce((a,i)=>a+priceOf(prod(i.id))*i.q,0);}
 function shipCost(){return S.cart.length===0?0:(cartSub()>=SHIPFREE?0:SHIPCOST);}
-function syncCart(){$('#cartcount').textContent=cartCount();lsSet('benkashoes.cart',S.cart);}
+function syncCart(){$('#cartcount').textContent=cartCount();$('#cartbtn').setAttribute('aria-label','Panier, '+cartCount()+' article(s)');lsSet('benkashoes.cart',S.cart);}
 
