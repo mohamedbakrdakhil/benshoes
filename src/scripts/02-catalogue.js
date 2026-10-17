@@ -20,11 +20,11 @@ const FAMS=[['tous','Tous les coloris']];
    Ne rien glisser entre « price: » et « colors: » — seo.py et
    verif-catalogue.py lisent ce bloc à l'expression régulière. */
 const CATALOG=[
-  {id:'opus',hold:4,use:'Tous les jours',name:'Opus',sub:'Mocassin-mule à bride penny',fam:'penny',style:'penny',price:259,
+  {id:'opus',hold:4,use:'Tous les jours',name:'Opus',sub:'Mocassin-mule à bride penny',fam:'penny',style:'penny',price:279,
    colors:['beige','taupe','marron','tabac','burgundy','gris','marine','noir'],
    stock:[9,16,21,18,11],flag:'Le plus porté',
    blurb:"La bride penny ajourée, posée sur un daim souple monté à la main sur forme. Talon ouvert : on l’enfile d’un geste, il tient par le cou-de-pied. Huit daims au choix, du beige au noir, c’est le modèle sur lequel l’atelier a bâti sa réputation.",
-   spec:[['Tige','Daim de veau, monté sur forme'],['Bride','Penny ajourée, surpiquée main'],['Première','Liège estampé benka'],['Semelle','Gomme souple, cousue']]}
+   spec:[['Tige','Daim de veau, monté sur forme'],['Bride','Penny ajourée, surpiquée main'],['Semelle','Gomme souple']]}
 ];
 const FAQ=[
  ['Comment choisir ma pointure ?',
@@ -33,8 +33,8 @@ const FAQ=[
   "Oui, parce que la tige est montée sur forme : elle épouse le cou-de-pied au lieu de pincer les orteils. Les premiers jours on a le réflexe de crisper le pied, puis le daim se fait et la mule suit la marche toute seule. Ce n\u2019est pas une chaussure de course, c\u2019est une chaussure de journée."],
  ['Comment entretenir le daim ?',
   "Brosse en crêpe à sec, jamais d\u2019eau. Une tache fraîche part à la gomme à daim, une auréole se traite à la vapeur puis au brossage. Passez un spray imperméabilisant deux fois par an : le daim boit tout, mieux vaut le protéger avant la pluie qu\u2019après."],
- ['La première en liège change-t-elle avec le temps ?',
-  "C\u2019est même le principe. Le liège se tasse sous les points d\u2019appui au fil des ports et finit par garder le creux de votre pied. Au bout de deux ou trois semaines, la première n\u2019est plus plate : elle est à vous. C\u2019est l\u2019empreinte du logo."],
+ ['La première en gomme change-t-elle avec le temps ?',
+  "C\u2019est même le principe. La gomme épouse la forme du pied sous l\u2019appui et finit par en garder le creux. Au bout de deux ou trois semaines, la première n\u2019est plus plate : elle est à vous. C\u2019est l\u2019empreinte du logo."],
  ['Puis-je payer en ligne ?',
   "Pas encore. Vous composez votre panier et vous le validez : la commande arrive directement à l\u2019atelier avec une référence. On vous rappelle pour confirmer la disponibilité dans votre pointure, puis vous réglez à la livraison ou par virement."],
  ['Livrez-vous en dehors du Maroc ?',

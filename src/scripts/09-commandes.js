@@ -11,7 +11,7 @@ function admHTML(){
     <p class="serif">Cette page est affichée à l'intérieur d'un autre site. Pour votre sécurité, l'espace commandes ne s'ouvre qu'à l'adresse ${esc(SHOP.site)} dans une fenêtre à lui.</p>
     <a class="btn btn-pri" href="https://${esc(SHOP.site)}/#admin" target="_blank" rel="noopener" style="margin-top:22px">Ouvrir la vraie page</a></div></div>`;
   const hd=`<div class="adm-hd"><div class="wrap adm-hd-in">
-    <span class="brand">BENKASHOES<i></i><small>Liège &amp; Cuir</small></span>
+    <span class="brand">BENKASHOES<i></i><small>Daim &amp; Cuir</small></span>
     <span class="badge-adm">Espace commandes</span>
     <div class="adm-tabs">
       <button data-act="admtab" data-k="commandes" aria-pressed="${S.admTab==='commandes'}">Commandes</button>

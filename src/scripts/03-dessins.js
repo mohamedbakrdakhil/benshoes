@@ -53,7 +53,7 @@ function sandal(st,colorKey,platform,lite){
    +`<ellipse cx="100" cy="${450+lift}" rx="64" ry="11" fill="rgba(30,16,8,.22)"/>`
    +`<path d="${SOLE}" transform="translate(-4.6,${lift+2.5}) scale(1.046)" fill="#2a2420"/>`;
   for(let i=2;i>=1;i--) s+=`<path d="${SOLE}" transform="translate(${(-3.4*i/2).toFixed(2)},${(lift*i/2-2.6*i/2).toFixed(2)}) scale(${(1+.034*i/2).toFixed(3)})" fill="url(#k${u})" stroke="rgba(40,26,8,.34)" stroke-width=".7"/>`;
-  // première de propreté en liège, visible derrière la tige
+  // première de propreté en gomme, visible derrière la tige
   s+=`<path d="${SOLE}" fill="url(#b${u})"/><g clip-path="url(#sc${u})">`;
   if(!lite){
     [.86,.7,.54,.38].forEach(k=>{s+=`<path d="${SOLE}" transform="translate(100,222) scale(${k}) translate(-100,-222)" fill="none" stroke="rgba(92,62,24,.14)" stroke-width="1"/>`;});
@@ -80,7 +80,7 @@ function anatomySVG(){
   <path d="M100 100v18" stroke="var(--line-2)" stroke-dasharray="2 3"/><path d="M196 100v18" stroke="var(--line-2)" stroke-dasharray="2 3"/></g>
   <g transform="translate(34,150)">
     <text font-family="Archivo, sans-serif" font-size="9" letter-spacing="1.6" fill="var(--fg-soft)">ÉPAISSEURS</text>
-    ${[['Tige en daim','1,6 mm'],['Doublure cuir','0,8 mm'],['Première liège','6 mm'],['Semelle gomme','9 mm']].map((r,i)=>
+    ${[['Tige en daim','1,6 mm'],['Doublure cuir','0,8 mm'],['Première gomme','6 mm'],['Semelle gomme','9 mm']].map((r,i)=>
       `<g transform="translate(0,${18+i*18})"><rect width="214" height="1" y="13" fill="var(--line)"/><text font-family="Newsreader, serif" font-size="11.5" fill="var(--fg)">${r[0]}</text><text x="214" text-anchor="end" font-family="Archivo, sans-serif" font-weight="600" font-size="10.5" fill="var(--accent-text)">${r[1]}</text></g>`).join('')}
   </g></svg>`;
 }

@@ -30,8 +30,7 @@ function cartHTML(){
       <label class="f">Téléphone<input id="f_phone" type="tel" inputmode="tel" maxlength="20" value="${esc(f.phone)}" autocomplete="tel" placeholder="06 12 34 56 78"></label>
       <label class="f">E-mail<input id="f_email" type="email" maxlength="120" value="${esc(f.email)}" autocomplete="email" placeholder="amina@exemple.fr"></label>
       <label class="f full">Adresse<input id="f_addr" maxlength="200" value="${esc(f.addr)}" autocomplete="street-address" placeholder="12 rue Tahar Sebti"></label>
-      <label class="f">Code postal<input id="f_zip" maxlength="20" inputmode="numeric" value="${esc(f.zip)}" autocomplete="postal-code" placeholder="20250"></label>
-      <label class="f">Ville<input id="f_city" maxlength="80" value="${esc(f.city)}" autocomplete="address-level2" placeholder="Casablanca"></label>
+      <label class="f full">Ville<input id="f_city" maxlength="80" value="${esc(f.city)}" autocomplete="address-level2" placeholder="Casablanca"></label>
       <label class="f full">Pays<select id="f_country">${['Maroc','France','Belgique','Espagne','Algérie','Tunisie','Canada','Autre'].map(c=>`<option ${(f.country||'Maroc')===c?'selected':''}>${c}</option>`).join('')}</select></label>
       <label class="f full">Note pour l'atelier <span style="text-transform:none;letter-spacing:0;font-weight:400">(optionnel)</span><textarea id="f_note" maxlength="500" placeholder="Pied large, livrer après 18 h…">${esc(f.note)}</textarea></label>
       <input id="f_site" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
@@ -43,7 +42,7 @@ function cartHTML(){
       <button class="btn btn-pri" data-act="place" style="justify-content:center">Valider la commande</button>
       <button class="btn btn-out btn-sm" data-act="back" style="justify-content:center">Retour au panier</button>`;
   } else if(!S.cart.length){
-    body=`<div class="empty"><h4>Votre panier est vide</h4><p>Huit cuirs, une seule coupe — choisissez la couleur, la pointure vient après.</p>
+    body=`<div class="empty"><h4>Votre panier est vide</h4><p>Huit daims, une seule coupe — choisissez la couleur, la pointure vient après.</p>
       <a class="btn btn-out btn-sm" href="#modeles" data-act="closep" style="margin-top:18px">Voir la collection</a></div>`;
     foot='';
   } else {
@@ -70,13 +69,13 @@ function orderText(o){
   return `COMMANDE ${o.ref} — ${SHOP.site}\n${new Date(o.createdAt).toLocaleString('fr-FR')}\n\n`
     +o.items.map(i=>`${i.q} × ${i.name} — ${i.color} — pointure ${i.size} — ${fmt(i.unit*i.q)}`).join('\n')
     +`\n\nLivraison : ${o.ship?fmt(o.ship):'offerte'}\nTOTAL : ${fmt(o.total)}\n\n`
-    +`${o.customer.name}\n${o.customer.phone}\n${o.customer.email}\n${o.customer.addr}\n${o.customer.zip} ${o.customer.city}\n${o.customer.country}`
+    +`${o.customer.name}\n${o.customer.phone}\n${o.customer.email}\n${o.customer.addr}\n${o.customer.city}\n${o.customer.country}`
     +(o.note?`\n\nNote : ${o.note}`:'');
 }
 function readForm(){
   const g=id=>($('#'+id)?.value||'').trim();
   return {name:g('f_name'),phone:g('f_phone'),email:g('f_email'),addr:g('f_addr'),
-    zip:g('f_zip'),city:g('f_city'),country:$('#f_country')?.value||'Maroc',note:g('f_note'),
+    zip:'',city:g('f_city'),country:$('#f_country')?.value||'Maroc',note:g('f_note'),
     site:g('f_site')};   // piège à robots : un humain ne voit pas ce champ
 }
 /* ---------- dépôt de la commande dans le tableur de l'atelier ----------

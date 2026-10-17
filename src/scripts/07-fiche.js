@@ -116,7 +116,7 @@ function sheetHTML(){
     </div>
     <div class="panel-ft">
       <button class="btn btn-pri" data-act="add" ${si&&st>0?'':'disabled'} style="justify-content:center">${si?`Ajouter au panier — ${fmt(priceOf(p))}`:'Choisissez une pointure'}</button>
-      <p class="note" style="text-align:center">Expédition 48 h · ${LIVR_PHRASE()} · essai 30 jours</p>
+      <p class="note" style="text-align:center">Expédition 48 h · ${LIVR_PHRASE()}</p>
     </div></div>`;
 }
 
@@ -130,11 +130,9 @@ function sheetTab(p){
   if(tab==='livraison') return `<p class="serif" style="padding-top:16px">Expédition le jour même pour toute commande confirmée avant 14 h. Vous réglez à la livraison ou par virement : le paiement en ligne n\u2019est pas encore branché sur la boutique.</p>
     <ul class="spec"><li><span>Délai</span><span>48 h partout au Maroc</span></li>
     <li><span>Frais de port</span><span>${SHIPCOST===0||SHIPFREE===0?'offerts':`${fmt(SHIPCOST)}, offerts dès ${fmt(SHIPFREE)}`}</span></li>
-    <li><span>Paiement</span><span>À la livraison ou par virement</span></li>
-    <li><span>Retour</span><span>30 jours, frais à notre charge</span></li>
-    <li><span>Ressemelage</span><span>80 DH, sans limite de durée</span></li></ul>`;
+    <li><span>Paiement</span><span>À la livraison ou par virement</span></li></ul>`;
   return `<ul class="spec" style="border-top:0">${p.spec.map(r=>`<li><span>${r[0]}</span><span>${r[1]}</span></li>`).join('')}
-    <li><span>Montage</span><span>Sur forme, semelle cousue</span></li>
+    <li><span>Montage</span><span>Sur forme</span></li>
     <li><span>Travail</span><span>${p.hold} sur 5 — ${p.use.toLowerCase()}</span></li>
     <li><span>Pointures</span><span>37 à 41</span></li></ul>`;
 }
