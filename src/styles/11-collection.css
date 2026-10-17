@@ -1,0 +1,96 @@
+/* ===================== La collection, version éditoriale =====================
+
+   Reprise de la refonte premium qui avait été annulée. Elle est ici dans sa
+   propre feuille, et non fondue dans les autres, pour deux raisons : elle
+   vient en dernier et surcharge donc proprement, et elle se retire d'un
+   seul fichier si elle ne convient pas.
+
+   Ce qu'elle change, et pourquoi c'est mieux pour vendre :
+
+   La vignette passe en 4/5 cadrée au plus juste. Avant, la photo flottait
+   au milieu d'un carré avec du vide autour : la chaussure occupait la
+   moitié de la carte. Maintenant elle la remplit.
+
+   Le nom et le coloris ne se partagent plus une ligne. « Opus · Marron
+   taupe » sur deux colonnes de 174 px passait à la ligne n'importe où. Le
+   modèle au-dessus, en romain, le coloris en dessous, en petit : on lit le
+   modèle d'un coup d'œil et la nuance en second, ce qui est l'ordre dans
+   lequel on choisit.
+
+   La grille perd ses filets. Les cartes reposaient dans un quadrillage qui
+   les enfermait ; elles respirent sur le fond de la page, et c'est l'image
+   qui porte, pas la bordure.
+   =========================================================================== */
+
+/* La barre d'outils : les filtres à gauche, le compte à droite. Un filet
+   simple la sépare du chapeau — le motif de zellige, qui ponctue les autres
+   sections, ferait ici doublon avec les huit pastilles de couleur. */
+.collection-toolbar{display:flex;align-items:center;justify-content:space-between;
+  gap:16px;flex-wrap:wrap;margin-bottom:24px;
+  border-top:1px solid var(--line);padding-top:22px}
+.collection-toolbar .filters{margin:0;gap:12px}
+.collection-count{font-size:.7rem;color:var(--fg-soft);white-space:nowrap;
+  letter-spacing:.04em}
+#modeles .sec-head{padding-bottom:0}
+#modeles .sec-head::after{display:none}
+/* Le chapeau de la section passe au romain, comme les noms de cartes : la
+   ronde sur la première ligne et le romain italique sur la seconde faisaient
+   deux voix dans un même titre. */
+#modeles .sec-head h2{font-family:var(--fb);font-weight:400;letter-spacing:-.035em;
+  line-height:1.04}
+#modeles .sec-head h2 em{font-style:italic;font-weight:300;color:var(--accent-text)}
+
+/* La puce active prend l'encre du texte : sur une barre qui porte déjà huit
+   couleurs, une neuvième teinte ne se lit plus comme un état. */
+.chip[aria-pressed="true"]{background:var(--fg);border-color:var(--fg);color:var(--bg)}
+
+.grid{background:transparent;border:0;gap:30px 20px}
+.card{padding:0;background:transparent;gap:14px}
+.card:hover{background:transparent}
+.card-art{aspect-ratio:4/5;border-radius:0;background:var(--surface-2)}
+.card-art .pv{width:100%;height:100%;object-fit:cover;
+  transition:transform .6s cubic-bezier(.2,.7,.3,1)}
+.card:hover .card-art .pv{transform:scale(1.045)}
+
+.card-name{gap:10px;align-items:start}
+.card-name h3{font-family:var(--fb);font-weight:400;font-size:1.45rem;
+  letter-spacing:-.03em;line-height:1.05}
+.card-name h3 span{display:block;font-family:var(--fu);font-size:.68rem;
+  font-weight:400;letter-spacing:.02em;color:var(--fg-soft);margin-top:6px}
+.card-name .p{font-size:.78rem;font-weight:400;margin-top:4px;white-space:nowrap}
+.card-meta{margin-top:10px;font-size:.58rem;letter-spacing:.05em;line-height:1.5}
+
+/* L'étiquette remonte en haut à gauche, sur fond clair. En bas, posée sur la
+   photo pleine, elle masquait la semelle — le détail qu'on regarde. */
+.card-flag{top:12px;bottom:auto;left:12px;border-radius:0;
+  background:var(--surface);color:var(--fg);font-size:.52rem;padding:6px 8px;z-index:1}
+
+/* « Découvrir » n'apparaît qu'au survol ou au focus clavier : sur tactile il
+   n'y a pas de survol, et une invite permanente sur huit cartes est du bruit. */
+.card-discover{position:absolute;bottom:12px;left:12px;right:12px;
+  background:var(--surface);padding:11px 13px;display:flex;
+  justify-content:space-between;align-items:center;font-size:.68rem;
+  color:var(--fg);opacity:0;transform:translateY(8px);
+  transition:opacity .2s ease,transform .2s ease;pointer-events:none}
+.card:hover .card-discover,.card:focus-visible .card-discover{opacity:1;transform:none}
+@media(hover:none){.card-discover{display:none}}
+
+/* L'en-tête s'allège : le panier en contour plutôt qu'en aplat sombre, les
+   deux icônes sans cadre. La page gagne en calme, et le bouton « Ajouter au
+   panier » de la fiche redevient le seul aplat plein de l'écran. */
+.icbtn{border:0;background:transparent}
+.cartbtn{background:transparent;border:1px solid var(--line-2);color:var(--fg);
+  font-weight:500}
+.cartbtn:hover{border-color:var(--fg)}
+.cartbtn b{background:var(--accent);color:#fff}
+
+@media(max-width:700px){
+  .grid{gap:24px 14px}
+  .card{padding:0;gap:10px}
+  .card-name{flex-direction:row;align-items:start;gap:8px}
+  .card-name h3{font-size:1.12rem}
+  .card-name h3 span{font-size:.62rem;margin-top:4px}
+  .card-name .p{font-size:.72rem}
+  .card-meta{font-size:.54rem;margin-top:7px}
+  .collection-toolbar{gap:10px;padding-top:18px;margin-bottom:18px}
+}

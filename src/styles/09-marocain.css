@@ -90,12 +90,9 @@
    lit comme une pièce exposée dans une niche, ce qui est exactement le
    propos du show-room. Les deux boîtes ont déjà overflow:hidden, l'arc
    rogne donc la photo sans qu'on touche à sa mise en page. */
-.card-art{border-radius:var(--arc)}
-/* L'arc rogne le haut de la boîte, et l'étiquette « Épuisé » y vivait : on
-   n'en lisait plus que la fin. Elle descend au pied de la vignette, là où
-   les coins restent droits — et c'est de toute façon là qu'on la cherche
-   sur une fiche produit. */
-.card-flag{top:auto;bottom:0;border-radius:0 calc(var(--r) + 3px) 0 0}
+/* Les vignettes de la collection n'ont pas d'arc : la section est passée au
+   cadrage éditorial de 11-collection.css, où la photo remplit la carte et
+   l'étiquette revient en haut. L'arc reste sur l'atelier et la fiche. */
 .at-img{border-radius:var(--arc)}
 .rotor{border-radius:var(--arc)}
 /* La vignette de l'anatomie et les alcôves du couloir suivent. */

@@ -44,6 +44,11 @@ function renderGrid(){
     p.colors.filter(c=>!S.colorFilter||c===S.colorFilter).forEach(c=>paires.push([p,c])));
   $('#filters').querySelectorAll('[data-act="fam"]').forEach(b=>b.setAttribute('aria-pressed',S.filter===b.dataset.k));
   $('#filters').querySelectorAll('[data-act="col"]').forEach(b=>b.setAttribute('aria-pressed',S.colorFilter===b.dataset.k));
+  // Le compte des cuirs affichés, sous les pastilles. role="status" : un
+  // lecteur d'écran annonce le nouveau total quand on filtre, sinon le
+  // changement se produit en silence.
+  const compte=$('#collection-count');
+  if(compte) compte.textContent=paires.length+' coloris'+(S.colorFilter?' · '+COLORS[S.colorFilter].n:'');
   if(!paires.length){$('#grid').innerHTML=`<div class="empty" style="grid-column:1/-1;background:var(--surface)"><h4>Aucun cuir dans cette combinaison</h4><p>Essayez une autre couleur ou revenez à tous les cuirs.</p></div>`;return;}
   $('#grid').innerHTML=paires.map(([p,c],i)=>{
     const out=totStock(p)===0;
@@ -51,13 +56,16 @@ function renderGrid(){
     const ruban=out?`<span class="card-flag out">Épuisé</span>`
                    :(i===0&&p.flag?`<span class="card-flag">${p.flag}</span>`:'');
     return `<button class="card" data-act="open" data-id="${p.id}" data-c="${c}">
-      <div class="card-art">${ruban}${visuel(p,c)}</div>
-      <div><div class="card-name"><h3>${p.name} · ${COLORS[c].n}</h3><span class="p num">${fmt(priceOf(p))}</span></div>
+      <div class="card-art">${ruban}${visuel(p,c)}<span class="card-discover">Découvrir <span aria-hidden="true">↗</span></span></div>
+      <div><div class="card-name"><h3>${p.name} <span>${COLORS[c].n}</span></h3><span class="p num">${fmt(priceOf(p))}</span></div>
       <div class="card-meta"><span>${p.sub}</span><span class="dots"><i style="background:linear-gradient(135deg,${COLORS[c].c},${COLORS[c].d})"></i></span></div></div>
     </button>`;}).join('');
 }
 function cartCount(){return S.cart.reduce((a,i)=>a+i.q,0);}
 function cartSub(){return S.cart.reduce((a,i)=>a+priceOf(prod(i.id))*i.q,0);}
 function shipCost(){return S.cart.length===0?0:(cartSub()>=SHIPFREE?0:SHIPCOST);}
-function syncCart(){$('#cartcount').textContent=cartCount();lsSet('benkashoes.cart',S.cart);}
+function syncCart(){$('#cartcount').textContent=cartCount();
+  // Le compteur seul ne dit rien à qui n'a pas l'écran.
+  $('#cartbtn')?.setAttribute('aria-label','Panier, '+cartCount()+' article(s)');
+  lsSet('benkashoes.cart',S.cart);}
 

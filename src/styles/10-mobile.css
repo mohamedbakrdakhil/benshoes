@@ -8,13 +8,9 @@
      Tout ce qui suit n'est que la conséquence d'une carte deux fois moins
      large : le nom et le prix ne tiennent plus côte à côte, les marges et
      les corps se resserrent. */
+  /* Deux colonnes. Le reste de l'habillage de la carte — proportions,
+     typographie, étiquette — vit dans 11-collection.css, qui vient après. */
   .grid{grid-template-columns:1fr 1fr}
-  .card{padding:11px 11px 13px;gap:9px}
-  .card-name{flex-direction:column;align-items:flex-start;gap:1px}
-  .card-name h3{font-size:.95rem;line-height:1.15}
-  .card-name .p{font-size:.88rem}
-  .card-meta{font-size:.58rem;letter-spacing:.04em;gap:6px}
-  .card-flag{font-size:.52rem;padding:3px 6px;letter-spacing:.08em}
 }
 @media(max-width:860px){
   :root{--mobile-header:62px;--mobile-screen:100svh;--mobile-screen-top:0px}

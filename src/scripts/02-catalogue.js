@@ -11,7 +11,7 @@ const COLORS={
   gris:{n:'Gris',c:'#7e8389',d:'#575c61'},
   marine:{n:'Marine',c:'#27374f',d:'#16202f'}
 };
-const FAMS=[['tous','Tous les modèles']];
+const FAMS=[['tous','Tous les coloris']];
 /* Les coloris listés sous chaque modèle sont exactement ceux dont l'atelier a
    envoyé les photos. Un coloris annoncé sans photo s'afficherait en dessin au
    milieu des autres : une boutique à moitié photographiée fait plus de mal que
