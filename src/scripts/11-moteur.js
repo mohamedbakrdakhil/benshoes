@@ -7,7 +7,8 @@ const GEO={};
 function mesurerEcranMobile(){
   if(!matchMedia('(max-width:860px)').matches)return;
   const root=document.documentElement,v=window.visualViewport;
-  const hauteur=$('.hdr')?.getBoundingClientRect().height||62;
+  const entete=$('.hdr');
+  const hauteur=(entete?.getBoundingClientRect().height||62)+(entete?(parseFloat(getComputedStyle(entete).top)||0):0);
   root.style.setProperty('--mobile-header',hauteur+'px');
   if(!v||v.scale===1){root.style.setProperty('--mobile-screen',(v?.height||innerHeight)+'px');
     root.style.setProperty('--mobile-screen-top',(v?.offsetTop||0)+'px');}
