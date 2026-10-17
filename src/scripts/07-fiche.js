@@ -1,12 +1,8 @@
 /* ======================= fiche produit ======================= */
 
-/* Toutes les photos du coloris choisi, empilées dans la fiche.
-
-   Empilées plutôt qu'en carrousel : un carrousel demande un état, des
-   flèches, des points, du clavier et du tactile — et cache la moitié des
-   photos derrière un geste que beaucoup ne font pas. Ici tout est visible en
-   faisant défiler, ce que tout le monde sait faire. Les images suivantes sont
-   différées : seule la première coûte quelque chose à l'ouverture. */
+/* Toutes les vues restent disponibles : galerie empilée sur ordinateur,
+   rangée à défilement natif sur téléphone pour rapprocher les pointures.
+   Les images suivantes sont différées. */
 /* Le tourne-disque : la paire que la cliente fait tourner elle-même.
    ------------------------------------------------------------------
    « Elle ressemble à quoi de l'autre côté ? » est la question que le
@@ -29,7 +25,7 @@ let rotorAuto=null;
 
 function rotorHTML(p,c){
   const n=(COLORS[c]||{}).n||c;
-  return `<div class="sheet-art rotor" tabindex="0" role="img"
+  return `<div class="rotor" tabindex="0" role="img"
     aria-label="${att(p.name+' en daim '+n+', à faire tourner')}"
     data-src="assets/produits/rotor-${att(c)}.jpg">
     <div class="rotor-vue"></div>
@@ -84,11 +80,15 @@ function majRotor(){
 }
 function galerie(p,c){
   const n=nbPhotos(p.id,c);
-  const rot=rotorHTML(p,c);
-  if(n<=1) return `<div class="galerie">${rot}<div class="sheet-art">${visuel(p,c)}</div></div>`;
+  // Le tourne-disque n'est plus DANS la galerie. Sur téléphone celle-ci se
+  // parcourt au doigt horizontalement, et le tourne-disque tourne au doigt
+  // horizontalement : les deux se disputaient le même geste, et le premier
+  // qui l'attrapait empêchait l'autre d'exister. Il est posé au-dessus,
+  // dans sheetHTML — un geste chacun.
+  if(n<=1) return `<div class="galerie" tabindex="0" role="region" aria-label="Photos du produit, faites glisser pour les parcourir"><div class="sheet-art">${visuel(p,c)}</div></div>`;
   let h='';
   for(let i=0;i<n;i++) h+=`<div class="sheet-art">${visuel(p,c,false,i)}</div>`;
-  return `<div class="galerie">${rot}${h}</div>`;
+  return `<div class="galerie" tabindex="0" role="region" aria-label="Photos du produit, faites glisser pour les parcourir">${h}</div>`;
 }
 
 function sheetHTML(){
@@ -98,7 +98,9 @@ function sheetHTML(){
     <div class="panel-hd"><span class="eyebrow">${p.sub}</span><h3 style="flex:0"></h3>
       <button class="close" data-act="closep" style="margin-left:auto" aria-label="Fermer">✕</button></div>
     <div class="panel-bd">
+      ${rotorHTML(p,c)}
       ${galerie(p,c)}
+      <p class="gallery-hint">Faites glisser pour voir les autres photos<span aria-hidden="true">↔</span></p>
       <div class="sheet-top"><h2>${p.name}</h2><span class="sheet-price num">${fmt(priceOf(p))}</span></div>
       <p class="serif">${p.blurb}</p>
       <div class="fld"><div class="fld-lab"><span class="t">Cuir</span><span class="v">${COLORS[c].n}</span></div>

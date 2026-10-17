@@ -133,16 +133,16 @@ label.f.bad input{border-color:var(--bad)}
    la boîte a sa taille avant que la planche arrive, donc rien ne saute.
    `touch-action:pan-y` laisse la page défiler verticalement sous le doigt —
    sans ça, un pouce qui descend se retrouvait prisonnier de la rotation. */
-.sheet-art.rotor{position:relative;background:#f4ece7;overflow:hidden;
+.rotor{position:relative;background:#f4ece7;overflow:hidden;margin-bottom:14px;
   touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none}
-.sheet-art.rotor.prise{cursor:grabbing}
+.rotor.prise{cursor:grabbing}
 .rotor-vue{width:100%;aspect-ratio:260/213;background-repeat:no-repeat;
   background-size:600% 400%;background-position:0 0}
 .rotor-aide{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);
   font-family:var(--fu);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;
   color:#fdf3ee;background:rgba(28,12,8,.62);padding:6px 12px;border-radius:999px;
   opacity:0;transition:opacity .4s ease;pointer-events:none}
-.sheet-art.rotor.prete .rotor-aide{opacity:1}
+.rotor.prete .rotor-aide{opacity:1}
 /* Une fois qu'on a compris, l'invite n'a plus rien à dire. */
-.sheet-art.rotor.touche .rotor-aide{opacity:0}
-.sheet-art.rotor:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.rotor.touche .rotor-aide{opacity:0}
+.rotor:focus-visible{outline:2px solid var(--accent);outline-offset:3px}

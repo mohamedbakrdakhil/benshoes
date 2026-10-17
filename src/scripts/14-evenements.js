@@ -1,5 +1,13 @@
 /* ======================= rendu + interactions ======================= */
+let panneauAffiche=null;
 function draw(){
+  const mobile=matchMedia('(max-width:860px)').matches;
+  const memePanneau=mobile&&S.panel&&S.panel===panneauAffiche;
+  const defilement=$('#overlays .panel-bd')?.scrollTop||0;
+  const galerieX=$('#overlays .galerie')?.scrollLeft||0;
+  const focus=document.activeElement;
+  const action=focus?.dataset.act;
+  const cle=focus?.dataset.k,taille=focus?.dataset.s;
   const adm=location.hash==='#admin';
   $('#shopview').hidden=adm;$('#admview').hidden=!adm;
   if(adm)$('#admview').innerHTML=admHTML();else{renderGrid();revelations();}
@@ -7,9 +15,21 @@ function draw(){
   const o=$('#overlays');
   o.innerHTML=S.panel==='sheet'?sheetHTML():S.panel==='cart'?cartHTML():S.panel==='manual'?manualHTML():'';
   if(S.panel){o.insertAdjacentHTML('afterbegin','<div class="scrim" data-act="closep"></div>');
-    o.querySelector('.close')?.focus();}
-  // Sans condition : c'est aussi ce passage qui éteint la rotation quand la
-  // fiche se ferme.
+    let cible=null;
+    if(memePanneau&&action){
+      cible=[...o.querySelectorAll('[data-act]')].find(el=>el.dataset.act===action&&el.dataset.k===cle&&el.dataset.s===taille);
+    }
+    (cible||o.querySelector('.close'))?.focus({preventScroll:mobile});
+  }
+  if(memePanneau){
+    const bd=o.querySelector('.panel-bd'),g=o.querySelector('.galerie');
+    if(bd)bd.scrollTop=defilement;if(g)g.scrollLeft=galerieX;
+  }
+  panneauAffiche=S.panel;
+  if(mobile)mesurerEcranMobile();
+  // Sans condition : c'est aussi ce passage qui éteint la rotation du
+  // tourne-disque quand la fiche se ferme. Un appel conditionnel laissait
+  // un intervalle tourner sur un élément retiré du document.
   majRotor();
   document.body.style.overflow=S.panel?'hidden':'';
   $('#cartcount').textContent=cartCount();
@@ -204,5 +224,10 @@ document.addEventListener('change',e=>{
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&e.target.id==='pw'){e.preventDefault();document.querySelector('[data-act="login"]')?.click();return;}
   if(e.key==='Escape'&&S.panel){S.panel=null;S.manual=null;draw();}});
-addEventListener('hashchange',()=>{S.panel=null;draw();window.scrollTo(0,0);});
+let ancienAdmin=location.hash==='#admin';
+addEventListener('hashchange',()=>{
+  const admin=location.hash==='#admin';S.panel=null;draw();
+  if(admin||ancienAdmin)window.scrollTo(0,0);
+  ancienAdmin=admin;
+});
 

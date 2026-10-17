@@ -4,12 +4,24 @@
    rendu pendant l'animation, qui est la première cause de saccade. */
 const MOTEUR={taches:[],actif:false,t:0};
 const GEO={};
+function mesurerEcranMobile(){
+  if(!matchMedia('(max-width:860px)').matches)return;
+  const root=document.documentElement,v=window.visualViewport;
+  const entete=$('.hdr');
+  const hauteur=(entete?.getBoundingClientRect().height||62)+(entete?(parseFloat(getComputedStyle(entete).top)||0):0);
+  root.style.setProperty('--mobile-header',hauteur+'px');
+  if(!v||v.scale===1){root.style.setProperty('--mobile-screen',(v?.height||innerHeight)+'px');
+    root.style.setProperty('--mobile-screen-top',(v?.offsetTop||0)+'px');}
+}
+window.visualViewport?.addEventListener('resize',mesurerEcranMobile,{passive:true});
+window.visualViewport?.addEventListener('scroll',mesurerEcranMobile,{passive:true});
 function mesurer(){
+  mesurerEcranMobile();
   GEO.vw=innerWidth; GEO.vh=innerHeight;
   if(typeof RV!=='undefined'&&RV.length)mesurerRV();
-  const v=$('#visite'); if(v){GEO.vTop=v.offsetTop; GEO.vSpan=Math.max(1,v.offsetHeight-GEO.vh);}
+  const v=$('#visite'); if(v){const stage=$('.visite-stage'),decalage=parseFloat(getComputedStyle(stage).top)||0;GEO.vTop=v.offsetTop-decalage; GEO.vSpan=Math.max(1,v.offsetHeight-stage.offsetHeight);}
   const a=$('#atelier'),t=$('#attrack');
-  if(a){GEO.aTop=a.offsetTop; GEO.aSpan=Math.max(1,a.offsetHeight-GEO.vh);}
+  if(a){const stage=$('.at-stage'),decalage=parseFloat(getComputedStyle(stage).top)||0;GEO.aTop=a.offsetTop-decalage; GEO.aSpan=Math.max(1,a.offsetHeight-stage.offsetHeight);}
   if(t){GEO.tW=t.scrollWidth;
     GEO.figs=[...t.children].map(el=>({im:el.querySelector('img'),x:el.offsetLeft,w:el.offsetWidth}))
       .filter(o=>o.im);}

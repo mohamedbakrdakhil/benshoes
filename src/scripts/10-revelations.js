@@ -18,6 +18,7 @@ function initMotion(){
       return sy<1400;});}
   // boutons magnétiques
   document.addEventListener('pointermove',e=>{
+    if(e.pointerType==='touch')return;
     const b=e.target.closest('.btn-pri,.btn-hero,.cartbtn');
     if(!b){document.querySelectorAll('[data-mag]').forEach(x=>{x.style.transform='';x.removeAttribute('data-mag')});return;}
     const r=b.getBoundingClientRect();

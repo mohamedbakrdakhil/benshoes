@@ -97,7 +97,7 @@
    sur une fiche produit. */
 .card-flag{top:auto;bottom:0;border-radius:0 calc(var(--r) + 3px) 0 0}
 .at-img{border-radius:var(--arc)}
-.sheet-art.rotor{border-radius:var(--arc)}
+.rotor{border-radius:var(--arc)}
 /* La vignette de l'anatomie et les alcôves du couloir suivent. */
 .anat-fig{border-radius:var(--arc);overflow:hidden}
 
