@@ -27,10 +27,11 @@ const SESSION_DAYS = 14;
 const SIZES = [37, 38, 39, 40, 41];
 const COLORS = ['noir','beige','marron','taupe','tabac','burgundy','gris','marine'];
 const SEED = {
-  opus: { name: 'Opus', price: 259, colors: ['beige','taupe','marron','tabac','burgundy','gris','marine','noir'], stock: [9,16,21,18,11] },
+  opus:    { price: 299, colors: ['burgundy','noir','beige','marron','taupe','tabac','gris','marine'], stock: [9,16,21,18,11] },
+  stepy:   { price: 259, colors: ['beige','noir','marron','gris','marine'],                            stock: [7,13,17,14,8] },
+  western: { price: 359, colors: ['noir'],                                                             stock: [4,7,9,8,5] },
 };
-const COLOR_NAMES = {noir:'Noir',beige:'Beige',marron:'Marron',taupe:'Marron taupe',tabac:'Tabac',burgundy:'Burgundy',gris:'Gris',marine:'Marine'};
-const SHIP_FREE = 0, SHIP_COST = 0;
+const SHIP_FREE = 400, SHIP_COST = 35;
 const STATUSES = ['nouvelle','confirmee','expediee','livree','annulee'];
 
 /* ---------- stockage : un fichier JSON, écritures sérialisées ---------- */
@@ -165,8 +166,8 @@ function buildOrder(input, source) {
     const size = Number(it.size);
     if (!SIZES.includes(size)) return { error: 'Pointure invalide.' };
     const q = Math.floor(Number(it.q));
-    if (!(q >= 1 && q <= 99)) return { error: 'Quantité invalide.' };
-    items.push({ id: it.id, name: p.name, color: COLOR_NAMES[colorKey], colorKey, size, q,
+    if (!(q >= 1 && q <= 10)) return { error: 'Quantité invalide.' };
+    items.push({ id: it.id, name: str(it.name, 40) || it.id, color: str(it.color, 40), colorKey, size, q,
                  unit: Number(db.catalog.prices[it.id] ?? p.price) });
   }
   // stock
@@ -182,9 +183,7 @@ function buildOrder(input, source) {
                      addr: str(c.addr, 200), zip: str(c.zip, 20), city: str(c.city, 80), country: str(c.country, 60) || 'Maroc' };
   if (!customer.name) return { error: 'Le nom du client est obligatoire.' };
   if (source === 'boutique') {
-    if(customer.country!=='Maroc')return {error:'Pour une livraison à l’étranger, contactez l’atelier pour un devis.'};
     for (const k of ['phone', 'addr', 'city']) if (!customer[k]) return { error: 'Coordonnées de livraison incomplètes.' };
-    if(!/^[0-9+().\s-]{8,20}$/.test(customer.phone)||customer.phone.replace(/\D/g,'').length<8)return {error:'Numéro de téléphone invalide.'};
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(customer.email)) return { error: 'Adresse e-mail invalide.' };
   }
   const sub = items.reduce((a, i) => a + i.unit * i.q, 0);
@@ -206,9 +205,9 @@ function buildOrder(input, source) {
 const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8',
   '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp',
-  '.mp4': 'video/mp4', '.woff2': 'font/woff2', '.ico': 'image/x-icon', '.txt': 'text/plain; charset=utf-8', '.xml': 'application/xml; charset=utf-8' };
+  '.ico': 'image/x-icon', '.txt': 'text/plain; charset=utf-8', '.xml': 'application/xml; charset=utf-8' };
 function serveStatic(req, res, pathname) {
-  let rel;try{rel=decodeURIComponent(pathname).replace(/\\+/g, '/');}catch{res.writeHead(400).end('Chemin invalide');return;}
+  let rel = decodeURIComponent(pathname).replace(/\\+/g, '/');
   if (rel.endsWith('/')) rel += 'index.html';
   if (rel.includes('\u0000')) { res.writeHead(400).end('Chemin invalide'); return; }
   const file = path.resolve(PUBLIC_DIR, '.' + path.posix.normalize('/' + rel));

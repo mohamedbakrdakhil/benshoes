@@ -30,7 +30,7 @@ function tourHTML(c){
    réduit les animations ou si le forfait est compté. */
 function lancerTour(){
   const v=document.querySelector('video[data-tour]');
-  if(!v||v.src||!v.closest('details')?.open) return;
+  if(!v||v.src) return;
   const co=navigator.connection||{};
   if(co.saveData===true||/^(slow-)?2g$/.test(co.effectiveType||'')||!MOTION) return;
   v.src=v.dataset.tour;
@@ -38,10 +38,11 @@ function lancerTour(){
 }
 function galerie(p,c){
   const n=nbPhotos(p.id,c);
-  const principal=visuel(p,c).replace('loading="lazy"','loading="eager"');
-  let autres='';for(let i=1;i<n;i++)autres+=`<div class="sheet-art">${visuel(p,c,false,i)}</div>`;
-  return `<div class="galerie"><div class="sheet-art">${principal}</div>
-    <details class="gallery-more"><summary>Voir les autres vues <span aria-hidden="true">＋</span></summary>${autres}${tourHTML(c)}</details></div>`;
+  const tour=tourHTML(c);
+  if(n<=1) return `<div class="galerie">${tour}<div class="sheet-art">${visuel(p,c)}</div></div>`;
+  let h='';
+  for(let i=0;i<n;i++) h+=`<div class="sheet-art">${visuel(p,c,false,i)}</div>`;
+  return `<div class="galerie">${tour}${h}</div>`;
 }
 
 function sheetHTML(){
@@ -60,9 +61,9 @@ function sheetHTML(){
         <div class="sizegrid">${SIZES.map((s,i)=>{const k=stockOf(p,i);
           return `<button class="sizebtn" data-act="setsize" data-s="${s}" aria-pressed="${si===s}" ${k?'':'disabled'}>${s}${k&&k<=3?`<small>${k} rest.</small>`:''}</button>`;}).join('')}</div>
         <p class="note" style="margin-top:9px">Entre deux pointures, prenez la plus petite : <a href="#tailles" data-act="closep" style="color:var(--accent-text)">voir le guide</a>.</p></div>
-      <div class="tabs" role="group" aria-label="Informations sur le produit">
+      <div class="tabs" role="tablist">
         ${[['fiche','Fiche technique'],['entretien','Entretien'],['livraison','Livraison']].map(([k,l])=>
-          `<button data-act="tab" data-k="${k}" aria-pressed="${(S.tab||'fiche')===k}">${l}</button>`).join('')}
+          `<button role="tab" data-act="tab" data-k="${k}" aria-selected="${(S.tab||'fiche')===k}">${l}</button>`).join('')}
       </div>
       <div class="tabpane">${sheetTab(p)}</div>
     </div>

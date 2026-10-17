@@ -37,7 +37,7 @@ const BRAND={logo:'assets/marque/benka.png',logoClair:'assets/marque/benka-clair
    vidéo ne se télécharge qu'ensuite, et seulement si les conditions sont
    réunies (voir fondVideo() dans 10-revelations.js). Sans affiche, la
    section resterait noire le temps du chargement. */
-const VIDEOS={};
+const VIDEOS={top:'assets/videos/collection'};
 
 /* Surcharge manuelle, pour une photo isolée qui ne suit pas la convention de
    nommage. Le cas normal passe par assets/produits/ et images.py. */
@@ -70,7 +70,7 @@ function visuel(p,c,lite,i){
      vignette occupe 293 px sur 375, soit 78 % — pas les 42 % que j'avais
      écrits en imaginant deux colonnes. Un « sizes » faux fait choisir au
      navigateur une image trop lourde ou trop floue. */
-  const places=lite?'100px':'(max-width:700px) 50vw, (max-width:980px) 48vw, 400px';
+  const places=lite?'(max-width:860px) 80vw, 300px':'(max-width:860px) 92vw, 480px';
   /* Un <img> seul, jamais un <picture>.
 
      Le <picture> servait à offrir le WebP avec un repli JPEG. Il créait des
