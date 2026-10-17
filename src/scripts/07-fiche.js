@@ -85,10 +85,10 @@ function galerie(p,c){
   // horizontalement : les deux se disputaient le même geste, et le premier
   // qui l'attrapait empêchait l'autre d'exister. Il est posé au-dessus,
   // dans sheetHTML — un geste chacun.
-  if(n<=1) return `<div class="galerie" tabindex="0" role="region" aria-label="Photos du produit, faites glisser pour les parcourir"><div class="sheet-art">${visuel(p,c)}</div></div>`;
+  if(n<=1) return `<div class="galerie" role="group" aria-label="Photos du produit"><div class="sheet-art">${visuel(p,c)}</div></div>`;
   let h='';
   for(let i=0;i<n;i++) h+=`<div class="sheet-art">${visuel(p,c,false,i)}</div>`;
-  return `<div class="galerie" tabindex="0" role="region" aria-label="Photos du produit, faites glisser pour les parcourir">${h}</div>`;
+  return `<div class="galerie" role="group" aria-label="Photos du produit">${h}</div>`;
 }
 
 function sheetHTML(){
@@ -100,7 +100,6 @@ function sheetHTML(){
     <div class="panel-bd">
       ${rotorHTML(p,c)}
       ${galerie(p,c)}
-      <p class="gallery-hint">Faites glisser pour voir les autres photos<span aria-hidden="true">↔</span></p>
       <div class="sheet-top"><h2>${p.name}</h2><span class="sheet-price num">${fmt(priceOf(p))}</span></div>
       <p class="serif">${p.blurb}</p>
       <div class="fld"><div class="fld-lab"><span class="t">Cuir</span><span class="v">${COLORS[c].n}</span></div>

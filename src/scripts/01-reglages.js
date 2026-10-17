@@ -70,7 +70,11 @@ function visuel(p,c,lite,i){
      vignette occupe 293 px sur 375, soit 78 % — pas les 42 % que j'avais
      écrits en imaginant deux colonnes. Un « sizes » faux fait choisir au
      navigateur une image trop lourde ou trop floue. */
-  const places=lite?'(max-width:860px) 80vw, 300px':'(max-width:860px) 92vw, 480px';
+  // La grille et la galerie de fiche passent à deux colonnes sous 700 px :
+    // sans ce palier, le navigateur y chargeait une image prévue pour 92 % de
+    // la largeur, soit quatre fois les pixels nécessaires.
+    const places=lite?'(max-width:860px) 80vw, 300px'
+                     :'(max-width:700px) 46vw, (max-width:860px) 92vw, 480px';
   /* Un <img> seul, jamais un <picture>.
 
      Le <picture> servait à offrir le WebP avec un repli JPEG. Il créait des

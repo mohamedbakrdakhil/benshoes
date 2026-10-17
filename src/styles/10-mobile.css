@@ -1,5 +1,21 @@
 /* Corrections téléphone : conserver le dessin de la boutique et du show-room. */
-.gallery-hint{display:none}
+@media(max-width:700px){
+  /* La collection en deux colonnes.
+     Sur une seule, huit coloris faisaient 3 400 px de défilement : on ne
+     compare pas deux couleurs qu'on ne peut pas voir ensemble, et c'est
+     précisément ce qu'on vient faire ici. Deux colonnes ramènent la grille
+     à 1 700 px et mettent quatre cuirs sous les yeux à la fois.
+     Tout ce qui suit n'est que la conséquence d'une carte deux fois moins
+     large : le nom et le prix ne tiennent plus côte à côte, les marges et
+     les corps se resserrent. */
+  .grid{grid-template-columns:1fr 1fr}
+  .card{padding:11px 11px 13px;gap:9px}
+  .card-name{flex-direction:column;align-items:flex-start;gap:1px}
+  .card-name h3{font-size:.95rem;line-height:1.15}
+  .card-name .p{font-size:.88rem}
+  .card-meta{font-size:.58rem;letter-spacing:.04em;gap:6px}
+  .card-flag{font-size:.52rem;padding:3px 6px;letter-spacing:.08em}
+}
 @media(max-width:860px){
   :root{--mobile-header:62px;--mobile-screen:100svh;--mobile-screen-top:0px}
   html{scroll-padding-top:calc(var(--mobile-header) + 12px)}
@@ -43,11 +59,19 @@
   .panel-hd .eyebrow{font-size:.6rem;letter-spacing:.1em;min-width:0}
   .panel-hd .close{flex-shrink:0}
   .panel-bd{min-height:0;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
-  .panel.plein .galerie{display:flex;overflow-x:auto;gap:10px;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:thin;margin-bottom:0;padding-bottom:8px}
-  .panel.plein .galerie .sheet-art{flex:0 0 100%;width:100%;height:clamp(180px,75vw,360px);min-width:0;scroll-snap-align:start;aspect-ratio:auto}
+  /* Les photos en damier, et non une par une.
+     Le carrousel à défilement horizontal rapprochait bien les pointures,
+     mais il cachait quatre photos sur cinq derrière un geste : on ne sait
+     pas qu'elles existent, donc on ne les cherche pas. Un damier de deux
+     colonnes garde le gain de hauteur — c'était le but — et montre tout
+     d'un coup. Une photo seule garde la largeur entière. */
+  .panel.plein .galerie{display:grid;grid-template-columns:1fr 1fr;gap:8px;
+    margin-bottom:0;overflow:visible}
+  .panel.plein .galerie .sheet-art{width:100%;height:clamp(130px,38vw,190px);
+    min-width:0;aspect-ratio:auto}
+  .panel.plein .galerie .sheet-art:only-child{grid-column:1 / -1;height:clamp(180px,70vw,320px)}
   .panel.plein .galerie .sheet-art .pv{width:100%;height:100%;object-fit:contain}
-  .gallery-hint{display:flex;justify-content:space-between;gap:12px;font-size:.7rem;color:var(--fg-soft);margin:6px 0 20px}
-  .gallery-hint span{font-size:1rem;line-height:1}
+  /* L'invite au glissement a été retirée du HTML : tout est visible. */
   .panel-ft{padding:12px max(16px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));gap:8px}
   .panel-ft .btn{min-height:44px;height:auto;line-height:1.35;padding-block:11px}
   .close,.sizebtn{min-height:44px;min-width:44px}

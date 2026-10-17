@@ -38,14 +38,16 @@ const CAM=[
   // 900 unités une niche fait 137 pixels contre 73 avant, et la rangée des
   // huit en occupe 1194 sur 1440 — rien n'est coupé, et on voit enfin ce
   // qu'on est venu voir.
-  // Deux arrivées, parce que deux cadres. Sur ordinateur on revient sur le
-  // mur ; sur téléphone la fenêtre fait moitié moins large et la même
-  // approche y coupait les deux niches des extrémités — le téléphone garde
-  // donc le plan large, qui lui convenait. (`innerWidth` plutôt que PETIT :
-  // cette constante-ci est déclarée plus bas dans le fichier.)
+  // Deux arrivées, parce que deux cadres — et sur téléphone j'avais d'abord
+  // tranché à l'envers. Le plan large y tenait les huit niches sans en
+  // couper une seule, ce qui semblait le bon choix ; mesuré sur un écran de
+  // 390 px, chaque chaussure y faisait 32 pixels. Huit points illisibles ne
+  // valent pas quatre paires qu'on voit. La caméra s'approche donc, la
+  // rangée déborde du cadre, et ça se lit pour ce que c'est : un mur long.
+  // (`innerWidth` plutôt que PETIT : cette constante est déclarée plus bas.)
   ...(innerWidth<700
-      ? [[.96, 900,-4150, 90,  8],
-         [1,   820,-4280, 90, 11]]
+      ? [[.96,1500,-4265, 90,  6],
+         [1,  1850,-4280, 90,  4]]
       : [[.97,1380,-4240, 90,  4],
          [1,  1700,-4300, 90,  2]])];
 /* Les plans sont groupés par quartier. Un quartier loin de la caméra est
