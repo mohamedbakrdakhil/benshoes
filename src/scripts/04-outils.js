@@ -44,9 +44,9 @@ function nettoyerCommande(o){
 }
 const nettoyerListe=v=>(Array.isArray(v)?v:[]).slice(0,2000).map(nettoyerCommande).filter(Boolean);
 const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
-function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2300);}
+function toast(m){const t=document.createElement('div');t.className='toast';t.setAttribute('role','status');t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2300);}
 function newRef(){const d=new Date();const y=String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0');
-  let r='';for(let i=0;i<4;i++)r+='ACDEFHJKLMNPRTUVWXY34789'[Math.floor(Math.random()*24)];return `BS-${y}-${r}`;}
+  let r='';for(let i=0;i<4;i++)r+='ACDEFHJKLMNPRTUVWXY34789'[Math.floor(Math.random()*'ACDEFHJKLMNPRTUVWXY34789'.length)];return `BS-${y}-${r}`;}
 
 /* La livraison, dite en français. Avec un seuil à zéro, « offerte dès 0 DH »
    n'a aucun sens : on écrit simplement qu'elle est offerte. La formule suit

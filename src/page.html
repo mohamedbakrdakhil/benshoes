@@ -1,12 +1,14 @@
 
 <div id="shopview">
+<a class="skip-link" href="#modeles">Aller à la collection</a>
+<div class="announcement">Livraison offerte au Maroc <span aria-hidden="true">·</span> Paiement à la livraison</div>
 <div class="prog" id="prog" aria-hidden="true"></div>
 
 <header class="hdr">
   <div class="wrap hdr-in">
     <a class="brand" href="#top" style="text-decoration:none">BENKASHOES<i></i><small>Liège &amp; Cuir</small></a>
-    <nav class="nav" id="nav">
-      <a href="#modeles">Modèles</a>
+    <nav class="nav" id="nav" aria-label="Navigation principale">
+      <a href="#modeles">Collection</a>
       <a href="#liege">Le liège</a>
       <a href="#atelier">L’atelier</a>
       <a href="#tailles">Tailles</a>
@@ -24,9 +26,9 @@
       <button class="cartbtn" id="cartbtn">Panier <b id="cartcount">0</b></button>
     </div>
   </div>
-  <nav class="navmob" id="navmob" hidden>
-    <a href="#visite">La visite <span>FÈS → L’ATELIER</span></a>
-    <a href="#modeles">Modèles <span>8</span></a>
+  <nav class="navmob" id="navmob" aria-label="Navigation mobile" hidden>
+    <a href="#experience">La visite <span>FÈS → L’ATELIER</span></a>
+    <a href="#modeles">Collection <span>8 COLORIS</span></a>
     <a href="#liege">La semelle <span>EN COUPE</span></a>
     <a href="#atelier">L’atelier <span>EN IMAGES</span></a>
     <a href="#tailles">Tailles <span>37–41</span></a>
@@ -35,22 +37,129 @@
   </nav>
 </header>
 
-<section class="hero" id="top">
-  <svg class="hero-topo" id="herotopo" viewBox="0 0 1200 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
-  <div class="hero-glow" id="heroglow" aria-hidden="true"></div>
+<section class="hero premium-hero" id="top" aria-labelledby="hero-title">
   <div class="wrap hero-in">
+    <div class="hero-copy">
+      <span class="eyebrow">BENKA · ATELIER MAROCAIN</span>
+      <h1 id="hero-title">Le goût du beau.<br>La liberté<br><em>à chaque pas.</em></h1>
+      <p>Du daim, du liège et le geste de l’artisan. Découvrez Opus, la mule qui fait du quotidien une belle occasion.</p>
+      <div class="hero-cta"><a class="btn btn-pri" href="#modeles">Découvrir la collection <span aria-hidden="true">↗</span></a><a class="hero-story" href="#atelier">Rencontrer l’atelier <span aria-hidden="true">→</span></a></div>
+      <div class="hero-note"><span class="hero-note-dot" aria-hidden="true"></span>Façonné à la main au Maroc · Du 37 au 41</div>
+    </div>
+    <figure class="hero-visual">
+      <img src="assets/produits/opus-beige-1-960.webp" srcset="assets/produits/opus-beige-1-480.webp 480w, assets/produits/opus-beige-1-640.webp 640w, assets/produits/opus-beige-1-960.webp 960w" sizes="(max-width:700px) 100vw, 52vw" width="960" height="1273" alt="La paire Opus en daim beige, bride penny et première en liège Benka" fetchpriority="high" decoding="async">
+      <span class="hero-edition">L’ESSENTIEL BENKA / 01</span>
+      <figcaption><div><span>LA SIGNATURE</span><strong>Opus en daim beige</strong></div><a href="#modeles" data-act="open" data-id="opus" data-c="beige" aria-label="Découvrir Opus en daim beige"><span id="hero-price">259 DH</span> <span aria-hidden="true">↗</span></a></figcaption>
+    </figure>
+  </div>
+</section>
+<div class="ticker"><div class="marquee"><div class="mq-track"><div class="mq-group"><span>Première en liège estampée benka</span><span>Livraison 48 h partout au Maroc</span><span>Essai 30 jours, retour offert</span><span>Monté à la main sur forme</span><span>Daim de veau tanné à Fès</span></div><div class="mq-group" aria-hidden="true"><span>Première en liège estampée benka</span><span>Livraison 48 h partout au Maroc</span><span>Essai 30 jours, retour offert</span><span>Monté à la main sur forme</span><span>Daim de veau tanné à Fès</span></div></div></div></div>
+
+<section class="stats" id="stats"><div class="wrap"><div class="stats-in">
+  <div class="stat"><div class="n" data-count="8">8</div><div class="l">Cuirs au catalogue</div></div>
+  <div class="stat"><div class="n" data-count="0" data-suffix=" DH">0 DH</div><div class="l">De frais de livraison</div></div>
+  <div class="stat"><div class="n" data-count="5">5</div><div class="l">Pointures, du 37 au 41</div></div>
+  <div class="stat"><div class="n" data-count="30" data-suffix=" j">30 j</div><div class="l">D’essai à la maison</div></div>
+</div></div></section>
+
+<main>
+<section class="sec wrap" id="modeles">
+  <div class="sec-head rv">
     <div>
-      <span class="eyebrow on-band">Atelier Benkashoes · Depuis 2019</span>
-      <h1><span class="ln"><i>La semelle qui</i></span><span class="ln"><i>prend l'<em>empreinte</em></i></span><span class="ln"><i>de votre pas.</i></span></h1>
-      <p>Une première en liège estampée benka, qui se tasse sous l’appui et garde la forme de votre pied. Daim de veau monté à la main sur forme, dans notre atelier.</p>
-      <div class="hero-cta">
-        <a class="btn btn-hero" href="#modeles">Voir la collection</a>
-        <a class="btn btn-ghost" href="#liege">Comment c'est fait</a>
-      </div>
+      <span class="eyebrow">La collection</span>
+      <h2 style="margin-top:12px">Une signature.<br><em>Huit nuances.</em></h2>
+    </div>
+    <p class="serif">Du beige lumineux au noir intemporel, trouvez le daim qui vous ressemble. Une même coupe, un confort qui se fait à votre pied.</p>
+  </div>
+  <div class="collection-toolbar"><div class="filters" id="filters" aria-label="Filtrer la collection"></div><span id="collection-count" class="collection-count" role="status"></span></div>
+  <div class="grid" id="grid"></div>
+  <!-- La grille est peinte par le script. Sans script — un visiteur qui l'a
+       coupé, un robot qui n'en exécute pas — la collection restait vide :
+       c'est tout le commerce de la page qui disparaissait. Le repli est
+       fabriqué au build depuis le même catalogue. -->
+@@CATALOGUE@@
+</section>
+
+<section class="sec wrap" id="liege">
+  <div class="sec-head rv">
+    <div>
+      <span class="eyebrow">Anatomie</span>
+      <h2 style="margin-top:12px">Quatre pièces,<br>du dessus au sol.</h2>
+    </div>
+    <p class="serif">Une coupe d’une mule Benkashoes. Quatre pièces seulement, assemblées sur forme : c’est ce qui la rend aussi souple dès le premier jour.</p>
+  </div>
+  <div class="anat rv"><div class="anat-in">
+    <div class="anat-fig" id="anatfig"></div>
+    <div class="anat-list">
+      <div class="anat-item"><span class="n">01</span><div><h4>Tige en daim de veau</h4><p>Coupée et parée à la main, 1,6 mm. C’est elle qui donne la souplesse : le daim cède là où le pied pousse, sans jamais se déformer.</p></div></div>
+      <div class="anat-item"><span class="n">02</span><div><h4>Doublure cuir</h4><p>Peau de chèvre pleine fleur sur tout le pourtour de l’ouverture. Elle absorbe l’humidité et empêche la tige de marquer le cou-de-pied.</p></div></div>
+      <div class="anat-item"><span class="n">03</span><div><h4>Première en liège</h4><p>Estampée benka. Elle se tasse sous l’appui au fil des ports et finit par garder l’empreinte du pied — c’est tout le sens du logo.</p></div></div>
+      <div class="anat-item"><span class="n">04</span><div><h4>Semelle en gomme</h4><p>Cousue, pas collée. Souple sous le pied, elle accroche sur le carrelage comme sur le pavé, et se remplace en atelier quand elle s’use.</p></div></div>
+    </div>
+  </div></div>
+</section>
+
+<section class="atelier editorial-atelier" id="atelier">
+  <div class="at-stage">
+    <div class="at-track" id="attrack"><div class="at-intro">
+      <span class="eyebrow on-band">L’atelier</span>
+      <h2>De la tige<br>à la paire.</h2>
+      <p>Photographié chez nous, à Casablanca. De la pile de tiges à la paire finie.</p>
+    </div><figure class="at-ph"><div class="at-img"><img src="assets/atelier/02.jpg" srcset="assets/atelier/02-800.jpg 800w, assets/atelier/02.jpg 1600w" sizes="(max-width:700px) 78vw, 400px" alt="La coupe — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>01 — La coupe</b><span>Les tiges en daim, coupées et parées, attendent le montage. Chaque pile est un modèle et une pointure.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/atelier/01.jpg" srcset="assets/atelier/01-800.jpg 800w, assets/atelier/01.jpg 1600w" sizes="(max-width:700px) 78vw, 400px" alt="La bride — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>02 — La bride</b><span>La bride penny et sa découpe en accolade. Le détail signature de l’Opus.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/atelier/03.jpg" srcset="assets/atelier/03-800.jpg 800w, assets/atelier/03.jpg 1600w" sizes="(max-width:700px) 78vw, 400px" alt="L’établi — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>03 — L’établi</b><span>Marteau et pince à monter. Le daim est tiré sur la forme, puis cloué point par point.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/atelier/04.jpg" srcset="assets/atelier/04-800.jpg 800w, assets/atelier/04.jpg 1600w" sizes="(max-width:700px) 78vw, 400px" alt="Le montage — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>04 — Le montage</b><span>La machine referme l’avant sur la forme. Ici, trois paires en pointure 40.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/atelier/05.jpg" srcset="assets/atelier/05-800.jpg 800w, assets/atelier/05.jpg 1600w" sizes="(max-width:700px) 78vw, 400px" alt="Les formes — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>05 — Les formes</b><span>Le casier. Du 37 au 41, chaque pointure a sa forme en bois, numérotée.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/atelier/06.jpg" srcset="assets/atelier/06-800.jpg 800w, assets/atelier/06.jpg 1600w" sizes="(max-width:700px) 78vw, 400px" alt="L’estampe — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>06 — L’estampe</b><span>La première reçoit le logo. À partir de là, la paire porte un nom.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/atelier/rangee-mules-noires.jpg" srcset="assets/atelier/rangee-mules-noires-800.jpg 800w, assets/atelier/rangee-mules-noires.jpg 1189w" sizes="(max-width:700px) 78vw, 400px" alt="Les mules noires alignées avant la mise en boîte — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>07 — Le départ</b><span>Les mules noires alignées, premières en liège visibles, avant la mise en boîte.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/produits/opus-marine-1-640.jpg" srcset="assets/produits/opus-marine-1-480.jpg 480w, assets/produits/opus-marine-1-640.jpg 640w, assets/produits/opus-marine-1-960.jpg 960w" sizes="(max-width:700px) 78vw, 400px" alt="L’Opus fini en daim marine, bride penny et tranche de liège" loading="lazy" decoding="async"></div><figcaption><b>08 — Le marine</b><span>L’Opus fini, en daim marine. La bride penny, ses deux points d’arrêt, et la tranche de liège sous la semelle.</span></figcaption></figure></div>
+    <div class="at-bar" aria-hidden="true"><i id="atbar"></i></div>
+  </div>
+</section>
+
+<section class="sec wrap" id="tailles">
+  <div class="sec-head rv">
+    <div>
+      <span class="eyebrow">Guide des pointures</span>
+      <h2 style="margin-top:12px">Mesurez, ne devinez pas.</h2>
+    </div>
+    <p class="serif">Posez le talon contre un mur, marquez le bout du gros orteil, mesurez en millimètres. Une mule doit tenir sans serrer : entre deux pointures, prenez la plus petite — le daim se détend d’un demi-point au port.</p>
+  </div>
+  <div class="scroll-x rv"><table class="sizetable">
+    <thead><tr><th>Pointure EU</th><th>Pied (mm)</th><th>Longueur première</th><th>Largeur normale</th><th>Largeur large</th></tr></thead>
+    <tbody id="sizebody"></tbody>
+  </table></div>
+  <div class="pledges">
+    <div class="pledge">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.6"><path d="M3 7h13v10H3zM16 10h3.5l1.5 3v4H16z"/><circle cx="7" cy="18" r="1.8"/><circle cx="18" cy="18" r="1.8"/></svg>
+      <h4>Livraison 48 h</h4><p>Expédition le jour même pour toute commande passée avant 14 h. Suivi envoyé par e-mail. Offerte partout au Maroc, sans minimum.</p>
+    </div>
+    <div class="pledge">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.6"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v4.5h4.5"/></svg>
+      <h4>Essai 30 jours</h4><p>Portez-les chez vous un mois. Si la pointure ou le cuir ne vous vont pas, le retour est gratuit et remboursé sous 5 jours.</p>
+    </div>
+    <div class="pledge">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.6"><path d="M12 3l7 3v6c0 4.2-2.9 7.4-7 9-4.1-1.6-7-4.8-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
+      <h4>Ressemelage</h4><p>La semelle en gomme se remplace en atelier pour 80 DH, autant de fois qu’il le faut. La première en liège, elle, garde votre empreinte.</p>
     </div>
   </div>
 </section>
-<section class="visite" id="visite">
+
+<section class="sec wrap" id="commander">
+  <div class="sec-head rv">
+    <div><span class="eyebrow">Passer commande</span><h2 style="margin-top:12px">Quatre étapes,<br>pas une de plus.</h2></div>
+    <p class="serif">Choisissez votre paire, renseignez votre adresse et laissez l’atelier s’occuper de la suite. Vous réglez à la livraison, après confirmation de votre commande.</p>
+  </div>
+  <div class="steps-grid">
+    <div class="step"><div class="no">01</div><h4>Choisissez la forme</h4><p>Mesurez votre pied contre un mur avant de choisir la pointure. Entre deux tailles, prenez la plus petite : le daim se détend d’un demi-point au port.</p></div>
+    <div class="step"><div class="no">02</div><h4>Validez le panier</h4><p>Votre commande arrive directement à l’atelier avec une référence. Rien à envoyer : gardez simplement la référence sous la main.</p></div>
+    <div class="step"><div class="no">03</div><h4>L’atelier confirme</h4><p>On vérifie la disponibilité dans la pointure et le coloris demandés, puis on vous rappelle sous 24 heures ouvrées pour valider l’adresse.</p></div>
+    <div class="step"><div class="no">04</div><h4>Livraison et essai</h4><p>Expédition sous 48 h partout au Maroc, paiement à la livraison. Vous avez trente jours pour changer d’avis, retour à notre charge.</p></div>
+  </div>
+</section>
+
+<section class="sec wrap" id="faq">
+  <div class="sec-head rv">
+    <div><span class="eyebrow">Questions fréquentes</span><h2 style="margin-top:12px">Ce qu’on nous<br>demande le plus.</h2></div>
+    <p class="serif">Une question qui n’est pas là ? Écrivez à l’atelier, on répond dans la journée.</p>
+  </div>
+  <div class="faq rv" id="faqlist"></div>
+</section>
+<section class="care-section sec wrap" id="entretien"><div><span class="eyebrow">FAIRE DURER LE BEAU</span><h2>Un peu d’attention.<br><em>Beaucoup d’allure.</em></h2></div><div class="care-tips"><article><span>01 / BROSSER</span><h3>Le daim aime la douceur.</h3><p>Une brosse en crêpe, à sec, suffit pour raviver la matière. Une gomme à daim aide à retirer les petites traces.</p></article><article><span>02 / PROTÉGER</span><h3>Prêt pour le quotidien.</h3><p>Utilisez un imperméabilisant adapté au daim. Laissez sécher à l’air libre, à l’écart du soleil et des sources de chaleur.</p></article></div></section>
+<section class="experience wrap" id="experience"><details id="visit-details"><summary><span><span class="eyebrow">UNE PARENTHÈSE À FÈS</span><strong>Entrez dans l’univers Benka.</strong></span><span class="experience-link">Explorer la visite <span aria-hidden="true">↗</span></span></summary><section class="visite" id="visite">
   <div class="visite-stage">
     <div class="world" id="world" aria-hidden="true"></div>
     <div class="visite-ui">
@@ -88,111 +197,7 @@
     <div class="vprog" aria-hidden="true"><i id="vprogbar"></i></div>
   </div>
 </section>
-<div class="ticker"><div class="marquee"><div class="mq-track"><div class="mq-group"><span>Première en liège estampée benka</span><span>Livraison 48 h partout au Maroc</span><span>Essai 30 jours, retour offert</span><span>Monté à la main sur forme</span><span>Daim de veau tanné à Fès</span></div><div class="mq-group" aria-hidden="true"><span>Première en liège estampée benka</span><span>Livraison 48 h partout au Maroc</span><span>Essai 30 jours, retour offert</span><span>Monté à la main sur forme</span><span>Daim de veau tanné à Fès</span></div></div></div></div>
-
-<section class="stats" id="stats"><div class="wrap"><div class="stats-in">
-  <div class="stat"><div class="n" data-count="8">8</div><div class="l">Cuirs au catalogue</div></div>
-  <div class="stat"><div class="n" data-count="0" data-suffix=" DH">0 DH</div><div class="l">De frais de livraison</div></div>
-  <div class="stat"><div class="n" data-count="5">5</div><div class="l">Pointures, du 37 au 41</div></div>
-  <div class="stat"><div class="n" data-count="30" data-suffix=" j">30 j</div><div class="l">D’essai à la maison</div></div>
-</div></div></section>
-
-<main>
-<section class="sec wrap" id="modeles">
-  <div class="sec-head rv">
-    <div>
-      <span class="eyebrow">La collection</span>
-      <h2 style="margin-top:12px">Un modèle,<br>huit cuirs.</h2>
-    </div>
-    <p class="serif">La mule Opus, montée à la main sur forme, dans huit daims de veau. Même coupe, même première en liège estampée : seule la couleur change, et c’est elle qui décide du reste.</p>
-  </div>
-  <div class="filters" id="filters"></div>
-  <div class="grid" id="grid"></div>
-  <!-- La grille est peinte par le script. Sans script — un visiteur qui l'a
-       coupé, un robot qui n'en exécute pas — la collection restait vide :
-       c'est tout le commerce de la page qui disparaissait. Le repli est
-       fabriqué au build depuis le même catalogue. -->
-@@CATALOGUE@@
-</section>
-
-<section class="sec wrap" id="liege">
-  <div class="sec-head rv">
-    <div>
-      <span class="eyebrow">Anatomie</span>
-      <h2 style="margin-top:12px">Quatre pièces,<br>du dessus au sol.</h2>
-    </div>
-    <p class="serif">Une coupe d’une mule Benkashoes. Quatre pièces seulement, assemblées sur forme : c’est ce qui la rend aussi souple dès le premier jour.</p>
-  </div>
-  <div class="anat rv"><div class="anat-in">
-    <div class="anat-fig" id="anatfig"></div>
-    <div class="anat-list">
-      <div class="anat-item"><span class="n">01</span><div><h4>Tige en daim de veau</h4><p>Coupée et parée à la main, 1,6 mm. C’est elle qui donne la souplesse : le daim cède là où le pied pousse, sans jamais se déformer.</p></div></div>
-      <div class="anat-item"><span class="n">02</span><div><h4>Doublure cuir</h4><p>Peau de chèvre pleine fleur sur tout le pourtour de l’ouverture. Elle absorbe l’humidité et empêche la tige de marquer le cou-de-pied.</p></div></div>
-      <div class="anat-item"><span class="n">03</span><div><h4>Première en liège</h4><p>Estampée benka. Elle se tasse sous l’appui au fil des ports et finit par garder l’empreinte du pied — c’est tout le sens du logo.</p></div></div>
-      <div class="anat-item"><span class="n">04</span><div><h4>Semelle en gomme</h4><p>Cousue, pas collée. Souple sous le pied, elle accroche sur le carrelage comme sur le pavé, et se remplace en atelier quand elle s’use.</p></div></div>
-    </div>
-  </div></div>
-</section>
-
-<section class="atelier" id="atelier">
-  <div class="at-stage">
-    <div class="at-track" id="attrack"><div class="at-intro">
-      <span class="eyebrow on-band">L’atelier</span>
-      <h2>De la tige<br>à la paire.</h2>
-      <p>Photographié chez nous, à Casablanca. De la pile de tiges à la paire finie.</p>
-    </div><figure class="at-ph"><div class="at-img"><img src="assets/atelier/02.jpg" srcset="assets/atelier/02-800.jpg 800w, assets/atelier/02.jpg 1600w" sizes="(max-width:700px) 78vw, 400px" alt="La coupe — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>01 — La coupe</b><span>Les tiges en daim, coupées et parées, attendent le montage. Chaque pile est un modèle et une pointure.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/atelier/01.jpg" srcset="assets/atelier/01-800.jpg 800w, assets/atelier/01.jpg 1600w" sizes="(max-width:700px) 78vw, 400px" alt="La bride — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>02 — La bride</b><span>La bride penny et sa découpe en accolade. C’est le détail qui distingue l’Opus des deux autres.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/atelier/03.jpg" srcset="assets/atelier/03-800.jpg 800w, assets/atelier/03.jpg 1600w" sizes="(max-width:700px) 78vw, 400px" alt="L’établi — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>03 — L’établi</b><span>Marteau et pince à monter. Le daim est tiré sur la forme, puis cloué point par point.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/atelier/04.jpg" srcset="assets/atelier/04-800.jpg 800w, assets/atelier/04.jpg 1600w" sizes="(max-width:700px) 78vw, 400px" alt="Le montage — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>04 — Le montage</b><span>La machine referme l’avant sur la forme. Ici, trois paires en pointure 40.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/atelier/05.jpg" srcset="assets/atelier/05-800.jpg 800w, assets/atelier/05.jpg 1600w" sizes="(max-width:700px) 78vw, 400px" alt="Les formes — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>05 — Les formes</b><span>Le casier. Du 37 au 41, chaque pointure a sa forme en bois, numérotée.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/atelier/06.jpg" srcset="assets/atelier/06-800.jpg 800w, assets/atelier/06.jpg 1600w" sizes="(max-width:700px) 78vw, 400px" alt="L’estampe — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>06 — L’estampe</b><span>La première reçoit le logo. À partir de là, la paire porte un nom.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/atelier/rangee-mules-noires.jpg" srcset="assets/atelier/rangee-mules-noires-800.jpg 800w, assets/atelier/rangee-mules-noires.jpg 1189w" sizes="(max-width:700px) 78vw, 400px" alt="Les mules noires alignées avant la mise en boîte — atelier Benkashoes" loading="lazy" decoding="async"></div><figcaption><b>07 — Le départ</b><span>Les mules noires alignées, premières en liège visibles, avant la mise en boîte.</span></figcaption></figure><figure class="at-ph"><div class="at-img"><img src="assets/produits/opus-marine-1-640.jpg" srcset="assets/produits/opus-marine-1-480.jpg 480w, assets/produits/opus-marine-1-640.jpg 640w, assets/produits/opus-marine-1-960.jpg 960w" sizes="(max-width:700px) 78vw, 400px" alt="L’Opus fini en daim marine, bride penny et tranche de liège" loading="lazy" decoding="async"></div><figcaption><b>08 — Le marine</b><span>L’Opus fini, en daim marine. La bride penny, ses deux points d’arrêt, et la tranche de liège sous la semelle.</span></figcaption></figure></div>
-    <div class="at-bar" aria-hidden="true"><i id="atbar"></i></div>
-  </div>
-</section>
-
-<section class="sec wrap" id="tailles">
-  <div class="sec-head rv">
-    <div>
-      <span class="eyebrow">Guide des pointures</span>
-      <h2 style="margin-top:12px">Mesurez, ne devinez pas.</h2>
-    </div>
-    <p class="serif">Posez le talon contre un mur, marquez le bout du gros orteil, mesurez en millimètres. Une mule doit tenir sans serrer : entre deux pointures, prenez la plus petite — le daim se détend d’un demi-point au port.</p>
-  </div>
-  <div class="scroll-x rv"><table class="sizetable">
-    <thead><tr><th>Pointure EU</th><th>Pied (mm)</th><th>Longueur première</th><th>Largeur normale</th><th>Largeur large</th></tr></thead>
-    <tbody id="sizebody"></tbody>
-  </table></div>
-  <div class="pledges">
-    <div class="pledge">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.6"><path d="M3 7h13v10H3zM16 10h3.5l1.5 3v4H16z"/><circle cx="7" cy="18" r="1.8"/><circle cx="18" cy="18" r="1.8"/></svg>
-      <h4>Livraison 48 h</h4><p>Expédition le jour même pour toute commande passée avant 14 h. Suivi envoyé par e-mail. Offerte partout au Maroc, sans minimum.</p>
-    </div>
-    <div class="pledge">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.6"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v4.5h4.5"/></svg>
-      <h4>Essai 30 jours</h4><p>Portez-les chez vous un mois. Si la pointure ou le cuir ne vous vont pas, le retour est gratuit et remboursé sous 5 jours.</p>
-    </div>
-    <div class="pledge">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.6"><path d="M12 3l7 3v6c0 4.2-2.9 7.4-7 9-4.1-1.6-7-4.8-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
-      <h4>Ressemelage</h4><p>La semelle en gomme se remplace en atelier pour 80 DH, autant de fois qu’il le faut. La première en liège, elle, garde votre empreinte.</p>
-    </div>
-  </div>
-</section>
-
-<section class="sec wrap" id="commander">
-  <div class="sec-head rv">
-    <div><span class="eyebrow">Passer commande</span><h2 style="margin-top:12px">Quatre étapes,<br>pas une de plus.</h2></div>
-    <p class="serif">Le paiement en ligne n’est pas branché : l’atelier confirme chaque commande à la main avant de l’expédier. C’est plus lent qu’un bouton, et ça évite les ruptures de stock.</p>
-  </div>
-  <div class="steps-grid">
-    <div class="step"><div class="no">01</div><h4>Choisissez la forme</h4><p>Mesurez votre pied contre un mur avant de choisir la pointure. Entre deux tailles, prenez la plus petite : le daim se détend d’un demi-point au port.</p></div>
-    <div class="step"><div class="no">02</div><h4>Validez le panier</h4><p>Votre commande arrive directement à l’atelier avec une référence. Rien à envoyer : gardez simplement la référence sous la main.</p></div>
-    <div class="step"><div class="no">03</div><h4>L’atelier confirme</h4><p>On vérifie la disponibilité dans la pointure et le coloris demandés, puis on vous rappelle sous 24 heures ouvrées pour valider l’adresse.</p></div>
-    <div class="step"><div class="no">04</div><h4>Livraison et essai</h4><p>Expédition sous 48 h partout au Maroc, paiement à la livraison. Vous avez trente jours pour changer d’avis, retour à notre charge.</p></div>
-  </div>
-</section>
-
-<section class="sec wrap" id="faq">
-  <div class="sec-head rv">
-    <div><span class="eyebrow">Questions fréquentes</span><h2 style="margin-top:12px">Ce qu’on nous<br>demande le plus.</h2></div>
-    <p class="serif">Une question qui n’est pas là ? Écrivez à l’atelier, on répond dans la journée.</p>
-  </div>
-  <div class="faq rv" id="faqlist"></div>
-</section>
+</details></section>
 </main>
 
 <footer class="ftr" id="maison">
@@ -205,7 +210,7 @@
       <div><h5>Collection</h5><ul id="ftrmodels"></ul></div>
       <div><h5>Aide</h5><ul>
         <li><a href="#tailles">Guide des pointures</a></li>
-        <li><a href="#liege">Entretien du daim</a></li>
+        <li><a href="#entretien">Entretien du daim</a></li>
         <li><a href="#tailles">Livraison &amp; retours</a></li>
         <li><a href="#admin" id="admlink">Espace commandes</a></li>
       </ul></div>
