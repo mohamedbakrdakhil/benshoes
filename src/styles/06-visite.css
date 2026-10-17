@@ -322,7 +322,16 @@
      au point le plus défavorable, sans un octet de mémoire en plus. */
   .visite-stage{perspective:650px}
   .pane-sign b{font-size:38px}.pane-sign i{font-size:11px;letter-spacing:.3em;margin-top:10px}
-  .niche b{font-size:11px}.niche span{font-size:9px}
+  /* Les étiquettes mangeaient la niche. Posées à 13 et 11 px dans une boîte
+     de 95 px de large, elles occupaient un tiers de la hauteur utile et la
+     chaussure se faisait écraser par le jeu du flex. Ramenées à 10 et 8, le
+     tirage respire. */
+  .niche{padding:9px 6px 7px}
+  .niche b{font-size:10px;margin-top:5px}
+  .niche span{font-size:8px}
+  /* La hauteur reste pilotée par la hauteur, pas par la largeur : passer à
+     width:100% faisait tomber le tirage de 79 à 55 px, l'inverse du but. */
+  .niche .pv{height:76%;width:auto;max-width:100%;min-height:0}
 }
 html.degrade .visite,html.degrade .atelier{height:auto!important}
 html.degrade .visite-stage,html.degrade .at-stage{position:static;height:auto;min-height:0;padding-block:52px}
@@ -374,6 +383,14 @@ html.degrade [data-rv]{opacity:1!important;transform:none!important}
   filter:sepia(.16) saturate(.96) brightness(.93) contrast(1.02)
          drop-shadow(0 calc(5px/var(--f)) calc(9px/var(--f)) rgba(0,0,0,.6))}
 .pv-decoupe{object-fit:contain}
+/* Pas de filtre sur téléphone — et cette règle vient APRÈS la précédente,
+   sinon elle ne s'applique pas : à spécificité égale, c'est la dernière qui
+   gagne, et ma première tentative était déclarée plus haut dans le fichier.
+   À 30 px de large, ni la teinte sépia ni l'ombre portée ne se voient ; en
+   revanche un filtre sur une image minuscule dans un sous-arbre en
+   transformation 3D est une façon connue de faire disparaître le rendu sur
+   Safari iOS. Ce qui ne se voit pas et peut coûter l'affichage s'en va. */
+@media(max-width:700px){.niche .pv{filter:none}}
 
 /* Alcôve éclairée du couloir : le creux et la lumière d'une vitrine, sans
    produit. Vue de profil, une photo n'y occuperait qu'une dizaine de pixels. */

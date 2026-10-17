@@ -183,7 +183,17 @@ function photoNiche(col,nom){
   return `<img class="pv pv-decoupe" src="${b}-380.png"`
     +` srcset="${b}-190.png 190w, ${b}-380.png 380w"`
     +` sizes="(max-width:700px) 95px, 230px" width="380" height="258"`
-    +` alt="${att(nom+' — '+((COLORS[col]||{}).n||col))}" loading="lazy" decoding="async">`;
+    +` alt="${att(nom+' — '+((COLORS[col]||{}).n||col))}"`
+    // Chargement immédiat sur téléphone, et c'est la correction du défaut
+    // le plus tenace de cette scène : les niches vivent dans des zones mises
+    // en display:none tant que la caméra n'en approche pas, et une image
+    // différée à l'intérieur d'un élément masqué ne commence à se charger
+    // qu'au moment où il réapparaît. Safari iOS, prudent sur l'intersection
+    // dans un sous-arbre en transformation 3D, ne les demandait jamais : le
+    // fond de niche, la LED et les étiquettes s'affichaient — ce sont du CSS
+    // et du texte — et la chaussure manquait. Les huit font 51 Ko en 190 px,
+    // c'est le prix de la seule chose qu'on vient voir.
+    +` loading="${PETIT?'eager':'lazy'}" decoding="async">`;
 }
 function niche(p,left,w,ht,top,plate,col){
   if(K!==1){left*=K;w*=K;ht*=K;top*=K;}
