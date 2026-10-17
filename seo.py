@@ -169,7 +169,7 @@ def graphe(produits, faq, tailles, liv, email, tel, reseaux, desc):
             'brand': {'@type': 'Brand', 'name': 'Benkashoes'},
             'manufacturer': {'@id': ORG},
             'category': 'Chaussures > Mocassins-mules',
-            'material': 'Daim de veau, première en gomme, doublure cuir',
+            'material': 'Daim de veau, première en mousse, semelle EVA',
             'color': p['coloris'], 'size': tailles,
             'image': URL + 'assets/marque/partage-1200x630.jpg',
             'offers': offre,

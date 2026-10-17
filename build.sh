@@ -21,7 +21,7 @@ set -e
 cd "$(dirname "$0")"
 URL="${SITE_URL:-https://www.benkashoes.ma/}"
 TITRE="Benkashoes — mocassins-mules en daim, atelier marocain"
-DESC="Benkashoes — la mule Opus en daim de veau, première en gomme estampée, doublure cuir pleine fleur. Huit coloris, pointures 37 à 41, 279 DH. Livraison offerte partout au Maroc."
+DESC="Benkashoes — la mule Opus en daim de veau, première en mousse estampée, doublure cuir pleine fleur. Huit coloris, pointures 37 à 41, 279 DH. Livraison offerte partout au Maroc."
 PARTAGE="assets/marque/partage-1200x630.jpg"
 # L'icône d'onglet : l'empreinte de la marque, relevée sur le fichier de logo
 # par logo.py, encodée en adresse de données. Le dessin au jugé qu'elle
