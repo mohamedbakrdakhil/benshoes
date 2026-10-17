@@ -7,42 +7,88 @@
    photos derrière un geste que beaucoup ne font pas. Ici tout est visible en
    faisant défiler, ce que tout le monde sait faire. Les images suivantes sont
    différées : seule la première coûte quelque chose à l'ouverture. */
-/* La paire qui tourne, en tête de la galerie.
-   ------------------------------------------
-   Une cliente qui hésite veut voir la chaussure sous un autre angle — c'est
-   la question que le commerce en ligne laisse sans réponse, et c'est elle
-   qui fait renoncer. Quatre secondes de rotation y répondent avant même
-   qu'elle soit posée.
+/* Le tourne-disque : la paire que la cliente fait tourner elle-même.
+   ------------------------------------------------------------------
+   « Elle ressemble à quoi de l'autre côté ? » est la question que le
+   commerce en ligne laisse sans réponse, et c'est elle qui fait renoncer.
+   Une vidéo y répond à moitié : elle montre ce qu'on a décidé de montrer.
+   Ici la cliente tient la chaussure — elle la tourne au doigt, s'arrête sur
+   l'angle qui l'intéresse, revient.
 
-   L'affiche est la première image du plan : elle s'affiche tout de suite,
-   et c'est tout ce qui part sur le réseau si le système demande moins
-   d'animations ou si la connexion est comptée. La vidéo ne se télécharge
-   qu'ensuite, et seulement pour le coloris ouvert — 50 Ko. */
-function tourHTML(c){
-  const b='assets/produits/tour-'+c;
-  return `<div class="sheet-art tour">
-    <video class="pv" width="600" height="492" poster="${att(b)}.jpg"
-      muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"
-      data-tour="${att(b)}.mp4"></video></div>`;
+   Vingt-quatre vues sur une seule planche, et non vingt-quatre fichiers :
+   une image, une requête, et le changement de vue ne coûte qu'un décalage
+   de fond — aucun chargement, donc aucun à-coup sous le doigt. C'est aussi
+   pourquoi ce n'est pas une vidéo : chercher une image précise dans un flux
+   compressé saute, et une vidéo ne se laisse pas tenir.
+
+   Elle tourne doucement toute seule tant qu'on n'y a pas touché — sinon
+   rien ne dit qu'elle est vivante. Au premier contact, elle se tait et
+   obéit. */
+const ROT_N=24, ROT_COLS=6, ROT_RANGS=4;
+let rotorAuto=null;
+
+function rotorHTML(p,c){
+  const n=(COLORS[c]||{}).n||c;
+  return `<div class="sheet-art rotor" tabindex="0" role="img"
+    aria-label="${att(p.name+' en daim '+n+', à faire tourner')}"
+    data-src="assets/produits/rotor-${att(c)}.jpg">
+    <div class="rotor-vue"></div>
+    <span class="rotor-aide" aria-hidden="true">Glissez pour tourner</span></div>`;
 }
-/* Appelée après que la fiche est posée dans le document. Les garde-fous sont
-   les mêmes que pour la boucle du héros : rien ne se télécharge si le système
-   réduit les animations ou si le forfait est compté. */
-function lancerTour(){
-  const v=document.querySelector('video[data-tour]');
-  if(!v||v.src) return;
+
+/* Appelée à CHAQUE rendu, panneau ouvert ou non : c'est elle qui éteint la
+   rotation précédente. Sans ce passage inconditionnel, fermer la fiche
+   laissait un intervalle tourner sur un élément retiré du document. */
+function majRotor(){
+  if(rotorAuto){clearInterval(rotorAuto);rotorAuto=null;}
+  const r=document.querySelector('.rotor');
+  if(!r) return;
+  // Connexion comptée : on retire le tourne-disque. Les photos de la galerie
+  // restent, et elles suffisent à acheter.
   const co=navigator.connection||{};
-  if(co.saveData===true||/^(slow-)?2g$/.test(co.effectiveType||'')||!MOTION) return;
-  v.src=v.dataset.tour;
-  v.play().catch(()=>{});
+  if(co.saveData===true||/^(slow-)?2g$/.test(co.effectiveType||'')){r.remove();return;}
+
+  const vue=r.querySelector('.rotor-vue');
+  const img=new Image();
+  img.onerror=()=>r.remove();
+  img.onload=()=>{
+    vue.style.backgroundImage=`url("${r.dataset.src}")`;
+    r.classList.add('prete');
+    let i=0, tenu=false, x0=0, i0=0;
+    const pose=k=>{
+      i=((k%ROT_N)+ROT_N)%ROT_N;
+      vue.style.backgroundPosition=
+        `${(i%ROT_COLS)/(ROT_COLS-1)*100}% ${Math.floor(i/ROT_COLS)/(ROT_RANGS-1)*100}%`;
+    };
+    pose(0);
+    const taire=()=>{if(rotorAuto){clearInterval(rotorAuto);rotorAuto=null;}
+                     r.classList.add('touche');};
+    if(MOTION) rotorAuto=setInterval(()=>{if(!tenu)pose(i+1);},110);
+
+    r.addEventListener('pointerdown',e=>{
+      tenu=true; taire(); x0=e.clientX; i0=i;
+      r.setPointerCapture(e.pointerId); r.classList.add('prise');});
+    r.addEventListener('pointermove',e=>{
+      // Quatorze pixels par vue : assez pour viser un angle précis, assez
+      // peu pour faire un tour complet d'un seul geste sur un téléphone.
+      if(tenu) pose(i0+Math.round((e.clientX-x0)/14));});
+    const lacher=()=>{tenu=false; r.classList.remove('prise');};
+    r.addEventListener('pointerup',lacher);
+    r.addEventListener('pointercancel',lacher);
+    // Au clavier aussi : une flèche, une vue.
+    r.addEventListener('keydown',e=>{
+      if(e.key==='ArrowRight'||e.key==='ArrowLeft'){
+        taire(); pose(i+(e.key==='ArrowRight'?1:-1)); e.preventDefault();}});
+  };
+  img.src=r.dataset.src;
 }
 function galerie(p,c){
   const n=nbPhotos(p.id,c);
-  const tour=tourHTML(c);
-  if(n<=1) return `<div class="galerie">${tour}<div class="sheet-art">${visuel(p,c)}</div></div>`;
+  const rot=rotorHTML(p,c);
+  if(n<=1) return `<div class="galerie">${rot}<div class="sheet-art">${visuel(p,c)}</div></div>`;
   let h='';
   for(let i=0;i<n;i++) h+=`<div class="sheet-art">${visuel(p,c,false,i)}</div>`;
-  return `<div class="galerie">${tour}${h}</div>`;
+  return `<div class="galerie">${rot}${h}</div>`;
 }
 
 function sheetHTML(){

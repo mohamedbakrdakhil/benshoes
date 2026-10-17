@@ -167,3 +167,25 @@ sur une image transparente il cerne la boîte, pas la chaussure.
 **Pour les refaire** : extraire une image de chaque clip, la passer au
 détoureur, recadrer sur la silhouette, exporter en palette de 128 couleurs.
 Sans le dossier, il faut remettre `visuel()` dans `niche()`.
+
+---
+
+## `produits/rotor-<coloris>.jpg` — le tourne-disque
+
+Une planche de 24 vues par coloris, 6 colonnes sur 4 rangs, 260 px la vue,
+environ 130 Ko. Une seule se charge : celle du coloris ouvert.
+
+**Une planche et non 24 fichiers** : une image, une requête, et changer de
+vue ne coûte qu'un décalage de `background-position` — aucun chargement,
+donc aucun à-coup sous le doigt.
+
+**Et non une vidéo** : chercher une image précise dans un flux compressé
+saute, et une vidéo ne se laisse pas tenir. Ici la cliente tourne la
+chaussure elle-même, s'arrête sur l'angle qui l'intéresse, revient.
+
+Les 24 vues sont prises dans les 96 premières images du clip du coloris
+(`higgsfield-sorties/`), une sur quatre — la fenêtre dont la fidélité a été
+vérifiée coloris par coloris.
+
+**Pour les refaire** : extraire, recadrer sur la bande utile, coller en
+grille, enregistrer en JPEG progressif qualité 74.

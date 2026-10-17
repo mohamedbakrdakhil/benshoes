@@ -97,7 +97,7 @@
    sur une fiche produit. */
 .card-flag{top:auto;bottom:0;border-radius:0 calc(var(--r) + 3px) 0 0}
 .at-img{border-radius:var(--arc)}
-.sheet-art.tour{border-radius:var(--arc)}
+.sheet-art.rotor{border-radius:var(--arc)}
 /* La vignette de l'anatomie et les alcôves du couloir suivent. */
 .anat-fig{border-radius:var(--arc);overflow:hidden}
 
@@ -136,4 +136,58 @@ h2,h3,h4,.vcap h3,.card-name h3{font-family:var(--fr);letter-spacing:-.005em;lin
      ne montrait plus qu'une étoile et demie, ce qui ne se lit pas. */
   .sec-head::after{width:min(170px,62%)}
   .sec-head{padding-bottom:22px}
+}
+
+/* ---- L'arcade -------------------------------------------------------
+   Une enfilade d'arcs en transition entre deux sections, comme la galerie
+   d'un riad : on quitte une pièce par une rangée d'ouvertures, et le
+   zellige se voit à travers.
+
+   Tout tient en un empilement de fonds, sans une image ni un élément de
+   plus : le dessus est un mur de la couleur de la page, percé de demi-
+   disques transparents ; dessous, le motif. Le disque est posé au bas de
+   sa tuile — c'est ce qui lui donne un pied plutôt qu'une bulle — et il
+   déborde la moitié de la hauteur, sinon l'arc s'écrase en anse de panier.
+
+   Décoratif au sens strict : aria-hidden, aucun texte, rien à lire. */
+.arcade{height:58px;--z:15px;
+  background:
+    radial-gradient(circle at 50% 100%,transparent 0 30px,var(--bg) 30.5px) 0 0/84px 58px repeat-x,
+    repeating-linear-gradient(45deg,var(--zel-creme) 0 1px,transparent 1px calc(var(--z)/1.414)),
+    repeating-linear-gradient(-45deg,var(--zel-creme) 0 1px,transparent 1px calc(var(--z)/1.414)),
+    radial-gradient(circle at 0 0,var(--zel-ocre) 0 24%,transparent 25%) 0 0/var(--z) var(--z),
+    radial-gradient(circle at 100% 100%,var(--zel-ocre) 0 24%,transparent 25%) 0 0/var(--z) var(--z),
+    repeating-conic-gradient(from 45deg at 50% 50%,var(--zel-vert) 0 25%,transparent 0 50%) 0 0/var(--z) var(--z),
+    var(--zel-vert-2);
+  border-bottom:3px solid var(--zel-vert-2)}
+/* Celle du pied de page ouvre sur le bandeau bordeaux et non sur la page :
+   son mur prend donc la couleur du bandeau, sans quoi on verrait une bande
+   claire coincée entre deux sombres. */
+.arcade-pied{border-bottom:0;border-top:3px solid var(--zel-vert-2);
+  background:
+    radial-gradient(circle at 50% 0%,transparent 0 30px,var(--band-bg) 30.5px) 0 0/84px 58px repeat-x,
+    repeating-linear-gradient(45deg,var(--zel-creme) 0 1px,transparent 1px calc(var(--z)/1.414)),
+    repeating-linear-gradient(-45deg,var(--zel-creme) 0 1px,transparent 1px calc(var(--z)/1.414)),
+    radial-gradient(circle at 0 0,var(--zel-ocre) 0 24%,transparent 25%) 0 0/var(--z) var(--z),
+    radial-gradient(circle at 100% 100%,var(--zel-ocre) 0 24%,transparent 25%) 0 0/var(--z) var(--z),
+    repeating-conic-gradient(from 45deg at 50% 50%,var(--zel-vert) 0 25%,transparent 0 50%) 0 0/var(--z) var(--z),
+    var(--zel-vert-2)}
+@media(max-width:700px){
+  /* Des arcs de 84 px sur une page de 375 n'en laissent voir que quatre et
+     demi : on les resserre pour que la rangée se lise comme une enfilade. */
+  .arcade,.arcade-pied{height:44px;background-size:62px 44px,auto,auto,auto,auto,auto,auto}
+  .arcade{background-image:radial-gradient(circle at 50% 100%,transparent 0 22px,var(--bg) 22.5px),
+    repeating-linear-gradient(45deg,var(--zel-creme) 0 1px,transparent 1px calc(var(--z)/1.414)),
+    repeating-linear-gradient(-45deg,var(--zel-creme) 0 1px,transparent 1px calc(var(--z)/1.414)),
+    radial-gradient(circle at 0 0,var(--zel-ocre) 0 24%,transparent 25%),
+    radial-gradient(circle at 100% 100%,var(--zel-ocre) 0 24%,transparent 25%),
+    repeating-conic-gradient(from 45deg at 50% 50%,var(--zel-vert) 0 25%,transparent 0 50%),
+    linear-gradient(var(--zel-vert-2),var(--zel-vert-2))}
+  .arcade-pied{background-image:radial-gradient(circle at 50% 0%,transparent 0 22px,var(--band-bg) 22.5px),
+    repeating-linear-gradient(45deg,var(--zel-creme) 0 1px,transparent 1px calc(var(--z)/1.414)),
+    repeating-linear-gradient(-45deg,var(--zel-creme) 0 1px,transparent 1px calc(var(--z)/1.414)),
+    radial-gradient(circle at 0 0,var(--zel-ocre) 0 24%,transparent 25%),
+    radial-gradient(circle at 100% 100%,var(--zel-ocre) 0 24%,transparent 25%),
+    repeating-conic-gradient(from 45deg at 50% 50%,var(--zel-vert) 0 25%,transparent 0 50%),
+    linear-gradient(var(--zel-vert-2),var(--zel-vert-2))}
 }

@@ -8,8 +8,9 @@ function draw(){
   o.innerHTML=S.panel==='sheet'?sheetHTML():S.panel==='cart'?cartHTML():S.panel==='manual'?manualHTML():'';
   if(S.panel){o.insertAdjacentHTML('afterbegin','<div class="scrim" data-act="closep"></div>');
     o.querySelector('.close')?.focus();}
-  // La rotation ne démarre qu'une fois la fiche dans le document.
-  if(S.panel==='sheet') lancerTour();
+  // Sans condition : c'est aussi ce passage qui éteint la rotation quand la
+  // fiche se ferme.
+  majRotor();
   document.body.style.overflow=S.panel?'hidden':'';
   $('#cartcount').textContent=cartCount();
 }
