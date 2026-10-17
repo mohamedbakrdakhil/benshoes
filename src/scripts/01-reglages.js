@@ -2,7 +2,7 @@
    CONFIGURATION DE LA BOUTIQUE — modifiez ces quatre lignes
    =================================================================== */
 const SHOP={
-  email:'contact@benkashoes.ma',   // votre vraie adresse e-mail
+  email:'benkashoes@gmail.com',   // votre vraie adresse e-mail
   phone:'',                       // ex. '+212 6 12 34 56 78'  (vide = masqué)
   whatsapp:'',                    // ex. '2126XXXXXXXX' indicatif SANS le +  (vide = bouton masqué)
   site:'www.benkashoes.ma',      // l'adresse affichée en bas de page

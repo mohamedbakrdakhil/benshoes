@@ -222,12 +222,20 @@ reseaux:['https://www.instagram.com/votre-compte/',
 Elles partent alors en `sameAs` dans les données structurées — le signal le
 plus fort pour dire « ce site, ce compte et cette fiche sont la même maison ».
 
-### 4. Les coordonnées manquantes
+### 4. Les coordonnées
 
-`SHOP.whatsapp` est vide et `contact@benkashoes.ma` n'a pas d'enregistrement
-MX. Une cliente qui veut joindre l'atelier autrement que par le formulaire ne
-peut pas. Ça pèse sur la conversion, et les coordonnées complètes comptent
-aussi pour la fiche Google Business.
+**L'e-mail est réglé depuis le 17 octobre 2026.** L'adresse était
+`contact@benkashoes.ma`, dont le domaine n'a aucun enregistrement MX :
+vérifié, `dig MX benkashoes.ma` ne renvoie rien. Tout message écrit à cette
+adresse était donc refusé sans que personne, ni la cliente ni l'atelier, en
+soit averti. Elle est remplacée par `benkashoes@gmail.com`, qui reçoit.
+
+Un seul endroit à changer — `SHOP.email` dans `src/scripts/01-reglages.js` —
+et la correction se propage au pied de page, au récapitulatif de commande et
+aux données structurées, qui la déclarent en `email` et en `contactPoint`.
+
+**Reste `SHOP.whatsapp`, toujours vide.** Au Maroc c'est le canal par lequel
+on écrit à une boutique ; sans lui, le bouton reste masqué.
 
 ## Les mots-clés, honnêtement
 
