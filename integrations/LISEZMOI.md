@@ -24,11 +24,16 @@ Dans la feuille : menu **Extensions → Apps Script**.
 Effacez le `function myFunction() {}` qui s'y trouve, puis collez **tout** le
 contenu de `integrations/tableur.gs`.
 
-En haut du script, mettez votre adresse pour recevoir l'alerte :
+En haut du script, l'adresse qui reçoit l'alerte est déjà renseignée :
 
 ```js
-var ALERTE_EMAIL = 'votre.adresse@gmail.com';
+var ALERTE_EMAIL = 'benkashoes@gmail.com';
 ```
+
+> **Attention** : ce fichier est la source. Le script qui tourne vraiment
+> vit chez Google. Tant que vous n'avez pas recollé `tableur.gs` dans Apps
+> Script et redéployé, l'ancienne version continue de s'exécuter — et si
+> l'adresse y était vide, aucune alerte ne part.
 
 Enregistrez (l'icône disquette, ou ⌘S).
 

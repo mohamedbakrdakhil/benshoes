@@ -18,7 +18,7 @@
 /* ───────── à régler ───────── */
 
 // Votre adresse, pour l'e-mail d'alerte. Vide = pas d'e-mail.
-var ALERTE_EMAIL = '';
+var ALERTE_EMAIL = 'benkashoes@gmail.com';
 
 // Nom de l'onglet qui reçoit les commandes. Créé tout seul s'il manque.
 var ONGLET = 'Commandes';
