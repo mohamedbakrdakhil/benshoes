@@ -35,6 +35,34 @@ var ALERTE_EMAIL = 'benkashoes@gmail.com';
 > Script et redéployé, l'ancienne version continue de s'exécuter — et si
 > l'adresse y était vide, aucune alerte ne part.
 
+### Mettre à jour un script déjà publié
+
+Si la boutique tourne déjà, **ne faites pas « Nouveau déploiement »** : Google
+créerait une deuxième adresse `/exec`, et le site continuerait de parler à
+l'ancienne. Il faut remplacer la version derrière l'adresse existante :
+
+**Déployer** → **Gérer les déploiements** → le crayon ✏️ →
+**Version : Nouvelle version** → **Déployer**.
+
+L'URL ne change pas. C'est le but.
+
+### Vérifier, sans passer de commande
+
+Ouvrez l'adresse `/exec` du script dans un navigateur. Elle répond en clair :
+
+```json
+{"service":"Benkashoes — réception des commandes","methode":"POST","alerte":"armée"}
+```
+
+- `"alerte":"armée"` → l'adresse est bien en service, vous serez prévenu.
+- `"alerte":"absente"` → la version déployée a une adresse vide.
+- **pas de champ `alerte` du tout** → c'est une version antérieure à ce
+  témoin qui tourne : le collage ou le redéploiement n'a pas eu lieu.
+
+Et si un e-mail ne part pas malgré tout, la raison est désormais écrite dans
+**Exécutions**, dans la barre de gauche de l'éditeur Apps Script. Avant, l'échec
+était avalé en silence.
+
 Enregistrez (l'icône disquette, ou ⌘S).
 
 ## 3 · Publier

@@ -32,7 +32,7 @@ var MAX_PAR_HEURE = 40;
    TOUJOURS celui d'ici, jamais celui annoncé par le navigateur. */
 
 var CATALOGUE = {
-  opus:    { nom: 'Opus',    prix: 259, coloris: ['beige','taupe','marron','tabac','burgundy','gris','marine','noir'] }
+  opus:    { nom: 'Opus',    prix: 279, coloris: ['beige','taupe','marron','tabac','burgundy','gris','marine','noir'] }
 };
 var COLORIS = { noir:'Noir', beige:'Beige', marron:'Marron', taupe:'Marron taupe',
                 tabac:'Tabac', burgundy:'Burgundy', gris:'Gris', marine:'Marine',
@@ -272,7 +272,12 @@ function doPost(e) {
           cmd.client.nom + '\n' + cmd.client.tel + '\n' + cmd.client.email + '\n' +
           cmd.client.adr + '\n' + cmd.client.cp + ' ' + cmd.client.ville + '\n' + cmd.client.pays +
           (cmd.note ? '\n\nNote : ' + cmd.note : ''));
-      } catch (err) { /* un e-mail perdu ne doit pas perdre la commande */ }
+      } catch (err) {
+        // Un e-mail perdu ne doit pas perdre la commande : on continue. Mais
+        // le silence total rendait une adresse fausse indétectable — la trace
+        // apparaît désormais dans Exécutions, dans l'éditeur Apps Script.
+        console.error('Alerte e-mail non partie (' + ALERTE_EMAIL + ') : ' + err);
+      }
     }
 
     return reponse({ ok: true, ref: ref, total: cmd.total, livraison: cmd.livraison });
@@ -281,7 +286,16 @@ function doPost(e) {
   }
 }
 
-/** Ouvrir l'adresse dans un navigateur doit dire quelque chose d'utile. */
+/** Ouvrir l'adresse dans un navigateur doit dire quelque chose d'utile — et
+ *  d'abord : si l'alerte par e-mail est armée dans la version DEPLOYEE.
+ *
+ *  Le fichier du dépôt peut porter l'adresse sans que le script en service
+ *  l'ait reçue : ce sont deux copies distinctes, et seule celle de Google
+ *  s'exécute. Sans ce témoin, le seul moyen de savoir était de passer une
+ *  vraie commande et d'attendre un e-mail qui ne venait peut-être pas.
+ *
+ *  L'adresse elle-même n'est pas renvoyée : cette URL est publique. */
 function doGet() {
-  return reponse({ service: 'Benkashoes — réception des commandes', methode: 'POST' });
+  return reponse({ service: 'Benkashoes — réception des commandes', methode: 'POST',
+                   alerte: ALERTE_EMAIL ? 'armée' : 'absente' });
 }
