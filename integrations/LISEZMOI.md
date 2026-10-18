@@ -35,6 +35,21 @@ var ALERTE_EMAIL = 'benkashoes@gmail.com';
 > Script et redéployé, l'ancienne version continue de s'exécuter — et si
 > l'adresse y était vide, aucune alerte ne part.
 
+### Si « Page introuvable » s'affiche à la place de l'éditeur
+
+Google refuse d'ouvrir l'éditeur lié à une feuille quand plusieurs comptes
+sont connectés dans le même navigateur. Dans ce cas, on fait un script
+**autonome** au lieu d'un script lié :
+
+1. `script.google.com/u/<n>/home` → **Nouveau projet** (`<n>` = l'index du bon
+   compte ; 0 pour le premier connecté, 1 pour le deuxième…)
+2. Collez `tableur.gs`
+3. Renseignez `FEUILLE_ID` en haut du script avec l'identifiant de la feuille,
+   qui se lit dans son adresse entre `/d/` et `/edit`
+
+Le script vise alors la feuille explicitement, au lieu d'écrire dans « sa »
+feuille hôte. Tout le reste est identique.
+
 ### Mettre à jour un script déjà publié
 
 Si la boutique tourne déjà, **ne faites pas « Nouveau déploiement »** : Google

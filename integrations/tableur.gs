@@ -23,6 +23,18 @@ var ALERTE_EMAIL = 'benkashoes@gmail.com';
 // Nom de l'onglet qui reçoit les commandes. Créé tout seul s'il manque.
 var ONGLET = 'Commandes';
 
+/* Identifiant de la feuille qui reçoit les commandes.
+ *
+ * Vide = le script est « lié » à une feuille (Extensions → Apps Script depuis
+ * celle-ci) et écrit dans sa feuille hôte. C'est le cas simple.
+ *
+ * Renseigné = le script est autonome et vise cette feuille-là. Nécessaire
+ * quand plusieurs comptes Google sont connectés dans le même navigateur :
+ * Google refuse alors d'ouvrir l'éditeur lié et répond « Page introuvable ».
+ *
+ * L'identifiant se lit dans l'adresse de la feuille, entre /d/ et /edit. */
+var FEUILLE_ID = '18WEWekxfeI_fbxKN471uPGjCNy54ToMpF8Id2Dm42s8';
+
 // Au-delà de ce nombre de commandes par heure, le script refuse. Protège
 // d'un robot qui viendrait noyer la feuille.
 var MAX_PAR_HEURE = 40;
@@ -81,7 +93,8 @@ function reponse(obj) {
 }
 
 function feuille() {
-  var classeur = SpreadsheetApp.getActiveSpreadsheet();
+  var classeur = FEUILLE_ID ? SpreadsheetApp.openById(FEUILLE_ID)
+                            : SpreadsheetApp.getActiveSpreadsheet();
   var f = classeur.getSheetByName(ONGLET);
   if (!f) {
     f = classeur.insertSheet(ONGLET);
