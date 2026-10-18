@@ -299,6 +299,155 @@ function doPost(e) {
   }
 }
 
+/* ═════════════════ installation : organiser la feuille ═════════════════
+
+   À lancer UNE fois depuis l'éditeur Apps Script : choisissez « installer »
+   dans la liste des fonctions, puis Exécuter.
+
+   Rejouable sans risque : la fonction ne lit ni ne modifie aucune commande
+   déjà enregistrée. Elle ne fait que (re)poser la mise en forme, les menus
+   déroulants et le tableau de bord. Si vous cassez quelque chose en bricolant
+   la feuille, relancez-la.                                                  */
+
+var STATUTS = ['Nouvelle', 'Confirmée', 'Expédiée', 'Livrée', 'Annulée'];
+
+/* Largeur de chaque colonne, dans l'ordre de COLONNES. Posées explicitement :
+   la largeur par défaut coupe « Adresse » et « Articles », les deux colonnes
+   qu'on lit vraiment quand on prépare un colis. */
+var LARGEURS = [140, 130, 110, 170, 130, 200, 240, 100, 120, 90, 320, 100, 90, 100, 70, 260];
+
+/* Une teinte par statut. Le but n'est pas de décorer : c'est de voir d'un
+   coup d'œil, en ouvrant la feuille, ce qui attend d'être traité. */
+var TEINTES = {
+  'Nouvelle':  '#fff1dc',
+  'Confirmée': '#e3edfd',
+  'Expédiée':  '#e2f1e6',
+  'Livrée':    '#eceff1',
+  'Annulée':   '#fbe3e0'
+};
+
+function installer() {
+  var classeur = FEUILLE_ID ? SpreadsheetApp.openById(FEUILLE_ID)
+                            : SpreadsheetApp.getActiveSpreadsheet();
+
+  /* Sans fuseau explicite, Google date les commandes à l'heure du serveur.
+     Une commande passée à 23 h le lundi peut alors s'inscrire au mardi. */
+  classeur.setSpreadsheetTimeZone('Africa/Casablanca');
+
+  var f = feuille();                     // crée l'onglet et ses en-têtes au besoin
+  var n = COLONNES.length;
+
+  /* ---------- l'en-tête ---------- */
+  f.getRange(1, 1, 1, n).setValues([COLONNES])
+     .setFontWeight('bold').setBackground('#2b1512').setFontColor('#fdf6ec')
+     .setVerticalAlignment('middle');
+  f.setFrozenRows(1);
+  f.setRowHeight(1, 34);
+  for (var i = 0; i < n; i++) f.setColumnWidth(i + 1, LARGEURS[i]);
+
+  /* ---------- formats de colonne ---------- */
+  // Posés sur la colonne entière, pas seulement sur les lignes existantes :
+  // sinon chaque nouvelle commande arriverait sans format.
+  f.getRange('A2:A').setNumberFormat('dd/mm/yyyy hh:mm');
+  f.getRange('L2:N').setNumberFormat('#,##0 "DH"');
+  f.getRange('G2:G').setWrap(true);      // adresse
+  f.getRange('K2:K').setWrap(true);      // articles
+  f.getRange('P2:P').setWrap(true);      // note
+
+  /* ---------- le statut devient un menu déroulant ---------- */
+  // Tapé à la main, « expédiée » et « Expédié » coexistent et aucun compte
+  // ne tombe juste. La liste ferme la porte à l'orthographe libre.
+  f.getRange('C2:C').setDataValidation(
+    SpreadsheetApp.newDataValidation()
+      .requireValueInList(STATUTS, true)
+      .setAllowInvalid(false)
+      .setHelpText('Choisissez un statut dans la liste.')
+      .build());
+
+  /* ---------- la ligne se colore selon son statut ---------- */
+  var plage = f.getRange(2, 1, Math.max(f.getMaxRows() - 1, 1), n);
+  var regles = [];
+  STATUTS.forEach(function (st) {
+    var b = SpreadsheetApp.newConditionalFormatRule()
+      .whenFormulaSatisfied('=$C2="' + st + '"')
+      .setBackground(TEINTES[st])
+      .setRanges([plage]);
+    if (st === 'Annulée') b.setStrikethrough(true);
+    regles.push(b.build());
+  });
+  f.setConditionalFormatRules(regles);
+
+  /* ---------- un filtre, pour trier et chercher ---------- */
+  var filtre = f.getFilter();
+  if (filtre) filtre.remove();
+  f.getRange(1, 1, Math.max(f.getLastRow(), 2), n).createFilter();
+
+  tableauDeBord(classeur);
+  menageOngletVide(classeur);
+
+  // L'onglet qui résume passe devant : c'est ce qu'on veut voir en ouvrant.
+  classeur.setActiveSheet(classeur.getSheetByName('Tableau de bord'));
+  classeur.moveActiveSheet(1);
+  return 'Feuille organisée.';
+}
+
+/** Le résumé. Rien n'y est recopié : tout est formule, donc toujours juste. */
+function tableauDeBord(classeur) {
+  var t = classeur.getSheetByName('Tableau de bord');
+  if (!t) t = classeur.insertSheet('Tableau de bord');
+  t.clear();
+  t.clearConditionalFormatRules();
+
+  var O = "'" + ONGLET + "'!";
+  var lignes = [
+    ['BENKASHOES', ''],
+    ['Commandes reçues', '=COUNTA(' + O + 'B2:B)'],
+    ['Chiffre d\'affaires', '=SUM(' + O + 'N2:N)'],
+    ['Panier moyen', '=IFERROR(ROUND(B3/B2),0)'],
+    ['', ''],
+    ['PAR STATUT', '']
+  ];
+  STATUTS.forEach(function (st) {
+    lignes.push([st, '=COUNTIF(' + O + 'C2:C,"' + st + '")']);
+  });
+  lignes.push(['', '']);
+  lignes.push(['7 DERNIERS JOURS', '']);
+  lignes.push(['Commandes', '=COUNTIFS(' + O + 'A2:A,">="&TODAY()-7)']);
+  lignes.push(['Chiffre d\'affaires',
+               '=SUMIFS(' + O + 'N2:N,' + O + 'A2:A,">="&TODAY()-7)']);
+
+  // setValues accepte formules et textes : Sheets reconnaît le « = ».
+  t.getRange(1, 1, lignes.length, 2).setValues(lignes);
+
+  t.setColumnWidth(1, 220);
+  t.setColumnWidth(2, 140);
+  t.getRange('A1').setFontSize(16).setFontWeight('bold').setFontColor('#7a1f16');
+  t.getRange('A6').setFontWeight('bold').setFontColor('#7a1f16');
+  t.getRange('A13').setFontWeight('bold').setFontColor('#7a1f16');
+  t.getRange('A2:A4').setFontWeight('bold');
+  t.getRange('B3').setNumberFormat('#,##0 "DH"');
+  t.getRange('B4').setNumberFormat('#,##0 "DH"');
+  t.getRange('B15').setNumberFormat('#,##0 "DH"');
+  t.getRange('B2:B15').setHorizontalAlignment('right');
+  t.setFrozenRows(1);
+  if (t.getMaxColumns() > 2) t.deleteColumns(3, t.getMaxColumns() - 2);
+}
+
+/** Supprime l'onglet vide que Google crée avec tout nouveau classeur. */
+function menageOngletVide(classeur) {
+  classeur.getSheets().forEach(function (f) {
+    var nom = f.getName();
+    if (nom === ONGLET || nom === 'Tableau de bord') return;
+    // On ne supprime que ce qui est vraiment vide : jamais une feuille
+    // où quelqu'un aurait écrit quelque chose.
+    //
+    // isBlank() plutôt que getLastRow()===0 : sur l'onglet que Google crée
+    // avec le classeur, ces compteurs ne retombent pas toujours à zéro, et
+    // l'onglet vide survivait au ménage. isBlank() regarde le contenu.
+    if (f.getDataRange().isBlank()) classeur.deleteSheet(f);
+  });
+}
+
 /** Ouvrir l'adresse dans un navigateur doit dire quelque chose d'utile — et
  *  d'abord : si l'alerte par e-mail est armée dans la version DEPLOYEE.
  *
