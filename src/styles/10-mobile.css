@@ -63,10 +63,24 @@
      d'un coup. Une photo seule garde la largeur entière. */
   .panel.plein .galerie{display:grid;grid-template-columns:1fr 1fr;gap:8px;
     margin-bottom:0;overflow:visible}
-  .panel.plein .galerie .sheet-art{width:100%;height:clamp(130px,38vw,190px);
-    min-width:0;aspect-ratio:auto}
-  .panel.plein .galerie .sheet-art:only-child{grid-column:1 / -1;height:clamp(180px,70vw,320px)}
-  .panel.plein .galerie .sheet-art .pv{width:100%;height:100%;object-fit:contain}
+  /* La case prend la proportion des photos (3/4), au lieu de leur imposer
+     un paysage dans lequel un portrait ne tient pas. Mesuré : les visuels
+     produits par images.py font 320 × 424. La photo remplit donc la case
+     exactement — ni bande blanche, ni rognage.
+
+     grid-template-rows est l'essentiel. La case est une grille, et une
+     rangée « auto » se dimensionne sur son contenu : l'image prenait sa
+     hauteur naturelle (222 px dans une case de 143), le reste passait sous
+     overflow:hidden. « height:100% » ne pouvait rien : il se résolvait
+     contre une rangée indéfinie, donc en « auto ». object-fit:contain était
+     bien appliqué — il cadrait l'image dans une boîte elle-même trop
+     grande. On coupait 79 px, en haut et en bas. */
+  .panel.plein .galerie .sheet-art{width:100%;aspect-ratio:3/4;height:auto;
+    min-width:0;grid-template-rows:minmax(0,1fr)}
+  .panel.plein .galerie .sheet-art:only-child{grid-column:1 / -1;aspect-ratio:3/4;
+    height:auto;max-width:260px;margin-inline:auto}
+  .panel.plein .galerie .sheet-art .pv{width:100%;height:100%;min-height:0;
+    object-fit:contain}
   /* L'invite au glissement a été retirée du HTML : tout est visible. */
   .panel-ft{padding:12px max(16px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));gap:8px}
   .panel-ft .btn{min-height:44px;height:auto;line-height:1.35;padding-block:11px}
@@ -109,7 +123,7 @@
   .panel-hd{min-height:48px;padding-block:6px}
   .panel-ft{padding-top:8px;padding-bottom:calc(8px + env(safe-area-inset-bottom))}
   .panel-ft>.note{display:none}
-  .panel.plein .galerie .sheet-art{height:180px}
+  .panel.plein .galerie .sheet-art{aspect-ratio:auto;height:180px}
   .panel-ft .totals{font-size:.75rem;gap:3px}
   .panel-ft .totals .grand{font-size:.9rem;padding-top:4px;margin-top:2px}
 }

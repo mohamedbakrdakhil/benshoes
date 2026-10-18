@@ -47,8 +47,14 @@
 .grid{background:transparent;border:0;gap:30px 20px}
 .card{padding:0;background:transparent;gap:14px}
 .card:hover{background:transparent}
-.card-art{aspect-ratio:4/5;border-radius:0;background:var(--surface-2)}
-.card-art .pv{width:100%;height:100%;object-fit:cover;
+/* grid-template-rows pour la même raison que la galerie de la fiche : sans
+   lui, la rangée se dimensionne sur l'image et déborde de 12 px, qui sont
+   rognés en plus du cadrage 4/5 voulu. Ici on garde object-fit:cover — le
+   cadrage serré est l'effet recherché — mais il doit porter sur le cadre
+   exact, pas sur un cadre plus grand dont on perd le bas. */
+.card-art{aspect-ratio:4/5;border-radius:0;background:var(--surface-2);
+  grid-template-rows:minmax(0,1fr)}
+.card-art .pv{width:100%;height:100%;min-height:0;object-fit:cover;
   transition:transform .6s cubic-bezier(.2,.7,.3,1)}
 .card:hover .card-art .pv{transform:scale(1.045)}
 
