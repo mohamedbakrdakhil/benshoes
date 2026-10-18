@@ -53,9 +53,21 @@ var POINTURES   = [37,38,39,40,41];
 var LIVR_OFFERTE = 0;     // livraison offerte sans minimum
 var LIVR_PRIX    = 0;
 
+/* Les colonnes de l'onglet « Commandes » : une ligne = une commande.
+   « Code postal » est parti : le formulaire du site ne le demande plus, la
+   colonne restait vide. « Devise » aussi : elle annonçait MAD sur chaque
+   ligne d'une boutique qui ne vend qu'en dirhams. Deux colonnes de moins,
+   c'est deux colonnes de plus pour lire l'adresse. */
 var COLONNES = ['Reçue le','Référence','Statut','Nom','Téléphone','E-mail','Adresse',
-                'Code postal','Ville','Pays','Articles','Sous-total','Livraison',
-                'Total','Devise','Note'];
+                'Ville','Pays','Articles','Paires','Sous-total','Livraison','Total','Note'];
+
+/* L'onglet « Articles » : une ligne = une paire commandée.
+   « 1 × Opus Beige — pointure 39 » dans une seule cellule se lit, mais ne
+   se compte pas. Ici chaque détail a sa colonne, donc se trie, se filtre et
+   s'additionne : combien de 39 ce mois-ci, quel coloris part le mieux. */
+var ONGLET_ARTICLES = 'Articles';
+var COL_ARTICLES = ['Reçue le','Référence','Modèle','Coloris','Pointure',
+                    'Quantité','Prix unitaire','Total ligne'];
 
 /* ───────── utilitaires ───────── */
 
@@ -107,6 +119,33 @@ function feuille() {
     f.setColumnWidth(16, 260);
   }
   return f;
+}
+
+/** L'onglet du détail, créé au besoin. */
+function feuilleArticles() {
+  var classeur = FEUILLE_ID ? SpreadsheetApp.openById(FEUILLE_ID)
+                            : SpreadsheetApp.getActiveSpreadsheet();
+  var a = classeur.getSheetByName(ONGLET_ARTICLES);
+  if (!a) {
+    a = classeur.insertSheet(ONGLET_ARTICLES);
+    a.appendRow(COL_ARTICLES);
+    a.setFrozenRows(1);
+  }
+  return a;
+}
+
+/** Une ligne par paire commandée. */
+function ecrireArticles(recue, ref, lignes) {
+  if (!lignes || !lignes.length) return;
+  var a = feuilleArticles();
+  var depart = a.getLastRow() + 1;
+  var corps = lignes.map(function (l) {
+    return [recue, ref, cellule(l.modele), cellule(l.coloris),
+            l.pointure, l.q, l.prix, l.prix * l.q];
+  });
+  a.getRange(depart, 1, corps.length, COL_ARTICLES.length).setValues(corps);
+  a.getRange(depart, 1, corps.length, 1).setNumberFormat('dd/mm/yyyy hh:mm');
+  a.getRange(depart, 7, corps.length, 2).setNumberFormat('#,##0 \"DH\"');
 }
 
 /** Vrai si le quota horaire est dépassé. */
@@ -178,7 +217,7 @@ function construireCommande(entree) {
   if (!(brut instanceof Array) || !brut.length) return { erreur: 'Panier vide.' };
   if (brut.length > 20) return { erreur: 'Trop d’articles.' };
 
-  var articles = [], sousTotal = 0;
+  var articles = [], lignes = [], sousTotal = 0;
   for (var i = 0; i < brut.length; i++) {
     var it = brut[i] || {};
     var p = CATALOGUE[it.id];
@@ -191,6 +230,10 @@ function construireCommande(entree) {
     if (!(q >= 1 && q <= 10)) return { erreur: 'Quantité invalide.' };
     sousTotal += p.prix * q;                     // le prix vient d'ici, pas du navigateur
     articles.push(q + ' × ' + p.nom + ' ' + (COLORIS[c] || c) + ' — pointure ' + t);
+    // La même chose, mais en champs séparés : c'est cette forme qui part
+    // dans l'onglet « Articles ».
+    lignes.push({ modele: p.nom, coloris: (COLORIS[c] || c), pointure: t,
+                  q: q, prix: p.prix });
   }
 
   var c0 = entree.customer || {};
@@ -215,6 +258,8 @@ function construireCommande(entree) {
   return {
     commande: {
       articles: articles.join(' | '),
+      lignes: lignes,
+      paires: lignes.reduce(function (t, l) { return t + l.q; }, 0),
       client: client,
       note: texte(entree.note, 500),
       sousTotal: sousTotal,
@@ -259,18 +304,24 @@ function doPost(e) {
     try {
       f = feuille();
       ref = nouvelleReference(f);
+      var recue = new Date();
       f.appendRow([
-        new Date(), ref, 'Nouvelle',
+        recue, ref, 'Nouvelle',
         cellule(cmd.client.nom), texteBrut(cmd.client.tel), cellule(cmd.client.email),
-        cellule(cmd.client.adr), texteBrut(cmd.client.cp), cellule(cmd.client.ville),
-        cellule(cmd.client.pays), cellule(cmd.articles),
-        cmd.sousTotal, cmd.livraison, cmd.total, 'MAD', cellule(cmd.note)
+        cellule(cmd.client.adr), cellule(cmd.client.ville), cellule(cmd.client.pays),
+        cellule(cmd.articles), cmd.paires,
+        cmd.sousTotal, cmd.livraison, cmd.total, cellule(cmd.note)
       ]);
       // La date et les trois montants restent des valeurs, pas du texte :
       // sans cela la feuille ne saurait ni les trier ni les additionner.
       var l = f.getLastRow();
       f.getRange(l, 1).setNumberFormat('dd/mm/yyyy hh:mm');
       f.getRange(l, 12, 1, 3).setNumberFormat('#,##0 \"DH\"');
+      // Le détail, une ligne par paire. Si cette écriture échoue, la commande
+      // est déjà enregistrée : on ne la perd pas pour un détail.
+      try { ecrireArticles(recue, ref, cmd.lignes); } catch (err) {
+        console.error('Détail des articles non écrit (' + ref + ') : ' + err);
+      }
       memoire.retenir(ref);
     } finally {
       verrou.releaseLock();
@@ -314,7 +365,8 @@ var STATUTS = ['Nouvelle', 'Confirmée', 'Expédiée', 'Livrée', 'Annulée'];
 /* Largeur de chaque colonne, dans l'ordre de COLONNES. Posées explicitement :
    la largeur par défaut coupe « Adresse » et « Articles », les deux colonnes
    qu'on lit vraiment quand on prépare un colis. */
-var LARGEURS = [140, 130, 110, 170, 130, 200, 240, 100, 120, 90, 320, 100, 90, 100, 70, 260];
+var LARGEURS     = [140, 130, 110, 170, 130, 200, 260, 120, 90, 300, 70, 100, 90, 100, 240];
+var LARG_ARTICLES = [140, 130, 100, 140, 90, 90, 120, 110];
 
 /* Une teinte par statut. Le but n'est pas de décorer : c'est de voir d'un
    coup d'œil, en ouvrant la feuille, ce qui attend d'être traité. */
@@ -335,6 +387,7 @@ function installer() {
   classeur.setSpreadsheetTimeZone('Africa/Casablanca');
 
   var f = feuille();                     // crée l'onglet et ses en-têtes au besoin
+  migrerAncienFormat(f);                 // avant toute mise en forme
   var n = COLONNES.length;
 
   /* ---------- l'en-tête ---------- */
@@ -351,8 +404,8 @@ function installer() {
   f.getRange('A2:A').setNumberFormat('dd/mm/yyyy hh:mm');
   f.getRange('L2:N').setNumberFormat('#,##0 "DH"');
   f.getRange('G2:G').setWrap(true);      // adresse
-  f.getRange('K2:K').setWrap(true);      // articles
-  f.getRange('P2:P').setWrap(true);      // note
+  f.getRange('J2:J').setWrap(true);      // articles
+  f.getRange('O2:O').setWrap(true);      // note
 
   /* ---------- le statut devient un menu déroulant ---------- */
   // Tapé à la main, « expédiée » et « Expédié » coexistent et aucun compte
@@ -382,6 +435,7 @@ function installer() {
   if (filtre) filtre.remove();
   f.getRange(1, 1, Math.max(f.getLastRow(), 2), n).createFilter();
 
+  habillerArticles();
   tableauDeBord(classeur);
   menageOngletVide(classeur);
 
@@ -391,46 +445,149 @@ function installer() {
   return 'Feuille organisée.';
 }
 
-/** Le résumé. Rien n'y est recopié : tout est formule, donc toujours juste. */
+/** Met l'onglet du détail en forme. Même traitement que « Commandes » :
+    en-tête figé, largeurs posées, montants formatés sur la colonne entière. */
+function habillerArticles() {
+  var a = feuilleArticles();
+  var n = COL_ARTICLES.length;
+  a.getRange(1, 1, 1, n).setValues([COL_ARTICLES])
+   .setFontWeight('bold').setBackground('#2b1512').setFontColor('#fdf6ec')
+   .setVerticalAlignment('middle');
+  a.setFrozenRows(1);
+  a.setRowHeight(1, 34);
+  for (var i = 0; i < n; i++) a.setColumnWidth(i + 1, LARG_ARTICLES[i]);
+  a.getRange('A2:A').setNumberFormat('dd/mm/yyyy hh:mm');
+  a.getRange('G2:H').setNumberFormat('#,##0 "DH"');
+  var filtre = a.getFilter();
+  if (filtre) filtre.remove();
+  a.getRange(1, 1, Math.max(a.getLastRow(), 2), n).createFilter();
+}
+
+/** Le résumé. Rien n'y est recopié : tout est formule, donc toujours juste.
+
+    Les totaux de commande se lisent dans « Commandes », les comptages par
+    pointure et par coloris dans « Articles » — c'est tout l'intérêt d'avoir
+    séparé les deux : on peut enfin demander « combien de 39 beige ». */
 function tableauDeBord(classeur) {
   var t = classeur.getSheetByName('Tableau de bord');
   if (!t) t = classeur.insertSheet('Tableau de bord');
   t.clear();
   t.clearConditionalFormatRules();
 
-  var O = "'" + ONGLET + "'!";
-  var lignes = [
-    ['BENKASHOES', ''],
-    ['Commandes reçues', '=COUNTA(' + O + 'B2:B)'],
-    ['Chiffre d\'affaires', '=SUM(' + O + 'N2:N)'],
-    ['Panier moyen', '=IFERROR(ROUND(B3/B2),0)'],
-    ['', ''],
-    ['PAR STATUT', '']
-  ];
+  var C = "'" + ONGLET + "'!";
+  var A = "'" + ONGLET_ARTICLES + "'!";
+  var lignes = [], titres = [], argent = [];
+
+  function pousser(gauche, droite) { lignes.push([gauche, droite]); }
+  function titre(mot) { pousser('', ''); titres.push(lignes.length + 1); pousser(mot, ''); }
+  function dirham() { argent.push(lignes.length); }
+
+  pousser('BENKASHOES', '');
+  pousser('Commandes reçues', '=COUNTA(' + C + 'B2:B)');
+  pousser('Chiffre d\'affaires', '=SUM(' + C + 'N2:N)');            dirham();
+  pousser('Panier moyen', '=IFERROR(ROUND(B3/B2),0)');              dirham();
+  pousser('Paires vendues', '=SUM(' + C + 'K2:K)');
+
+  titre('PAR STATUT');
   STATUTS.forEach(function (st) {
-    lignes.push([st, '=COUNTIF(' + O + 'C2:C,"' + st + '")']);
+    pousser(st, '=COUNTIF(' + C + 'C2:C,"' + st + '")');
   });
-  lignes.push(['', '']);
-  lignes.push(['7 DERNIERS JOURS', '']);
-  lignes.push(['Commandes', '=COUNTIFS(' + O + 'A2:A,">="&TODAY()-7)']);
-  lignes.push(['Chiffre d\'affaires',
-               '=SUMIFS(' + O + 'N2:N,' + O + 'A2:A,">="&TODAY()-7)']);
 
-  // setValues accepte formules et textes : Sheets reconnaît le « = ».
+  titre('7 DERNIERS JOURS');
+  pousser('Commandes', '=COUNTIFS(' + C + 'A2:A,">="&TODAY()-7)');
+  pousser('Chiffre d\'affaires',
+          '=SUMIFS(' + C + 'N2:N,' + C + 'A2:A,">="&TODAY()-7)');   dirham();
+
+  // Paires, pas commandes : c'est ce qu'on commande au fournisseur.
+  titre('PAIRES PAR POINTURE');
+  POINTURES.forEach(function (pt) {
+    pousser(String(pt), '=SUMIFS(' + A + 'F2:F,' + A + 'E2:E,' + pt + ')');
+  });
+
+  titre('PAIRES PAR COLORIS');
+  var vus = {};
+  for (var id in CATALOGUE) {
+    CATALOGUE[id].coloris.forEach(function (c) {
+      var nom = COLORIS[c] || c;
+      if (vus[nom]) return;
+      vus[nom] = true;
+      pousser(nom, '=SUMIFS(' + A + 'F2:F,' + A + 'D2:D,"' + nom + '")');
+    });
+  }
+
   t.getRange(1, 1, lignes.length, 2).setValues(lignes);
-
   t.setColumnWidth(1, 220);
   t.setColumnWidth(2, 140);
   t.getRange('A1').setFontSize(16).setFontWeight('bold').setFontColor('#7a1f16');
-  t.getRange('A6').setFontWeight('bold').setFontColor('#7a1f16');
-  t.getRange('A13').setFontWeight('bold').setFontColor('#7a1f16');
-  t.getRange('A2:A4').setFontWeight('bold');
-  t.getRange('B3').setNumberFormat('#,##0 "DH"');
-  t.getRange('B4').setNumberFormat('#,##0 "DH"');
-  t.getRange('B15').setNumberFormat('#,##0 "DH"');
-  t.getRange('B2:B15').setHorizontalAlignment('right');
+  t.getRange('A2:A5').setFontWeight('bold');
+  titres.forEach(function (r) {
+    t.getRange(r, 1, 1, 2).setFontWeight('bold').setFontColor('#7a1f16');
+  });
+  /* Toute la colonne repasse en nombre simple AVANT qu'on y remette des
+     dirhams. Sans cette ligne, un format « DH » survivant d'une version
+     précédente du tableau collait à sa cellule : « Commandes : 2 DH ». */
+  t.getRange(2, 2, lignes.length - 1, 1).setNumberFormat('0');
+  argent.forEach(function (r) { t.getRange(r, 2).setNumberFormat('#,##0 "DH"'); });
+  t.getRange(2, 2, lignes.length - 1, 1).setHorizontalAlignment('right');
   t.setFrozenRows(1);
   if (t.getMaxColumns() > 2) t.deleteColumns(3, t.getMaxColumns() - 2);
+  if (t.getMaxRows() > lignes.length) t.deleteRows(lignes.length + 1, t.getMaxRows() - lignes.length);
+}
+
+/* ───────── reprise des commandes écrites dans l'ancien format ─────────
+
+   L'onglet avait 16 colonnes, dont « Code postal » et « Devise ». Les
+   commandes déjà enregistrées ne doivent pas être perdues pour autant :
+   on les réécrit dans le nouvel ordre, et on reconstruit leur détail.
+
+   Ne fait rien si l'en-tête est déjà au nouveau format — donc rejouable. */
+function migrerAncienFormat(f) {
+  var larg = Math.max(f.getLastColumn(), 1);
+  var tete = f.getRange(1, 1, 1, larg).getValues()[0];
+  if (tete.indexOf('Code postal') < 0) return;      // déjà migré
+
+  var n = f.getLastRow() - 1;
+  var vieilles = n > 0 ? f.getRange(2, 1, n, 16).getValues() : [];
+
+  f.clear();
+  f.clearConditionalFormatRules();
+  var filtre = f.getFilter();
+  if (filtre) filtre.remove();
+  f.getRange(1, 1, 1, COLONNES.length).setValues([COLONNES]);
+
+  if (!vieilles.length) return;
+  var neuves = vieilles.map(function (v) {
+    var lignes = lireArticles(v[10]);
+    var paires = lignes.reduce(function (t, l) { return t + l.q; }, 0);
+    return [v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[8], v[9],
+            v[10], paires, v[11], v[12], v[13], v[15]];
+  });
+  f.getRange(2, 1, neuves.length, COLONNES.length).setValues(neuves);
+
+  // Le détail repart de zéro : il se reconstruit entièrement d'ici.
+  var a = feuilleArticles();
+  if (a.getLastRow() > 1) a.getRange(2, 1, a.getLastRow() - 1, a.getLastColumn()).clearContent();
+  vieilles.forEach(function (v) {
+    ecrireArticles(v[0], v[1], lireArticles(v[10]));
+  });
+}
+
+/** Relit « 2 × Opus Marron taupe — pointure 39 | 1 × … » en champs séparés.
+
+    On ne relit ici que des textes écrits par ce script lui-même, dans un
+    format qu'il contrôle. Le nom de modèle est pris en un seul mot : si un
+    jour un modèle s'appelle « Opus Bis », il faudra revoir cette ligne. */
+function lireArticles(texteArticles) {
+  var sortie = [];
+  String(texteArticles || '').split(' | ').forEach(function (bout) {
+    var m = bout.match(/^(\d+)\s*×\s*(\S+)\s+(.+?)\s+—\s+pointure\s+(\d+)$/);
+    if (!m) return;
+    var prix = 0;
+    for (var id in CATALOGUE) if (CATALOGUE[id].nom === m[2]) prix = CATALOGUE[id].prix;
+    sortie.push({ modele: m[2], coloris: m[3], pointure: Number(m[4]),
+                  q: Number(m[1]), prix: prix });
+  });
+  return sortie;
 }
 
 /** Supprime l'onglet vide que Google crée avec tout nouveau classeur. */
