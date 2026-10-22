@@ -50,6 +50,19 @@ var COLORIS = { noir:'Noir', beige:'Beige', marron:'Marron', taupe:'Marron taupe
                 tabac:'Tabac', burgundy:'Burgundy', gris:'Gris', marine:'Marine',
                 taupe:'Marron taupe' };
 var POINTURES   = [37,38,39,40,41];
+
+/* Les ruptures, coloris par coloris : modèle → coloris → pointures épuisées.
+   Doit suivre « rupture » dans src/scripts/02-catalogue.js.
+
+   Le site masque déjà ces combinaisons, mais une page ouverte avant la
+   rupture garde l'ancienne grille : sans ce contrôle ici, elle pourrait
+   encore passer la commande. C'est ce script qui fait foi. */
+var RUPTURES = { opus: { beige: [38] } };
+
+function epuise(id, coloris, pointure) {
+  var m = RUPTURES[id];
+  return !!(m && m[coloris] && m[coloris].indexOf(pointure) >= 0);
+}
 var LIVR_OFFERTE = 0;     // livraison offerte sans minimum
 var LIVR_PRIX    = 0;
 
@@ -226,6 +239,9 @@ function construireCommande(entree) {
     if (p.coloris.indexOf(c) < 0) return { erreur: 'Coloris indisponible pour ce modèle.' };
     var t = Number(it.size);
     if (POINTURES.indexOf(t) < 0) return { erreur: 'Pointure invalide.' };
+    if (epuise(it.id, c, t))
+      return { erreur: (COLORIS[c] || c) + ' en pointure ' + t
+                       + ' est épuisé pour le moment.' };
     var q = Math.floor(Number(it.q));
     if (!(q >= 1 && q <= 10)) return { erreur: 'Quantité invalide.' };
     sousTotal += p.prix * q;                     // le prix vient d'ici, pas du navigateur

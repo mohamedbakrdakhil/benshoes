@@ -16,6 +16,13 @@ const prod=id=>CATALOG.find(p=>p.id===id);
 const priceOf=p=>S.ov.prices[p.id]??p.price;
 const stockOf=(p,i)=>(S.ov.stock[p.id]||p.stock)[i]??0;
 const totStock=p=>SIZES.reduce((a,_,i)=>a+stockOf(p,i),0);
+/* Le stock du modèle, affiné par coloris : une combinaison listée dans
+   « rupture » vaut zéro, quoi que dise le compteur commun. Tout ce qui
+   décide d'une vente — la grille de pointures, le bouton d'ajout, le
+   plafond de quantité, le bandeau « Épuisé » — passe par ici. */
+const enRupture=(p,c,t)=>!!(p.rupture&&p.rupture[c]&&p.rupture[c].indexOf(t)>=0);
+const stockCol=(p,c,i)=>enRupture(p,c,SIZES[i])?0:stockOf(p,i);
+const totStockCol=(p,c)=>SIZES.reduce((a,_,i)=>a+stockCol(p,c,i),0);
 const lsGet=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
 function nettoyerCommande(o){
   if(!o||typeof o!=='object')return null;

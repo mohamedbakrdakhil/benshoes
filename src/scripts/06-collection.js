@@ -51,10 +51,11 @@ function renderGrid(){
   if(compte) compte.textContent=paires.length+' coloris'+(S.colorFilter?' · '+COLORS[S.colorFilter].n:'');
   if(!paires.length){$('#grid').innerHTML=`<div class="empty" style="grid-column:1/-1;background:var(--surface)"><h4>Aucun cuir dans cette combinaison</h4><p>Essayez une autre couleur ou revenez à tous les cuirs.</p></div>`;return;}
   $('#grid').innerHTML=paires.map(([p,c],i)=>{
-    const out=totStock(p)===0;
+    const out=totStockCol(p,c)===0;
     // Le bandeau du modèle ne se répète pas sur chaque coloris.
     const ruban=out?`<span class="card-flag out">Épuisé</span>`
-                   :(i===0&&p.flag?`<span class="card-flag">${p.flag}</span>`:'');
+                   :((p.vedette?c===p.vedette:i===0)&&p.flag
+                       ?`<span class="card-flag">${p.flag}</span>`:'');
     return `<button class="card" data-act="open" data-id="${p.id}" data-c="${c}">
       <div class="card-art">${ruban}${visuel(p,c)}<span class="card-discover">Découvrir <span aria-hidden="true">↗</span></span></div>
       <div><div class="card-name"><h3>${p.name} <span>${COLORS[c].n}</span></h3><span class="p num">${fmt(priceOf(p))}</span></div>

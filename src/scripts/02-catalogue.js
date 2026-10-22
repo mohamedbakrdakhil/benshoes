@@ -23,6 +23,14 @@ const CATALOG=[
   {id:'opus',hold:4,use:'Tous les jours',name:'Opus',sub:'Mocassin-mule à bride penny',fam:'penny',style:'penny',price:279,
    colors:['beige','taupe','marron','tabac','burgundy','gris','marine','noir'],
    stock:[9,16,21,18,11],flag:'Le plus porté',
+   /* Le coloris qui porte le bandeau « Le plus porté ». Sans lui le bandeau
+      tombait sur la première vignette de la grille, c'est-à-dire sur le
+      premier coloris listé — un hasard d'ordre, pas une information. */
+   vedette:'tabac',
+   /* Les ruptures, coloris par coloris. « stock » ci-dessus est commun aux
+      huit cuirs : le mettre à zéro couperait la pointure partout. Ici on
+      ferme une seule combinaison. Format : coloris → pointures épuisées. */
+   rupture:{beige:[38]},
    blurb:"La bride penny ajourée, posée sur un daim souple monté à la main sur forme. Talon ouvert : on l’enfile d’un geste, il tient par le cou-de-pied. Huit daims au choix, du beige au noir, c’est le modèle sur lequel l’atelier a bâti sa réputation.",
    spec:[['Tige','Daim de veau, monté sur forme'],['Bride','Penny ajourée, surpiquée main'],['Semelle','EVA souple']]}
 ];

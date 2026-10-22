@@ -93,7 +93,7 @@ function galerie(p,c){
 
 function sheetHTML(){
   const p=prod(S.sheet.id),c=S.sheet.c,si=S.sheet.s;
-  const st=si==null?null:stockOf(p,SIZES.indexOf(si));
+  const st=si==null?null:stockCol(p,c,SIZES.indexOf(si));
   return `<div class="panel plein" role="dialog" aria-modal="true" aria-label="${p.name}">
     <div class="panel-hd"><span class="eyebrow">${p.sub}</span><h3 style="flex:0"></h3>
       <button class="close" data-act="closep" style="margin-left:auto" aria-label="Fermer">✕</button></div>
@@ -105,7 +105,7 @@ function sheetHTML(){
       <div class="fld"><div class="fld-lab"><span class="t">Cuir</span><span class="v">${COLORS[c].n}</span></div>
         <div class="colrow">${p.colors.map(k=>`<button class="colopt" data-act="setcol" data-k="${k}" aria-pressed="${k===c}"><i style="background:linear-gradient(135deg,${COLORS[k].c},${COLORS[k].d})"></i>${COLORS[k].n}</button>`).join('')}</div></div>
       <div class="fld"><div class="fld-lab"><span class="t">Pointure EU</span><span class="v">${si?`${si} · ${st>0?st+' en stock':'épuisé'}`:'Choisissez votre pointure'}</span></div>
-        <div class="sizegrid">${SIZES.map((s,i)=>{const k=stockOf(p,i);
+        <div class="sizegrid">${SIZES.map((s,i)=>{const k=stockCol(p,c,i);
           return `<button class="sizebtn" data-act="setsize" data-s="${s}" aria-pressed="${si===s}" ${k?'':'disabled'}>${s}${k&&k<=3?`<small>${k} rest.</small>`:''}</button>`;}).join('')}</div>
         <p class="note" style="margin-top:9px">Entre deux pointures, prenez la plus petite : <a href="#tailles" data-act="closep" style="color:var(--accent-text)">voir le guide</a>.</p></div>
       <div class="tabs" role="tablist">

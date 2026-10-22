@@ -117,10 +117,10 @@ document.addEventListener('click',async e=>{
     // fausserait le panier et la commande : on refuse aussi ici.
     if(!prod(id)||!COLORS[c]||!SIZES.includes(s)){toast('Choisissez une pointure');return;}
     const ex=S.cart.find(i=>i.id===id&&i.c===c&&i.s===s);
-    const max=stockOf(prod(id),SIZES.indexOf(s));
+    const max=stockCol(prod(id),c,SIZES.indexOf(s));
     if(ex){if(ex.q>=max){toast('Stock atteint pour cette pointure');return;}ex.q++;}else S.cart.push({id,c,s,q:1});
     syncCart();S.panel='cart';S.step=1;draw();bumpCart();toast('Ajouté au panier');}
-  else if(a==='qty'){const i=S.cart[+d.n];const max=stockOf(prod(i.id),SIZES.indexOf(i.s));
+  else if(a==='qty'){const i=S.cart[+d.n];const max=stockCol(prod(i.id),i.c,SIZES.indexOf(i.s));
     i.q+=+d.d;if(i.q>max){i.q=max;toast('Stock atteint');}if(i.q<1)S.cart.splice(+d.n,1);syncCart();draw();}
   else if(a==='rm'){S.cart.splice(+d.n,1);syncCart();draw();}
   else if(a==='next'){S.step=2;draw();}
