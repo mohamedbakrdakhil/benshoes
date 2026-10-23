@@ -111,11 +111,13 @@ function admCatalogue(){
     <div class="sec-head" style="margin-bottom:20px"><div><span class="eyebrow">Catalogue</span><h2 style="font-size:1.7rem;margin-top:10px">Prix et stock par pointure</h2></div>
       <p class="serif" style="max-width:40ch">Les valeurs livrées sont des valeurs de départ, à ajuster sur votre vrai stock. Chaque modification est enregistrée dès que vous quittez la case et s'applique à la boutique pour tout le monde.</p></div>
     ${(MODE!=='artifact'||S.db)?'':`<div class="callout" style="margin-bottom:18px;border-left-color:var(--bad)"><b>Enregistrement indisponible.</b> Vos modifications ne seront pas conservées dans cette vue.</div>`}
-    <div class="scroll-x"><table class="tbl"><thead><tr><th>Modèle</th><th>Prix</th>${SIZES.map(s=>`<th class="r">${s}</th>`).join('')}<th class="r">Total</th></tr></thead><tbody>
-    ${CATALOG.map(p=>`<tr><td><b style="font-weight:600">${p.name}</b><br><span style="color:var(--fg-soft);font-size:.76rem">${p.sub}</span></td>
-      <td><input class="pricei" type="number" min="0" step="1" value="${priceOf(p)}" data-ch="price" data-id="${p.id}" aria-label="Prix ${p.name}"></td>
-      ${SIZES.map((s,i)=>{const k=stockOf(p,i);return `<td class="r"><input class="stocki ${k?'':'zero'}" type="number" min="0" step="1" value="${k}" data-ch="stock" data-id="${p.id}" data-i="${i}" aria-label="Stock ${p.name} pointure ${s}"></td>`;}).join('')}
-      <td class="r" style="font-weight:700">${totStock(p)}</td></tr>`).join('')}
+    <div class="scroll-x"><table class="tbl"><thead><tr><th>Cuir</th><th>Prix</th>${SIZES.map(s=>`<th class="r">${s}</th>`).join('')}<th class="r">Total</th></tr></thead><tbody>
+    ${CATALOG.map(p=>p.colors.map((c,ci)=>`<tr><td><b style="font-weight:600">${ci===0?p.name:'&nbsp;'}</b> <span style="color:var(--fg-soft);font-size:.76rem">${COLORS[c].n}</span></td>
+      <td>${ci===0?`<input class="pricei" type="number" min="0" step="1" value="${priceOf(p)}" data-ch="price" data-id="${p.id}" aria-label="Prix ${p.name}">`:''}</td>
+      ${SIZES.map((s,i)=>{const k=stockOf(p,c,i),ferme=enRupture(p,c,s);
+        return `<td class="r"><input class="stocki ${k&&!ferme?'':'zero'}" type="number" min="0" step="1" value="${k}" data-ch="stock" data-id="${p.id}" data-c="${c}" data-i="${i}"${ferme?' title="Fermée à la vente malgré ce stock (rupture déclarée)"':''} aria-label="Stock ${p.name} ${COLORS[c].n} pointure ${s}${ferme?', fermée à la vente':''}"></td>`;}).join('')}
+      <td class="r" style="font-weight:700">${totBrutCol(p,c)}</td></tr>`).join('')
+      +`<tr><td colspan="2" style="font-weight:700">Total ${p.name}</td>${SIZES.map((s,i)=>`<td class="r" style="font-weight:700">${p.colors.reduce((a,c)=>a+stockOf(p,c,i),0)}</td>`).join('')}<td class="r" style="font-weight:700">${totBrut(p)}</td></tr>`).join('')}
     </tbody></table></div>
     <div class="filters" style="margin-top:18px"><button class="btn btn-out btn-sm" data-act="resetcat">Rétablir les valeurs de départ</button></div></div>`;
 }

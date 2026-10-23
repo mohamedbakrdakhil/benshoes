@@ -14,15 +14,31 @@ const att=s=>esc(s).replace(/`/g,'&#96;');
 const txt=(v,m)=>String(v??'').replace(/[\u0000-\u001f\u007f-\u009f]/g,' ').trim().slice(0,m);
 const prod=id=>CATALOG.find(p=>p.id===id);
 const priceOf=p=>S.ov.prices[p.id]??p.price;
-const stockOf=(p,i)=>(S.ov.stock[p.id]||p.stock)[i]??0;
-const totStock=p=>SIZES.reduce((a,_,i)=>a+stockOf(p,i),0);
-/* Le stock du modèle, affiné par coloris : une combinaison listée dans
-   « rupture » vaut zéro, quoi que dise le compteur commun. Tout ce qui
-   décide d'une vente — la grille de pointures, le bouton d'ajout, le
-   plafond de quantité, le bandeau « Épuisé » — passe par ici. */
+/* La grille de stock en vigueur : celle corrigée depuis l'espace atelier si
+   elle existe, sinon celle livrée avec le site.
+
+   Array.isArray écarte une grille enregistrée AVANT le passage au stock par
+   coloris : l'ancienne forme était un tableau de cinq nombres, la nouvelle
+   un objet coloris → tableau. Une vieille valeur restée dans le navigateur
+   ou dans la base ferait lire stock[0] comme un coloris et afficherait tout
+   à zéro — boutique entière fermée, sans message. On l'ignore. */
+const grilleStock=p=>{const o=S.ov.stock&&S.ov.stock[p.id];
+  return (o&&!Array.isArray(o))?o:p.stock;};
+const stockOf=(p,c,i)=>{const l=grilleStock(p)[c];return (l&&l[i])??0;};
+/* « rupture » reste la main de l'atelier par-dessus la grille : une
+   combinaison qu'on sait partie alors que l'inventaire la croit encore là.
+   Tout ce qui décide d'une vente — grille de pointures, bouton d'ajout,
+   plafond de quantité, bandeau « Épuisé » — passe par stockCol. */
 const enRupture=(p,c,t)=>!!(p.rupture&&p.rupture[c]&&p.rupture[c].indexOf(t)>=0);
-const stockCol=(p,c,i)=>enRupture(p,c,SIZES[i])?0:stockOf(p,i);
+const stockCol=(p,c,i)=>enRupture(p,c,SIZES[i])?0:stockOf(p,c,i);
 const totStockCol=(p,c)=>SIZES.reduce((a,_,i)=>a+stockCol(p,c,i),0);
+const totStock=p=>p.colors.reduce((a,c)=>a+totStockCol(p,c),0);
+/* Les mêmes totaux SANS le masque des ruptures. L'espace atelier compte des
+   paires en carton, pas des paires en vente : une combinaison fermée à la
+   main reste physiquement là, et l'afficher à zéro ferait perdre le chiffre
+   réel à la première correction. */
+const totBrutCol=(p,c)=>SIZES.reduce((a,_,i)=>a+stockOf(p,c,i),0);
+const totBrut=p=>p.colors.reduce((a,c)=>a+totBrutCol(p,c),0);
 const lsGet=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
 function nettoyerCommande(o){
   if(!o||typeof o!=='object')return null;

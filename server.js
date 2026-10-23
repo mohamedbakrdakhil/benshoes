@@ -27,7 +27,7 @@ const SESSION_DAYS = 14;
 const SIZES = [37, 38, 39, 40, 41];
 const COLORS = ['noir','beige','marron','taupe','tabac','burgundy','gris','marine'];
 const SEED = {
-  opus:    { price: 299, colors: ['burgundy','noir','beige','marron','taupe','tabac','gris','marine'], stock: [9,16,21,18,11] },
+  opus:    { price: 279, colors: ['burgundy','noir','beige','marron','taupe','tabac','gris','marine'], stock: [9,16,21,18,11] },
   stepy:   { price: 259, colors: ['beige','noir','marron','gris','marine'],                            stock: [7,13,17,14,8] },
   western: { price: 359, colors: ['noir'],                                                             stock: [4,7,9,8,5] },
 };
@@ -38,9 +38,27 @@ const STATUSES = ['nouvelle','confirmee','expediee','livree','annulee'];
 let db = { orders: [], catalog: null, seq: 0 };
 let writing = Promise.resolve();
 
+/* Le stock vit en grille « coloris -> une valeur par pointure ». SEED ne
+   garde qu'une ligne par modèle : une valeur de départ, dépliée ici sur
+   chaque coloris. Les vrais chiffres de l'atelier vivent dans
+   src/scripts/02-catalogue.js — ce serveur-ci n'est pas déployé. */
+function grilleSeed(id) {
+  const p = SEED[id], g = {};
+  for (const c of p.colors) g[c] = p.stock.slice();
+  return g;
+}
+/* La grille en vigueur pour un modèle, quelle que soit la forme trouvée en
+   base : une base écrite avant ce changement contient un seul tableau, on le
+   déplie plutôt que de repartir de zéro et d'effacer le travail de l'atelier. */
+function grille(id) {
+  const v = db.catalog.stock[id];
+  if (v && !Array.isArray(v)) return v;
+  if (Array.isArray(v)) { const g = {}; for (const c of SEED[id].colors) g[c] = v.slice(); return g; }
+  return grilleSeed(id);
+}
 function defaultCatalog() {
   const prices = {}, stock = {};
-  for (const [id, p] of Object.entries(SEED)) { prices[id] = p.price; stock[id] = p.stock.slice(); }
+  for (const [id, p] of Object.entries(SEED)) { prices[id] = p.price; stock[id] = grilleSeed(id); }
   return { prices, stock };
 }
 async function load() {
@@ -172,11 +190,13 @@ function buildOrder(input, source) {
   }
   // stock
   const need = {};
-  for (const it of items) { const k = it.id + ':' + it.size; need[k] = (need[k] || 0) + it.q; }
+  // La clé porte le coloris : deux cuirs de la même pointure ne puisent plus
+  // dans le même tas.
+  for (const it of items) { const k = it.id + ':' + it.colorKey + ':' + it.size; need[k] = (need[k] || 0) + it.q; }
   for (const [k, q] of Object.entries(need)) {
-    const [id, size] = k.split(':');
-    const have = (db.catalog.stock[id] || SEED[id].stock)[SIZES.indexOf(Number(size))] ?? 0;
-    if (have < q) return { error: `Stock insuffisant : ${id} en pointure ${size}.` };
+    const [id, colorKey, size] = k.split(':');
+    const have = (grille(id)[colorKey] || [])[SIZES.indexOf(Number(size))] ?? 0;
+    if (have < q) return { error: `Stock insuffisant : ${id} ${colorKey} en pointure ${size}.` };
   }
   const c = input.customer || {};
   const customer = { name: str(c.name, 80), phone: str(c.phone, 40), email: str(c.email, 120),
@@ -190,11 +210,12 @@ function buildOrder(input, source) {
   const ship = sub >= SHIP_FREE ? 0 : SHIP_COST;
   // décrément du stock
   for (const [k, q] of Object.entries(need)) {
-    const [id, size] = k.split(':');
-    const arr = (db.catalog.stock[id] || SEED[id].stock).slice();
+    const [id, colorKey, size] = k.split(':');
+    const g = grille(id), n = {};
+    for (const c of SEED[id].colors) n[c] = (g[c] || SEED[id].stock).slice();
     const ix = SIZES.indexOf(Number(size));
-    arr[ix] = Math.max(0, (arr[ix] ?? 0) - q);
-    db.catalog.stock[id] = arr;
+    n[colorKey][ix] = Math.max(0, (n[colorKey][ix] ?? 0) - q);
+    db.catalog.stock[id] = n;
   }
   return { order: { ref: newRef(), createdAt: new Date().toISOString(),
     status: source === 'atelier' ? 'confirmee' : 'nouvelle', source, items, customer,
@@ -309,10 +330,20 @@ const server = http.createServer(async (req, res) => {
       for (const id of Object.keys(SEED)) {
         const pr = Number(body.prices?.[id]);
         prices[id] = Number.isFinite(pr) && pr >= 0 && pr <= 100000 ? Math.round(pr) : db.catalog.prices[id];
-        const arr = body.stock?.[id];
-        stock[id] = Array.isArray(arr) && arr.length === SIZES.length
-          ? arr.map(v => { const n = Math.round(Number(v)); return Number.isFinite(n) && n >= 0 ? Math.min(n, 99999) : 0; })
-          : (db.catalog.stock[id] || SEED[id].stock).slice();
+        /* Le stock est une grille « coloris -> [une valeur par pointure] ».
+           L'ancienne forme — un seul tableau pour tous les coloris — est
+           encore acceptée et dépliée sur chaque coloris : une base écrite
+           avant ce changement ne doit pas remettre la boutique à zéro. */
+        const borne = v => { const n = Math.round(Number(v));
+          return Number.isFinite(n) && n >= 0 ? Math.min(n, 99999) : 0; };
+        const ligne = a => Array.isArray(a) && a.length === SIZES.length ? a.map(borne) : null;
+        const brut = body.stock?.[id];
+        const recu = {};
+        if (ligne(brut)) { for (const c of SEED[id].colors) recu[c] = ligne(brut); }
+        else if (brut && typeof brut === 'object') {
+          for (const c of SEED[id].colors) { const l = ligne(brut[c]); if (l) recu[c] = l; }
+        }
+        stock[id] = Object.keys(recu).length ? recu : grille(id);
       }
       db.catalog = { prices, stock }; await save();
       return json(res, 200, { prices, stock });

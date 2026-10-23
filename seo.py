@@ -47,7 +47,11 @@ def lire_catalogue(p='src/scripts/02-catalogue.js'):
     produits = []
     for m in re.finditer(
             r"\{id:'(\w+)'.*?name:'([^']*)',sub:'([^']*)'.*?price:(\d+),\s*\n?\s*"
-            r"colors:\[([^\]]*)\],\s*\n?\s*stock:\[([\d,\s]*)\].*?blurb:\"(.*?)\",\s*\n?\s*spec:",
+            # Le stock est passé d'un tableau commun aux coloris à une grille
+            # « coloris: [par pointure] ». On capture le bloc entre accolades et
+            # on additionne tous les nombres qu'il contient : la disponibilité
+            # annoncée à Google est un total, elle ne distingue pas les cuirs.
+            r"colors:\[([^\]]*)\],.*?stock:\{(.*?)\}.*?blurb:\"(.*?)\",\s*\n?\s*spec:",
             s, re.S):
         produits.append({
             'id':   m.group(1),
@@ -55,7 +59,7 @@ def lire_catalogue(p='src/scripts/02-catalogue.js'):
             'sous': m.group(3),
             'prix': int(m.group(4)),
             'coloris': [couleurs.get(c, c) for c in re.findall(r"'(\w+)'", m.group(5))],
-            'stock': sum(int(x) for x in m.group(6).split(',') if x.strip()),
+            'stock': sum(int(x) for x in re.findall(r'\d+', m.group(6))),
             'texte': deslash(m.group(7)),
         })
 

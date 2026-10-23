@@ -134,8 +134,15 @@ document.addEventListener('click',async e=>{
   else if(a==='row'){S.openRow=S.openRow===d.r?null:d.r;draw();}
   else if(a==='setst'){patchOrder(d.r,{status:d.k});toast('Statut : '+STATUS[d.k]);}
   else if(a==='deduct'){const o=S.orders.find(x=>x.ref===d.r);if(!o)return;
-    o.items.forEach(i=>{const p=prod(i.id);if(!p)return;const arr=(S.ov.stock[p.id]||p.stock).slice();
-      const ix=SIZES.indexOf(i.size);arr[ix]=Math.max(0,(arr[ix]??0)-i.q);S.ov.stock[p.id]=arr;});
+    o.items.forEach(i=>{const p=prod(i.id);if(!p)return;
+      const ix=SIZES.indexOf(i.size);if(ix<0)return;
+      // Copie profonde : une seule ligne est touchée, les sept autres cuirs
+      // doivent repartir intacts dans la grille enregistrée.
+      const g=grilleStock(p),n={};
+      p.colors.forEach(k=>n[k]=(g[k]||[]).slice());
+      const l=n[i.colorKey]||n[i.c];if(!l)return;
+      l[ix]=Math.max(0,(l[ix]??0)-i.q);
+      S.ov.stock[p.id]=n;});
     saveCat();patchOrder(d.r,{stockDeducted:true});toast('Stock mis à jour');}
   else if(a==='del'){if(t.dataset.sure!=='1'){t.dataset.sure='1';t.textContent='Confirmer ?';return;}
     S.orders=S.orders.filter(x=>x.ref!==d.r);S.openRow=null;draw();
@@ -185,7 +192,9 @@ document.addEventListener('change',e=>{
   const c=e.target.closest('[data-ch]');
   if(c){const v=Math.max(0,Math.round(+e.target.value||0));
     if(c.dataset.ch==='price'){S.ov.prices[c.dataset.id]=v;}
-    else{const p=prod(c.dataset.id);const arr=(S.ov.stock[p.id]||p.stock).slice();arr[+c.dataset.i]=v;S.ov.stock[p.id]=arr;}
+    else{const p=prod(c.dataset.id),g=grilleStock(p),n={};
+      p.colors.forEach(k=>n[k]=(g[k]||[]).slice());
+      (n[c.dataset.c]||(n[c.dataset.c]=[]))[+c.dataset.i]=v;S.ov.stock[p.id]=n;}
     saveCat();draw();return;}
   const m=e.target.closest('[data-mch]');
   if(m){readManual();const l=S.manual.lines[+m.dataset.n],k=m.dataset.mch;
