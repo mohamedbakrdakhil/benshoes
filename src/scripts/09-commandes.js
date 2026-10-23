@@ -109,13 +109,16 @@ function admDetail(o){
 function admCatalogue(){
   return `<div class="wrap" style="padding-block:26px 60px">
     <div class="sec-head" style="margin-bottom:20px"><div><span class="eyebrow">Catalogue</span><h2 style="font-size:1.7rem;margin-top:10px">Prix et stock par pointure</h2></div>
-      <p class="serif" style="max-width:40ch">Les valeurs livrées sont des valeurs de départ, à ajuster sur votre vrai stock. Chaque modification est enregistrée dès que vous quittez la case et s'applique à la boutique pour tout le monde.</p></div>
+      <p class="serif" style="max-width:46ch">Le stock se corrige désormais dans l'onglet <b>Stock</b> de votre tableur Google, et nulle part ailleurs : chaque commande y retire ce qu'elle emporte, et la boutique le relit à chaque visite. Ce tableau n'est qu'une lecture — une pointure à zéro y apparaît en rouge et se ferme toute seule à la vente.</p></div>
     ${(MODE!=='artifact'||S.db)?'':`<div class="callout" style="margin-bottom:18px;border-left-color:var(--bad)"><b>Enregistrement indisponible.</b> Vos modifications ne seront pas conservées dans cette vue.</div>`}
     <div class="scroll-x"><table class="tbl"><thead><tr><th>Cuir</th><th>Prix</th>${SIZES.map(s=>`<th class="r">${s}</th>`).join('')}<th class="r">Total</th></tr></thead><tbody>
     ${CATALOG.map(p=>p.colors.map((c,ci)=>`<tr><td><b style="font-weight:600">${ci===0?p.name:'&nbsp;'}</b> <span style="color:var(--fg-soft);font-size:.76rem">${COLORS[c].n}</span></td>
       <td>${ci===0?`<input class="pricei" type="number" min="0" step="1" value="${priceOf(p)}" data-ch="price" data-id="${p.id}" aria-label="Prix ${p.name}">`:''}</td>
       ${SIZES.map((s,i)=>{const k=stockOf(p,c,i),ferme=enRupture(p,c,s);
-        return `<td class="r"><input class="stocki ${k&&!ferme?'':'zero'}" type="number" min="0" step="1" value="${k}" data-ch="stock" data-id="${p.id}" data-c="${c}" data-i="${i}"${ferme?' title="Fermée à la vente malgré ce stock (rupture déclarée)"':''} aria-label="Stock ${p.name} ${COLORS[c].n} pointure ${s}${ferme?', fermée à la vente':''}"></td>`;}).join('')}
+        // Lecture seule : le stock ne se corrige plus ici mais dans l'onglet
+        // « Stock » du tableur. Un champ qui accepte la frappe sans rien
+        // enregistrer est pire qu'un champ fermé.
+        return `<td class="r"><input class="stocki ${k?'':'zero'}" type="number" value="${k}" readonly tabindex="-1" aria-readonly="true" aria-label="Stock ${p.name} ${COLORS[c].n} pointure ${s}"></td>`;}).join('')}
       <td class="r" style="font-weight:700">${totBrutCol(p,c)}</td></tr>`).join('')
       +`<tr><td colspan="2" style="font-weight:700">Total ${p.name}</td>${SIZES.map((s,i)=>`<td class="r" style="font-weight:700">${p.colors.reduce((a,c)=>a+stockOf(p,c,i),0)}</td>`).join('')}<td class="r" style="font-weight:700">${totBrut(p)}</td></tr>`).join('')}
     </tbody></table></div>

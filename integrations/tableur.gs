@@ -39,6 +39,28 @@ var FEUILLE_ID = '18WEWekxfeI_fbxKN471uPGjCNy54ToMpF8Id2Dm42s8';
 // d'un robot qui viendrait noyer la feuille.
 var MAX_PAR_HEURE = 40;
 
+// Nom de l'onglet qui porte le stock. Créé tout seul s'il manque.
+var ONGLET_STOCK = 'Stock';
+
+/* La semence du stock : ce qui est écrit dans l'onglet la première fois, et
+   plus jamais ensuite. Une fois l'onglet créé, c'est LUI qui fait foi — on ne
+   le réécrit pas depuis le code, sinon la moindre republication du script
+   effacerait les corrections de l'atelier.
+
+   Inventaire de référence 920, 202 paires. Ordre des colonnes : POINTURES. */
+var STOCK_DEPART = {
+  opus: { noir:     [6,6,6,6,4],
+          marron:   [6,6,6,6,4],
+          marine:   [6,6,6,6,4],
+          gris:     [6,6,6,6,4],
+          burgundy: [5,5,5,5,2],
+          taupe:    [5,5,5,5,2],
+          beige:    [5,0,5,6,2],   // 38 déclaré épuisé par l'atelier
+          tabac:    [5,5,6,5,2] }
+};
+
+var COL_STOCK = ['Modèle','Cuir','clé'].concat(POINTURES.map(String)).concat(['Total']);
+
 /* ───────── catalogue de référence ─────────
    DOIT correspondre à src/scripts/02-catalogue.js. Le prix retenu est
    TOUJOURS celui d'ici, jamais celui annoncé par le navigateur. */
@@ -51,18 +73,9 @@ var COLORIS = { noir:'Noir', beige:'Beige', marron:'Marron', taupe:'Marron taupe
                 taupe:'Marron taupe' };
 var POINTURES   = [37,38,39,40,41];
 
-/* Les ruptures, coloris par coloris : modèle → coloris → pointures épuisées.
-   Doit suivre « rupture » dans src/scripts/02-catalogue.js.
-
-   Le site masque déjà ces combinaisons, mais une page ouverte avant la
-   rupture garde l'ancienne grille : sans ce contrôle ici, elle pourrait
-   encore passer la commande. C'est ce script qui fait foi. */
-var RUPTURES = { opus: { beige: [38] } };
-
-function epuise(id, coloris, pointure) {
-  var m = RUPTURES[id];
-  return !!(m && m[coloris] && m[coloris].indexOf(pointure) >= 0);
-}
+/* Il n'y a plus de liste de ruptures tenue à la main : l'onglet « Stock » est
+   la seule vérité. Une case à zéro refuse la vente, et chaque commande
+   décrémente la sienne. Voir retirerDuStock plus bas. */
 var LIVR_OFFERTE = 0;     // livraison offerte sans minimum
 var LIVR_PRIX    = 0;
 
@@ -161,6 +174,141 @@ function ecrireArticles(recue, ref, lignes) {
   a.getRange(depart, 7, corps.length, 2).setNumberFormat('#,##0 \"DH\"');
 }
 
+/* ═══════════════ le stock, dans la feuille ═══════════════
+
+   C'est ici que vit la vérité du stock : une ligne par cuir, une colonne par
+   pointure. L'atelier corrige à la main dans l'onglet ; le site lit la même
+   chose par doGet ; chaque commande en retire ce qu'elle emporte.
+
+   Trois colonnes avant les chiffres : le modèle et le nom du cuir pour qu'on
+   s'y retrouve, puis la clé technique — c'est elle que le code lit, jamais le
+   nom affiché, qui peut être réécrit sans rien casser.                      */
+
+/** L'onglet du stock, semé la première fois et jamais réécrit ensuite. */
+function feuilleStock() {
+  var classeur = FEUILLE_ID ? SpreadsheetApp.openById(FEUILLE_ID)
+                            : SpreadsheetApp.getActiveSpreadsheet();
+  var f = classeur.getSheetByName(ONGLET_STOCK);
+  if (f) return f;
+  f = classeur.insertSheet(ONGLET_STOCK);
+  var lignes = [COL_STOCK];
+  for (var id in STOCK_DEPART) {
+    var p = CATALOGUE[id];
+    for (var i = 0; i < p.coloris.length; i++) {
+      var c = p.coloris[i], v = (STOCK_DEPART[id] || {})[c] || [];
+      var l = [p.nom, COLORIS[c] || c, c];
+      for (var k = 0; k < POINTURES.length; k++) l.push(Number(v[k]) || 0);
+      l.push('');                                   // le total, posé en formule
+      lignes.push(l);
+    }
+  }
+  f.getRange(1, 1, lignes.length, COL_STOCK.length).setValues(lignes);
+  var premiere = 4, derniere = 3 + POINTURES.length;
+  for (var r = 2; r <= lignes.length; r++) {
+    f.getRange(r, COL_STOCK.length).setFormula(
+      '=SUM(' + f.getRange(r, premiere, 1, POINTURES.length).getA1Notation() + ')');
+  }
+  habillerStock(f);
+  return f;
+}
+
+/** Mise en forme, rejouable. */
+function habillerStock(f) {
+  f = f || feuilleStock();
+  var n = COL_STOCK.length;
+  f.getRange(1, 1, 1, n).setValues([COL_STOCK])
+   .setFontWeight('bold').setBackground('#2b1512').setFontColor('#fdf6ec')
+   .setVerticalAlignment('middle');
+  f.setFrozenRows(1);
+  f.setRowHeight(1, 34);
+  f.setColumnWidth(1, 110); f.setColumnWidth(2, 150); f.setColumnWidth(3, 90);
+  for (var i = 0; i < POINTURES.length; i++) f.setColumnWidth(4 + i, 70);
+  f.setColumnWidth(n, 80);
+  // La clé est technique : on la montre, en gris, pour qu'on ne la prenne pas
+  // pour une case à remplir.
+  f.getRange('C2:C').setFontColor('#9aa0a6');
+  // Une case à zéro saute aux yeux : c'est une pointure fermée à la vente.
+  f.setConditionalFormatRules([SpreadsheetApp.newConditionalFormatRule()
+    .whenNumberEqualTo(0).setBackground('#fbe3e0').setFontColor('#8a1c13')
+    .setRanges([f.getRange(2, 4, Math.max(f.getMaxRows() - 1, 1), POINTURES.length)])
+    .build()]);
+}
+
+/** Le stock tel qu'il est, lu depuis l'onglet : { modèle: { cuir: [par pointure] } } */
+function lireStock() {
+  var f = feuilleStock(), out = {};
+  var n = f.getLastRow();
+  if (n < 2) return out;
+  var v = f.getRange(2, 1, n - 1, 3 + POINTURES.length).getValues();
+  for (var i = 0; i < v.length; i++) {
+    var cle = String(v[i][2] || '').trim();
+    if (!cle) continue;
+    // Le modèle est retrouvé par son nom affiché : une seule ligne de code à
+    // changer si un jour il y a deux modèles.
+    var id = null;
+    for (var k in CATALOGUE) if (CATALOGUE[k].nom === String(v[i][0]).trim()) id = k;
+    if (!id || CATALOGUE[id].coloris.indexOf(cle) < 0) continue;
+    var ligne = [];
+    for (var t = 0; t < POINTURES.length; t++) {
+      var x = Math.floor(Number(v[i][3 + t]));
+      ligne.push(isNaN(x) || x < 0 ? 0 : x);
+    }
+    (out[id] || (out[id] = {}))[cle] = ligne;
+  }
+  return out;
+}
+
+/** Combien reste-t-il, et où est-ce écrit. Rend null si la ligne n'existe pas. */
+function caseStock(f, id, cle, pointure) {
+  var n = f.getLastRow();
+  if (n < 2) return null;
+  var col = POINTURES.indexOf(Number(pointure));
+  if (col < 0) return null;
+  var v = f.getRange(2, 1, n - 1, 3).getValues();
+  for (var i = 0; i < v.length; i++) {
+    if (String(v[i][2] || '').trim() !== cle) continue;
+    if (String(v[i][0] || '').trim() !== CATALOGUE[id].nom) continue;
+    return { rangee: i + 2, colonne: 4 + col };
+  }
+  return null;
+}
+
+/* Retire du stock ce que la commande emporte — ou refuse, sans rien toucher.
+
+   À n'appeler QUE sous le verrou de doPost : entre le moment où l'on constate
+   qu'il reste une paire et celui où on l'enlève, une seconde commande ne doit
+   pas pouvoir passer. C'est tout l'intérêt de faire les deux ici.
+
+   Rend une chaîne d'erreur, ou null si tout est retiré. */
+function retirerDuStock(lignes) {
+  var f = feuilleStock();
+  var besoin = {}, i;
+  for (i = 0; i < lignes.length; i++) {
+    var k = lignes[i].id + '|' + lignes[i].cle + '|' + lignes[i].pointure;
+    besoin[k] = (besoin[k] || 0) + lignes[i].q;
+  }
+  // D'abord TOUT vérifier, ensuite seulement écrire : une commande de deux
+  // paires dont la seconde manque ne doit pas retirer la première.
+  var aEcrire = [];
+  for (var k2 in besoin) {
+    var p = k2.split('|'), ref = caseStock(f, p[0], p[1], p[2]);
+    if (!ref) return 'Stock introuvable pour ' + (COLORIS[p[1]] || p[1]) + ' en ' + p[2] + '.';
+    var reste = Math.floor(Number(f.getRange(ref.rangee, ref.colonne).getValue())) || 0;
+    if (reste < besoin[k2]) {
+      return reste <= 0
+        ? (COLORIS[p[1]] || p[1]) + ' en pointure ' + p[2] + ' est épuisé.'
+        : 'Il ne reste que ' + reste + ' paire(s) de ' + (COLORIS[p[1]] || p[1])
+          + ' en pointure ' + p[2] + '.';
+    }
+    aEcrire.push({ ref: ref, valeur: reste - besoin[k2] });
+  }
+  for (i = 0; i < aEcrire.length; i++) {
+    f.getRange(aEcrire[i].ref.rangee, aEcrire[i].ref.colonne).setValue(aEcrire[i].valeur);
+  }
+  CacheService.getScriptCache().remove('stock');
+  return null;
+}
+
 /** Vrai si le quota horaire est dépassé. */
 function tropDeCommandes() {
   var p = PropertiesService.getScriptProperties();
@@ -239,17 +387,14 @@ function construireCommande(entree) {
     if (p.coloris.indexOf(c) < 0) return { erreur: 'Coloris indisponible pour ce modèle.' };
     var t = Number(it.size);
     if (POINTURES.indexOf(t) < 0) return { erreur: 'Pointure invalide.' };
-    if (epuise(it.id, c, t))
-      return { erreur: (COLORIS[c] || c) + ' en pointure ' + t
-                       + ' est épuisé pour le moment.' };
     var q = Math.floor(Number(it.q));
     if (!(q >= 1 && q <= 10)) return { erreur: 'Quantité invalide.' };
     sousTotal += p.prix * q;                     // le prix vient d'ici, pas du navigateur
     articles.push(q + ' × ' + p.nom + ' ' + (COLORIS[c] || c) + ' — pointure ' + t);
     // La même chose, mais en champs séparés : c'est cette forme qui part
     // dans l'onglet « Articles ».
-    lignes.push({ modele: p.nom, coloris: (COLORIS[c] || c), pointure: t,
-                  q: q, prix: p.prix });
+    lignes.push({ id: it.id, cle: c, modele: p.nom, coloris: (COLORIS[c] || c),
+                  pointure: t, q: q, prix: p.prix });
   }
 
   var c0 = entree.customer || {};
@@ -316,8 +461,14 @@ function doPost(e) {
     // sur le numéro de ligne ni sur la référence.
     var verrou = LockService.getScriptLock();
     verrou.waitLock(20000);
-    var ref, f;
+    var ref, f, refus = null;
     try {
+      /* Le stock d'abord, et sous le même verrou que l'écriture : entre le
+         moment où l'on constate qu'il reste une paire et celui où on l'enlève,
+         une seconde commande ne doit pas pouvoir se glisser. Si ça refuse,
+         rien n'a bougé — ni le stock, ni la feuille des commandes. */
+      refus = retirerDuStock(cmd.lignes);
+      if (refus) throw { refusStock: refus };
       f = feuille();
       ref = nouvelleReference(f);
       var recue = new Date();
@@ -339,8 +490,12 @@ function doPost(e) {
         console.error('Détail des articles non écrit (' + ref + ') : ' + err);
       }
       memoire.retenir(ref);
-    } finally {
+    } catch (err) {
       verrou.releaseLock();
+      if (err && err.refusStock) return reponse({ erreur: err.refusStock });
+      throw err;
+    } finally {
+      try { verrou.releaseLock(); } catch (e) {}
     }
 
     if (ALERTE_EMAIL) {
@@ -452,6 +607,7 @@ function installer() {
   f.getRange(1, 1, Math.max(f.getLastRow(), 2), n).createFilter();
 
   habillerArticles();
+  habillerStock();
   tableauDeBord(classeur);
   menageOngletVide(classeur);
 
@@ -631,6 +787,19 @@ function menageOngletVide(classeur) {
  *
  *  L'adresse elle-même n'est pas renvoyée : cette URL est publique. */
 function doGet() {
+  /* Le site lit le stock ici à chaque visite. Un cache de soixante secondes
+     évite d'ouvrir la feuille pour chaque visiteur — le quota d'exécution
+     d'un compte Google n'est pas infini — sans jamais afficher plus d'une
+     minute de retard. retirerDuStock vide ce cache dès qu'il écrit. */
+  var cache = CacheService.getScriptCache(), brut = null;
+  try { brut = cache.get('stock'); } catch (e) {}
+  var stock;
+  if (brut) { try { stock = JSON.parse(brut); } catch (e) { stock = null; } }
+  if (!stock) {
+    try { stock = lireStock(); cache.put('stock', JSON.stringify(stock), 60); }
+    catch (e) { stock = null; }
+  }
   return reponse({ service: 'Benkashoes — réception des commandes', methode: 'POST',
-                   alerte: ALERTE_EMAIL ? 'armée' : 'absente' });
+                   alerte: ALERTE_EMAIL ? 'armée' : 'absente',
+                   stock: stock });
 }

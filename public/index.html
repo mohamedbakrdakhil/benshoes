@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; script-src 'self' 'sha256-5NEka1x9lIeU6uUbAnLCihOqcH+rn9DphG3tsxDSY7k='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; media-src 'self'; worker-src 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; script-src 'self' 'sha256-Fz7q9FMI2wE35A7rEOBOdY7MVKp16xLQjdhVqLpfu5A='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; media-src 'self'; worker-src 'none'; upgrade-insecure-requests">
 <meta name="benka-api" content="oui">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Benkashoes — mocassins-mules en daim, atelier marocain</title>
@@ -344,11 +344,10 @@ const CATALOG=[
           gris:     [6,6,6,6,4],
           burgundy: [5,5,5,5,2],
           taupe:    [5,5,5,5,2],
-          beige:    [5,5,5,6,2],
+          beige:    [5,0,5,6,2],
           tabac:    [5,5,6,5,2]},
    flag:'Le plus porté',
    vedette:'tabac',
-   rupture:{beige:[38]},
    blurb:"La bride penny ajourée, posée sur un daim souple monté à la main sur forme. Talon ouvert : on l’enfile d’un geste, il tient par le cou-de-pied. Huit daims au choix, du beige au noir, c’est le modèle sur lequel l’atelier a bâti sa réputation.",
    spec:[['Tige','Daim de veau, monté sur forme'],['Bride','Penny ajourée, surpiquée main'],['Semelle','EVA souple']]}
 ];
@@ -906,13 +905,13 @@ function admDetail(o){
 function admCatalogue(){
   return `<div class="wrap" style="padding-block:26px 60px">
     <div class="sec-head" style="margin-bottom:20px"><div><span class="eyebrow">Catalogue</span><h2 style="font-size:1.7rem;margin-top:10px">Prix et stock par pointure</h2></div>
-      <p class="serif" style="max-width:40ch">Les valeurs livrées sont des valeurs de départ, à ajuster sur votre vrai stock. Chaque modification est enregistrée dès que vous quittez la case et s'applique à la boutique pour tout le monde.</p></div>
+      <p class="serif" style="max-width:46ch">Le stock se corrige désormais dans l'onglet <b>Stock</b> de votre tableur Google, et nulle part ailleurs : chaque commande y retire ce qu'elle emporte, et la boutique le relit à chaque visite. Ce tableau n'est qu'une lecture — une pointure à zéro y apparaît en rouge et se ferme toute seule à la vente.</p></div>
     ${(MODE!=='artifact'||S.db)?'':`<div class="callout" style="margin-bottom:18px;border-left-color:var(--bad)"><b>Enregistrement indisponible.</b> Vos modifications ne seront pas conservées dans cette vue.</div>`}
     <div class="scroll-x"><table class="tbl"><thead><tr><th>Cuir</th><th>Prix</th>${SIZES.map(s=>`<th class="r">${s}</th>`).join('')}<th class="r">Total</th></tr></thead><tbody>
     ${CATALOG.map(p=>p.colors.map((c,ci)=>`<tr><td><b style="font-weight:600">${ci===0?p.name:'&nbsp;'}</b> <span style="color:var(--fg-soft);font-size:.76rem">${COLORS[c].n}</span></td>
       <td>${ci===0?`<input class="pricei" type="number" min="0" step="1" value="${priceOf(p)}" data-ch="price" data-id="${p.id}" aria-label="Prix ${p.name}">`:''}</td>
       ${SIZES.map((s,i)=>{const k=stockOf(p,c,i),ferme=enRupture(p,c,s);
-        return `<td class="r"><input class="stocki ${k&&!ferme?'':'zero'}" type="number" min="0" step="1" value="${k}" data-ch="stock" data-id="${p.id}" data-c="${c}" data-i="${i}"${ferme?' title="Fermée à la vente malgré ce stock (rupture déclarée)"':''} aria-label="Stock ${p.name} ${COLORS[c].n} pointure ${s}${ferme?', fermée à la vente':''}"></td>`;}).join('')}
+        return `<td class="r"><input class="stocki ${k?'':'zero'}" type="number" value="${k}" readonly tabindex="-1" aria-readonly="true" aria-label="Stock ${p.name} ${COLORS[c].n} pointure ${s}"></td>`;}).join('')}
       <td class="r" style="font-weight:700">${totBrutCol(p,c)}</td></tr>`).join('')
       +`<tr><td colspan="2" style="font-weight:700">Total ${p.name}</td>${SIZES.map((s,i)=>`<td class="r" style="font-weight:700">${p.colors.reduce((a,c)=>a+stockOf(p,c,i),0)}</td>`).join('')}<td class="r" style="font-weight:700">${totBrut(p)}</td></tr>`).join('')}
     </tbody></table></div>
@@ -1913,6 +1912,30 @@ if(!HASCLAUDE){
       loadOrders().then(draw);},20000);
   })();
 }
+(async function(){
+  if(!SHOP.tableur)return;
+  const valider=d=>{
+    if(!d||typeof d!=='object'||!d.stock||typeof d.stock!=='object')return null;
+    const net={};
+    CATALOG.forEach(p=>{
+      const g=d.stock[p.id];if(!g||typeof g!=='object')return;
+      const n={};
+      p.colors.forEach(c=>{const l=g[c];
+        if(Array.isArray(l)&&l.length===SIZES.length)
+          n[c]=l.map(v=>{const x=Math.floor(Number(v));return x>0?x:0;});});
+      if(Object.keys(n).length===p.colors.length)net[p.id]=n;});
+    return Object.keys(net).length?net:null;
+  };
+  const garde=lsGet('benkashoes.stock');
+  const tot=valider(garde);
+  if(tot){S.ov.stock=Object.assign({},S.ov.stock,tot);draw();}
+  try{
+    const r=await fetch(SHOP.tableur,{method:'GET'});
+    const frais=valider(await r.json());
+    if(frais){S.ov.stock=Object.assign({},S.ov.stock,frais);
+      lsSet('benkashoes.stock',{stock:frais});draw();}
+  }catch(e){/* feuille injoignable : on garde le repli, la boutique reste ouverte */}
+})();
 (async function(){
   if(STATIC)return;
   const [db,user]=await Promise.all([use('db'),use('user')]);

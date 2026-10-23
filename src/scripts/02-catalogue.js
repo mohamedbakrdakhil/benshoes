@@ -38,22 +38,13 @@ const CATALOG=[
           gris:     [6,6,6,6,4],
           burgundy: [5,5,5,5,2],
           taupe:    [5,5,5,5,2],
-          beige:    [5,5,5,6,2],
+          beige:    [5,0,5,6,2],
           tabac:    [5,5,6,5,2]},
    flag:'Le plus porté',
    /* Le coloris qui porte le bandeau « Le plus porté ». Sans lui le bandeau
       tombait sur la première vignette de la grille, c'est-à-dire sur le
       premier coloris listé — un hasard d'ordre, pas une information. */
    vedette:'tabac',
-   /* Fermetures à la main, par-dessus la grille ci-dessus.
-
-      Depuis que le stock est par coloris, une case à zéro suffit à fermer une
-      pointure : « rupture » n'est plus nécessaire pour ça. Elle sert
-      maintenant au cas inverse — l'inventaire croit encore à des paires que
-      l'atelier sait parties. On ferme la vente sans falsifier le compte.
-
-      Format : coloris → pointures fermées. */
-   rupture:{beige:[38]},
    blurb:"La bride penny ajourée, posée sur un daim souple monté à la main sur forme. Talon ouvert : on l’enfile d’un geste, il tient par le cou-de-pied. Huit daims au choix, du beige au noir, c’est le modèle sur lequel l’atelier a bâti sa réputation.",
    spec:[['Tige','Daim de veau, monté sur forme'],['Bride','Penny ajourée, surpiquée main'],['Semelle','EVA souple']]}
 ];

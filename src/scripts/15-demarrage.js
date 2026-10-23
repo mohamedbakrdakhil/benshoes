@@ -50,6 +50,42 @@ if(!HASCLAUDE){
       loadOrders().then(draw);},20000);
   })();
 }
+/* ───────── le stock vient de la feuille ─────────
+
+   La grille écrite dans 02-catalogue.js n'est plus qu'un repli : elle sert le
+   temps du premier affichage, et si la feuille est injoignable. La vérité est
+   dans l'onglet « Stock » du tableur, que chaque commande décrémente.
+
+   Rien n'est accepté à moitié. Une réponse incomplète — un cuir manquant, une
+   ligne qui n'a pas cinq pointures — est rejetée en bloc : mieux vaut un stock
+   d'hier qu'une boutique à moitié fermée sur une réponse tronquée. */
+(async function(){
+  if(!SHOP.tableur)return;
+  const valider=d=>{
+    if(!d||typeof d!=='object'||!d.stock||typeof d.stock!=='object')return null;
+    const net={};
+    CATALOG.forEach(p=>{
+      const g=d.stock[p.id];if(!g||typeof g!=='object')return;
+      const n={};
+      p.colors.forEach(c=>{const l=g[c];
+        if(Array.isArray(l)&&l.length===SIZES.length)
+          n[c]=l.map(v=>{const x=Math.floor(Number(v));return x>0?x:0;});});
+      if(Object.keys(n).length===p.colors.length)net[p.id]=n;});
+    return Object.keys(net).length?net:null;
+  };
+  // Le dernier stock connu s'affiche tout de suite : au rechargement suivant,
+  // les pointures fermées le restent sans attendre l'aller-retour.
+  const garde=lsGet('benkashoes.stock');
+  const tot=valider(garde);
+  if(tot){S.ov.stock=Object.assign({},S.ov.stock,tot);draw();}
+  try{
+    const r=await fetch(SHOP.tableur,{method:'GET'});
+    const frais=valider(await r.json());
+    if(frais){S.ov.stock=Object.assign({},S.ov.stock,frais);
+      lsSet('benkashoes.stock',{stock:frais});draw();}
+  }catch(e){/* feuille injoignable : on garde le repli, la boutique reste ouverte */}
+})();
+
 (async function(){
   if(STATIC)return;
   const [db,user]=await Promise.all([use('db'),use('user')]);
