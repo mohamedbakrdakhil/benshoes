@@ -59,7 +59,6 @@ var STOCK_DEPART = {
           tabac:    [5,5,6,5,2] }
 };
 
-var COL_STOCK = ['Modèle','Cuir','clé'].concat(POINTURES.map(String)).concat(['Total']);
 
 /* ───────── catalogue de référence ─────────
    DOIT correspondre à src/scripts/02-catalogue.js. Le prix retenu est
@@ -72,6 +71,11 @@ var COLORIS = { noir:'Noir', beige:'Beige', marron:'Marron', taupe:'Marron taupe
                 tabac:'Tabac', burgundy:'Burgundy', gris:'Gris', marine:'Marine',
                 taupe:'Marron taupe' };
 var POINTURES   = [37,38,39,40,41];
+
+/* Les colonnes de l'onglet « Stock ». Déclarée ICI, après POINTURES : plus
+   haut dans le fichier, POINTURES est hoistée mais encore vide, et le .map
+   échouait avant même que le script démarre. */
+var COL_STOCK = ['Modèle','Cuir','clé'].concat(POINTURES.map(String)).concat(['Total']);
 
 /* Il n'y a plus de liste de ruptures tenue à la main : l'onglet « Stock » est
    la seule vérité. Une case à zéro refuse la vente, et chaque commande
