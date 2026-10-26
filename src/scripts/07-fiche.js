@@ -27,7 +27,8 @@ function rotorHTML(p,c){
   const n=(COLORS[c]||{}).n||c;
   return `<div class="rotor" tabindex="0" role="img"
     aria-label="${att(p.name+' en daim '+n+', à faire tourner')}"
-    data-src="assets/produits/rotor-${att(c)}.jpg">
+    data-src="assets/produits/rotor-${att(c)}.webp"
+    data-repli="assets/produits/rotor-${att(c)}.jpg">
     <div class="rotor-vue"></div>
     <span class="rotor-aide" aria-hidden="true">Glissez pour tourner</span></div>`;
 }
@@ -46,7 +47,15 @@ function majRotor(){
 
   const vue=r.querySelector('.rotor-vue');
   const img=new Image();
-  img.onerror=()=>r.remove();
+  /* La planche nette est en WebP. Un navigateur qui l'ignore bascule une
+     fois sur l'ancienne en JPEG — floue, mais qui tourne — au lieu de perdre
+     le tourne-disque. Une seule reprise : si le repli échoue aussi, c'est le
+     réseau, et les photos de la galerie suffisent à acheter. */
+  let repli=false;
+  img.onerror=()=>{
+    if(!repli&&r.dataset.repli){repli=true;r.dataset.src=r.dataset.repli;img.src=r.dataset.repli;return;}
+    r.remove();
+  };
   img.onload=()=>{
     vue.style.backgroundImage=`url("${r.dataset.src}")`;
     r.classList.add('prete');
