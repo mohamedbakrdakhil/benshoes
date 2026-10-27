@@ -31,6 +31,12 @@ const savedCart=lsGet('benkashoes.cart');if(Array.isArray(savedCart))S.cart=save
   .filter(i=>i&&prod(i.id)&&COLORS[i.c]&&prod(i.id).colors.includes(i.c)&&SIZES.includes(i.s))
   .map(i=>({id:i.id,c:i.c,s:i.s,q:Math.min(99,Math.max(1,Math.floor(Number(i.q))||1))}));
 draw();
+// Une adresse qui désigne un coloris ouvre sa fiche tout de suite.
+(function(){const f=depuisLien();
+  if(f){S.sheet=f;S.tab='fiche';S.panel='sheet';draw();
+    const p=prod(f.id);
+    mesure('ViewContent',{content_type:'product',content_ids:[refMeta(f.id,f.c)],
+      content_name:p.name+' '+(COLORS[f.c]||{}).n,value:priceOf(p),currency:'MAD'});}})();
 if(!HASCLAUDE){
   TOKEN=lsGet('benkashoes.token')||'';
   S.canAdmin=true;loadLocal();

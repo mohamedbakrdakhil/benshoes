@@ -31,6 +31,18 @@ if not empreintes:
 
 script_src = "'self' " + ' '.join(empreintes)
 
+# Le pixel Meta, et lui seul, si un identifiant est renseigné. Trois origines
+# s'ouvrent alors, chacune pour une raison précise : le script de mesure est
+# servi par connect.facebook.net, les événements partent vers facebook.com, et
+# le repli sans JavaScript est une image sur ce même domaine. Tant que PIXEL
+# est vide, rien ne s'ouvre — on ne laisse pas une porte entrebâillée « au cas où ».
+pixel = bool(re.search(r"const PIXEL\s*=\s*'[^']+'", h))
+images = ["'self'", 'data:']
+if pixel:
+    script_src += ' https://connect.facebook.net'
+    images.append('https://www.facebook.com')
+    print('  pixel Meta : connect.facebook.net et facebook.com autorisés')
+
 # La page ne se connecte qu'à elle-même. Seule exception : si le tableur de
 # l'atelier est configuré, on ouvre juste ce qu'il faut pour lui parler —
 # Apps Script répond derrière une redirection, d'où les deux origines. Tant
@@ -39,6 +51,8 @@ destinations = ["'self'"]
 if re.search(r"tableur:\s*'https://script\.google\.com/[^']+'", h):
     destinations += ['https://script.google.com', 'https://script.googleusercontent.com']
     print('  tableur configuré : connect-src ouvert vers Apps Script')
+if pixel:
+    destinations += ['https://www.facebook.com', 'https://connect.facebook.net']
 
 # media-src reste fermé tant qu'aucune vidéo n'est déclarée. Une politique
 # ouverte « au cas où » est une permission qu'on oublie d'avoir donnée.
@@ -52,7 +66,7 @@ politique = '; '.join([
     'script-src ' + script_src,
     "style-src 'self' 'unsafe-inline'",
     "font-src 'self'",
-    "img-src 'self' data:",
+    'img-src ' + ' '.join(images),
     'connect-src ' + ' '.join(destinations),
     "media-src " + ("'self'" if videos else "'none'"),
     "worker-src 'none'",

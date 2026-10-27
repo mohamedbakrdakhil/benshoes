@@ -110,6 +110,13 @@ async function envoyerAuTableur(o,cle,leurre){
     catch(e2){return {ok:false,refus:false,message:'L\u2019envoi n\u2019a pas abouti. Voici votre récapitulatif à envoyer à l\u2019atelier.'};}
   }
 }
+/* Appelée une seule fois, quand la commande est vraiment passée. */
+function mesurerAchat(o){
+  mesure('Purchase',{content_type:'product',
+    content_ids:(o.items||[]).map(i=>refMeta(i.id,i.colorKey)),
+    num_items:(o.items||[]).reduce((a,i)=>a+i.q,0),
+    value:o.total,currency:'MAD'});
+}
 async function placeOrder(){
   if(S.envoi)return;   // le bouton a déjà été cliqué
   const f=readForm();S.form=f;
@@ -127,7 +134,7 @@ async function placeOrder(){
     note:f.note,sub,ship,total:sub+ship,currency:'MAD'};
   if(MODE==='api'){
     try{const r=await api('orders',{method:'POST',body:{items:o.items,customer:o.customer,note:o.note}});
-      S.lastOrder=Object.assign({},nettoyerCommande(r.order)||o,{saved:true});S.cart=[];syncCart();S.step=3;S.form=null;
+      mesurerAchat(o);S.lastOrder=Object.assign({},nettoyerCommande(r.order)||o,{saved:true});S.cart=[];syncCart();S.step=3;S.form=null;
       await refreshCatalog();draw();return;}
     catch(e){toast(e.message);return;}}
   if(SHOP.tableur){
@@ -138,7 +145,7 @@ async function placeOrder(){
     S.envoi=false;
     if(r.ok){
       if(r.ref)o.ref=r.ref;
-      S.lastOrder=Object.assign({},nettoyerCommande(o)||o,{saved:true,canal:'tableur'});
+mesurerAchat(o);      S.lastOrder=Object.assign({},nettoyerCommande(o)||o,{saved:true,canal:'tableur'});
       S.cart=[];syncCart();S.step=3;S.form=null;
       if(MODE==='local'){S.orders=[S.lastOrder].concat(S.orders);saveLocal();}
       draw();return;
@@ -153,6 +160,6 @@ async function placeOrder(){
   }
   let saved=false;
   if(S.db){try{await S.db.doc('orders/'+o.ref).set(o);saved=true;}catch(e){saved=false;}}
-  S.lastOrder=Object.assign({},nettoyerCommande(o)||o,{saved:saved});S.cart=[];syncCart();S.step=3;S.form=null;draw();
+mesurerAchat(o);  S.lastOrder=Object.assign({},nettoyerCommande(o)||o,{saved:saved});S.cart=[];syncCart();S.step=3;S.form=null;draw();
 }
 

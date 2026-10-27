@@ -108,9 +108,14 @@ document.addEventListener('click',async e=>{
   else if(a==='tab'){S.tab=d.k;draw();}
   else if(a==='fam'){S.filter=d.k;draw();}
   else if(a==='col'){S.colorFilter=S.colorFilter===d.k?null:d.k;draw();}
-  else if(a==='open'){const p=prod(d.id);S.sheet={id:p.id,c:d.c||p.colors[0],s:null};S.tab='fiche';S.panel='sheet';draw();}
-  else if(a==='closep'){S.panel=null;S.manual=null;draw();}
-  else if(a==='setcol'){S.sheet.c=d.k;draw();}
+  else if(a==='open'){const p=prod(d.id),c=d.c||p.colors[0];
+    S.sheet={id:p.id,c:c,s:null};S.tab='fiche';S.panel='sheet';draw();
+    poserLien('#'+p.id+'-'+c);
+    mesure('ViewContent',{content_type:'product',content_ids:[refMeta(p.id,c)],
+      content_name:p.name+' '+(COLORS[c]||{}).n,value:priceOf(p),currency:'MAD'});}
+  else if(a==='closep'){S.panel=null;S.manual=null;draw();
+    if(depuisLien())poserLien('');}
+  else if(a==='setcol'){poserLien('#'+S.sheet.id+'-'+d.k);S.sheet.c=d.k;draw();}
   else if(a==='setsize'){S.sheet.s=+d.s;draw();}
   else if(a==='add'){const{id,c,s}=S.sheet;
     // le bouton est désactivé sans pointure, mais une ligne sans pointure
@@ -119,11 +124,17 @@ document.addEventListener('click',async e=>{
     const ex=S.cart.find(i=>i.id===id&&i.c===c&&i.s===s);
     const max=stockCol(prod(id),c,SIZES.indexOf(s));
     if(ex){if(ex.q>=max){toast('Stock atteint pour cette pointure');return;}ex.q++;}else S.cart.push({id,c,s,q:1});
-    syncCart();S.panel='cart';S.step=1;draw();bumpCart();toast('Ajouté au panier');}
+    syncCart();S.panel='cart';S.step=1;draw();bumpCart();toast('Ajouté au panier');
+    const pr=prod(id);
+    mesure('AddToCart',{content_type:'product',content_ids:[refMeta(id,c)],
+      content_name:pr.name+' '+(COLORS[c]||{}).n,value:priceOf(pr),currency:'MAD'});}
   else if(a==='qty'){const i=S.cart[+d.n];const max=stockCol(prod(i.id),i.c,SIZES.indexOf(i.s));
     i.q+=+d.d;if(i.q>max){i.q=max;toast('Stock atteint');}if(i.q<1)S.cart.splice(+d.n,1);syncCart();draw();}
   else if(a==='rm'){S.cart.splice(+d.n,1);syncCart();draw();}
-  else if(a==='next'){S.step=2;draw();}
+  else if(a==='next'){S.step=2;draw();
+    mesure('InitiateCheckout',{content_type:'product',
+      content_ids:S.cart.map(i=>refMeta(i.id,i.c)),
+      num_items:cartCount(),value:cartSub()+shipCost(),currency:'MAD'});}
   else if(a==='back'){S.form=readForm();S.step=1;draw();}
   else if(a==='place'){placeOrder();}
   else if(a==='copysum'){const ok=await copy(orderText(S.lastOrder));toast(ok?'Récapitulatif copié':'Sélectionnez le texte pour le copier');}
@@ -233,9 +244,40 @@ document.addEventListener('change',e=>{
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&e.target.id==='pw'){e.preventDefault();document.querySelector('[data-act="login"]')?.click();return;}
   if(e.key==='Escape'&&S.panel){S.panel=null;S.manual=null;draw();}});
+/* ───────── l'adresse désigne une fiche ─────────
+
+   « benkashoes.ma/#opus-tabac » ouvre le tabac directement. Sans ça, une
+   publicité pour un coloris précis déposait la visiteuse sur la page
+   d'accueil, à elle de retrouver le modèle — et une bonne partie renonce là.
+
+   C'est aussi ce qui rend une fiche partageable, et ce qui fait que le
+   bouton « retour » du téléphone referme le panneau au lieu de quitter le
+   site. */
+function depuisLien(){
+  const h=decodeURIComponent(location.hash||'').replace(/^#/,'');
+  if(!h||h==='admin')return null;
+  const t=h.split('-');
+  if(t.length<2)return null;
+  const c=t.pop(),p=prod(t.join('-'));
+  return (p&&p.colors.includes(c))?{id:p.id,c:c,s:null}:null;
+}
+/* Nos propres écritures ne doivent pas déclencher le gestionnaire ci-dessous,
+   sinon ouvrir une fiche la refermerait aussitôt. */
+let lienInterne=false;
+function poserLien(h){
+  if((location.hash||'')===h)return;
+  lienInterne=true;
+  if(h)location.hash=h;
+  else history.replaceState(null,'',location.pathname+location.search);
+  setTimeout(()=>{lienInterne=false;},0);
+}
 let ancienAdmin=location.hash==='#admin';
 addEventListener('hashchange',()=>{
-  const admin=location.hash==='#admin';S.panel=null;draw();
+  if(lienInterne)return;
+  const admin=location.hash==='#admin';
+  const fiche=depuisLien();
+  if(fiche){S.sheet=fiche;S.tab='fiche';S.panel='sheet';draw();ancienAdmin=admin;return;}
+  S.panel=null;draw();
   if(admin||ancienAdmin)window.scrollTo(0,0);
   ancienAdmin=admin;
 });
