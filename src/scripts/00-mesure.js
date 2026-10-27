@@ -26,8 +26,13 @@ if(PIXEL){fbq('init',PIXEL);fbq('track','PageView');}
 
 /* Un seul point de passage, et jamais d'exception qui remonte : une erreur
    de mesure ne doit pas pouvoir casser une vente. */
-function mesure(nom,donnees){
-  try{if(PIXEL&&window.fbq)fbq('track',nom,donnees||{});}catch(e){}
+function mesure(nom,donnees,id){
+  /* « id » dédoublonne. L'achat part deux fois vers Meta : d'ici par le
+     pixel, et du script du tableur par l'API Conversions — le second passe
+     là où iOS et les bloqueurs arrêtent le premier. Même identifiant des
+     deux côtés, Meta comprend que c'est une seule vente et n'en compte
+     qu'une. Sans lui, votre chiffre d'affaires s'afficherait en double. */
+  try{if(PIXEL&&window.fbq)fbq('track',nom,donnees||{},id?{eventID:id}:undefined);}catch(e){}
 }
 /* L'identifiant d'un article, le même ici et dans le flux catalogue — c'est
    ce qui permet à Meta de remontrer LA paire regardée, pas une autre. */

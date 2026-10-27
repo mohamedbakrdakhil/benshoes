@@ -111,11 +111,11 @@ async function envoyerAuTableur(o,cle,leurre){
   }
 }
 /* Appelée une seule fois, quand la commande est vraiment passée. */
-function mesurerAchat(o){
+function mesurerAchat(o,id){
   mesure('Purchase',{content_type:'product',
     content_ids:(o.items||[]).map(i=>refMeta(i.id,i.colorKey)),
     num_items:(o.items||[]).reduce((a,i)=>a+i.q,0),
-    value:o.total,currency:'MAD'});
+    value:o.total,currency:'MAD'},id);
 }
 async function placeOrder(){
   if(S.envoi)return;   // le bouton a déjà été cliqué
@@ -132,20 +132,25 @@ async function placeOrder(){
     items:S.cart.map(i=>{const p=prod(i.id);return {id:p.id,name:p.name,color:COLORS[i.c].n,colorKey:i.c,size:i.s,q:i.q,unit:priceOf(p)};}),
     customer:{name:f.name,phone:f.phone,email:f.email,addr:f.addr,zip:f.zip,city:f.city,country:f.country},
     note:f.note,sub,ship,total:sub+ship,currency:'MAD'};
+  /* Un seul identifiant pour toute la commande, quel que soit le chemin
+     qu'elle prend. Il sert d'abord de clé d'idempotence vers le tableur, et
+     de dédoublonnage entre le pixel et l'API Conversions. */
+  const cle=cleCommande();
   if(MODE==='api'){
     try{const r=await api('orders',{method:'POST',body:{items:o.items,customer:o.customer,note:o.note}});
-      mesurerAchat(o);S.lastOrder=Object.assign({},nettoyerCommande(r.order)||o,{saved:true});S.cart=[];syncCart();S.step=3;S.form=null;
+      mesurerAchat(o,cle);S.lastOrder=Object.assign({},nettoyerCommande(r.order)||o,{saved:true});S.cart=[];syncCart();S.step=3;S.form=null;
       await refreshCatalog();draw();return;}
     catch(e){toast(e.message);return;}}
   if(SHOP.tableur){
     S.envoi=true;
     const b=document.querySelector('[data-act="place"]');
     if(b){b.disabled=true;b.textContent='Envoi en cours…';}
-    const r=await envoyerAuTableur(o,cleCommande(),f.site);
+    const r=await envoyerAuTableur(o,cle,f.site);
     S.envoi=false;
     if(r.ok){
       if(r.ref)o.ref=r.ref;
-mesurerAchat(o);      S.lastOrder=Object.assign({},nettoyerCommande(o)||o,{saved:true,canal:'tableur'});
+      mesurerAchat(o,cle);
+      S.lastOrder=Object.assign({},nettoyerCommande(o)||o,{saved:true,canal:'tableur'});
       S.cart=[];syncCart();S.step=3;S.form=null;
       if(MODE==='local'){S.orders=[S.lastOrder].concat(S.orders);saveLocal();}
       draw();return;
@@ -160,6 +165,7 @@ mesurerAchat(o);      S.lastOrder=Object.assign({},nettoyerCommande(o)||o,{saved
   }
   let saved=false;
   if(S.db){try{await S.db.doc('orders/'+o.ref).set(o);saved=true;}catch(e){saved=false;}}
-mesurerAchat(o);  S.lastOrder=Object.assign({},nettoyerCommande(o)||o,{saved:saved});S.cart=[];syncCart();S.step=3;S.form=null;draw();
+  mesurerAchat(o,cle);
+  S.lastOrder=Object.assign({},nettoyerCommande(o)||o,{saved:saved});S.cart=[];syncCart();S.step=3;S.form=null;draw();
 }
 

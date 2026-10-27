@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; script-src 'self' 'sha256-Ij460Zhuggs692S8kMqkvuMJjlFEYfJUCvuMuTNFV8o=' https://connect.facebook.net; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://www.facebook.com; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://www.facebook.com https://connect.facebook.net; media-src 'self'; worker-src 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; script-src 'self' 'sha256-pJFtUtjo7WyCsggTXsWDXB3+7QFUTiGFHWk5yaHkkig=' https://connect.facebook.net; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://www.facebook.com; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://www.facebook.com https://connect.facebook.net; media-src 'self'; worker-src 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Benkashoes — mocassins-mules en daim, atelier marocain</title>
 <meta name="description" content="Benkashoes — la mule Opus en daim de veau, première en mousse estampée, doublure cuir pleine fleur. Huit coloris, pointures 37 à 41, 279 DH. Livraison offerte partout au Maroc.">
@@ -260,8 +260,8 @@ const PIXEL='2324082461765253';
   (d.head||d.documentElement).appendChild(t);
 })(window,document);
 if(PIXEL){fbq('init',PIXEL);fbq('track','PageView');}
-function mesure(nom,donnees){
-  try{if(PIXEL&&window.fbq)fbq('track',nom,donnees||{});}catch(e){}
+function mesure(nom,donnees,id){
+  try{if(PIXEL&&window.fbq)fbq('track',nom,donnees||{},id?{eventID:id}:undefined);}catch(e){}
 }
 const refMeta=(id,c)=>id+'-'+c;
 const SHOP={
@@ -779,11 +779,11 @@ async function envoyerAuTableur(o,cle,leurre){
     catch(e2){return {ok:false,refus:false,message:'L\u2019envoi n\u2019a pas abouti. Voici votre récapitulatif à envoyer à l\u2019atelier.'};}
   }
 }
-function mesurerAchat(o){
+function mesurerAchat(o,id){
   mesure('Purchase',{content_type:'product',
     content_ids:(o.items||[]).map(i=>refMeta(i.id,i.colorKey)),
     num_items:(o.items||[]).reduce((a,i)=>a+i.q,0),
-    value:o.total,currency:'MAD'});
+    value:o.total,currency:'MAD'},id);
 }
 async function placeOrder(){
   if(S.envoi)return;   // le bouton a déjà été cliqué
@@ -799,20 +799,22 @@ async function placeOrder(){
     items:S.cart.map(i=>{const p=prod(i.id);return {id:p.id,name:p.name,color:COLORS[i.c].n,colorKey:i.c,size:i.s,q:i.q,unit:priceOf(p)};}),
     customer:{name:f.name,phone:f.phone,email:f.email,addr:f.addr,zip:f.zip,city:f.city,country:f.country},
     note:f.note,sub,ship,total:sub+ship,currency:'MAD'};
+  const cle=cleCommande();
   if(MODE==='api'){
     try{const r=await api('orders',{method:'POST',body:{items:o.items,customer:o.customer,note:o.note}});
-      mesurerAchat(o);S.lastOrder=Object.assign({},nettoyerCommande(r.order)||o,{saved:true});S.cart=[];syncCart();S.step=3;S.form=null;
+      mesurerAchat(o,cle);S.lastOrder=Object.assign({},nettoyerCommande(r.order)||o,{saved:true});S.cart=[];syncCart();S.step=3;S.form=null;
       await refreshCatalog();draw();return;}
     catch(e){toast(e.message);return;}}
   if(SHOP.tableur){
     S.envoi=true;
     const b=document.querySelector('[data-act="place"]');
     if(b){b.disabled=true;b.textContent='Envoi en cours…';}
-    const r=await envoyerAuTableur(o,cleCommande(),f.site);
+    const r=await envoyerAuTableur(o,cle,f.site);
     S.envoi=false;
     if(r.ok){
       if(r.ref)o.ref=r.ref;
-mesurerAchat(o);      S.lastOrder=Object.assign({},nettoyerCommande(o)||o,{saved:true,canal:'tableur'});
+      mesurerAchat(o,cle);
+      S.lastOrder=Object.assign({},nettoyerCommande(o)||o,{saved:true,canal:'tableur'});
       S.cart=[];syncCart();S.step=3;S.form=null;
       if(MODE==='local'){S.orders=[S.lastOrder].concat(S.orders);saveLocal();}
       draw();return;
@@ -823,7 +825,8 @@ mesurerAchat(o);      S.lastOrder=Object.assign({},nettoyerCommande(o)||o,{saved
   }
   let saved=false;
   if(S.db){try{await S.db.doc('orders/'+o.ref).set(o);saved=true;}catch(e){saved=false;}}
-mesurerAchat(o);  S.lastOrder=Object.assign({},nettoyerCommande(o)||o,{saved:saved});S.cart=[];syncCart();S.step=3;S.form=null;draw();
+  mesurerAchat(o,cle);
+  S.lastOrder=Object.assign({},nettoyerCommande(o)||o,{saved:saved});S.cart=[];syncCart();S.step=3;S.form=null;draw();
 }
 const ENCADRE=(function(){try{return STATIC&&window.top!==window.self;}catch(e){return STATIC;}})();
 function admHTML(){

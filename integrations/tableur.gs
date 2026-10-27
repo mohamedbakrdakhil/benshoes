@@ -39,6 +39,24 @@ var FEUILLE_ID = '18WEWekxfeI_fbxKN471uPGjCNy54ToMpF8Id2Dm42s8';
 // d'un robot qui viendrait noyer la feuille.
 var MAX_PAR_HEURE = 40;
 
+/* ───── l'API Conversions de Meta ─────
+
+   Le pixel du site perd 30 à 40 % des ventes : iOS, les bloqueurs de
+   publicité, un onglet fermé trop vite. Ici l'achat part des serveurs de
+   Google vers ceux de Meta, hors de portée de tout ça — et avec la
+   certitude qu'il a vraiment eu lieu, puisqu'on l'envoie après l'avoir
+   écrit dans la feuille.
+
+   JETON vide = rien n'est envoyé. Pour l'obtenir : Events Manager → votre
+   pixel → Paramètres → API de conversions → Générer un jeton d'accès.
+   Collez-le entre les apostrophes ci-dessous, puis redéployez.
+
+   Ce jeton donne le droit d'écrire des événements sur votre pixel : il ne
+   se partage pas, et ne sort pas de ce script. */
+var META_PIXEL = '2324082461765253';
+var META_JETON = '';
+var META_SITE  = 'https://www.benkashoes.ma/';
+
 // Nom de l'onglet qui porte le stock. Créé tout seul s'il manque.
 var ONGLET_STOCK = 'Stock';
 
@@ -313,6 +331,77 @@ function retirerDuStock(lignes) {
   return null;
 }
 
+/* ═══════════ l'achat, envoyé de serveur à serveur ═══════════ */
+
+/** SHA-256 en hexadécimal minuscule — la forme exigée par Meta. */
+function empreinte(v) {
+  if (!v) return null;
+  var o = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, String(v), Utilities.Charset.UTF_8);
+  var h = '';
+  for (var i = 0; i < o.length; i++) h += ('0' + (o[i] & 0xff).toString(16)).slice(-2);
+  return h;
+}
+
+/* Meta exige des données normalisées AVANT le hachage : sans ça, le même
+   client haché de deux façons donne deux empreintes, et le rapprochement
+   échoue en silence. */
+function normalTel(v) {
+  var d = String(v || '').replace(/\D/g, '');
+  if (!d) return null;
+  if (d.length === 9) d = '212' + d;                 // 6XXXXXXXX
+  else if (d.charAt(0) === '0') d = '212' + d.slice(1);
+  else if (d.slice(0, 3) !== '212' && d.length === 10) d = '212' + d.slice(1);
+  return d;
+}
+function normalTexte(v) {
+  return String(v || '').trim().toLowerCase()
+    .normalize ? String(v || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+               : String(v || '').trim().toLowerCase();
+}
+
+/* N'échoue jamais bruyamment : une commande enregistrée ne doit pas être
+   perdue parce que Meta a mal répondu. La trace va dans Exécutions. */
+function envoyerAchatAMeta(cle, cmd, ref) {
+  if (!META_JETON || !META_PIXEL) return;
+  var nom = normalTexte(cmd.client.nom).split(/\s+/);
+  var user = {
+    em:      [empreinte(normalTexte(cmd.client.email))],
+    ph:      [empreinte(normalTel(cmd.client.tel))],
+    fn:      [empreinte(nom[0])],
+    ln:      [empreinte(nom.length > 1 ? nom[nom.length - 1] : '')],
+    ct:      [empreinte(normalTexte(cmd.client.ville).replace(/\s/g, ''))],
+    country: [empreinte('ma')]
+  };
+  for (var k in user) if (!user[k][0]) delete user[k];
+
+  var contenus = (cmd.lignes || []).map(function (l) {
+    return { id: l.id + '-' + l.cle, quantity: l.q, item_price: l.prix };
+  });
+
+  var charge = { data: [{
+    event_name:       'Purchase',
+    event_time:       Math.floor(Date.now() / 1000),
+    event_id:         cle,            // le même que celui envoyé par le pixel
+    action_source:    'website',
+    event_source_url: META_SITE,
+    user_data:        user,
+    custom_data: { currency: 'MAD', value: cmd.total, order_id: ref,
+                   content_type: 'product', contents: contenus }
+  }] };
+
+  try {
+    var r = UrlFetchApp.fetch(
+      'https://graph.facebook.com/v21.0/' + META_PIXEL + '/events?access_token='
+        + encodeURIComponent(META_JETON),
+      { method: 'post', contentType: 'application/json',
+        payload: JSON.stringify(charge), muteHttpExceptions: true });
+    if (r.getResponseCode() !== 200)
+      console.error('Meta a refusé l\'achat ' + ref + ' : ' + r.getContentText().slice(0, 300));
+  } catch (err) {
+    console.error('Achat non transmis à Meta (' + ref + ') : ' + err);
+  }
+}
+
 /** Vrai si le quota horaire est dépassé. */
 function tropDeCommandes() {
   var p = PropertiesService.getScriptProperties();
@@ -518,6 +607,8 @@ function doPost(e) {
         console.error('Alerte e-mail non partie (' + ALERTE_EMAIL + ') : ' + err);
       }
     }
+
+    envoyerAchatAMeta(cle, cmd, ref);
 
     return reponse({ ok: true, ref: ref, total: cmd.total, livraison: cmd.livraison });
   } catch (err) {
