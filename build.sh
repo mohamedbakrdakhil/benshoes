@@ -196,6 +196,12 @@ cat > sitemap.xml <<SITEMAP
 </urlset>
 SITEMAP
 
+# ---------- 8b. le flux catalogue, pour les publicités dynamiques ----------
+# Meta relit ce fichier tous les jours à son adresse publique : il doit donc
+# suivre le catalogue et le stock sans qu'on y pense.
+if command -v python3 >/dev/null 2>&1; then python3 flux.py "$URL" || true; fi
+cp -f flux-meta.csv public/ 2>/dev/null || true
+
 # La clé IndexNow doit être servie à la racine pour que les moteurs qui
 # l'utilisent (Bing, Yandex, DuckDuckGo…) acceptent nos annonces d'adresse.
 # Google, lui, ne s'en sert pas : voir REFERENCEMENT.md.
