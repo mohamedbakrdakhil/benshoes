@@ -1,6 +1,7 @@
 /* ======================= boutique ======================= */
 function renderStatic(){
-  $('#herotopo').innerHTML=[1.6,1.3,1.05,.82,.6,.4,.22].map((k,i)=>
+  const topo=$('#herotopo');
+  if(topo)topo.innerHTML=[1.6,1.3,1.05,.82,.6,.4,.22].map((k,i)=>
     `<g transform="translate(600,310) scale(${k*2.1},${k*1.25}) translate(-100,-230)"><path d="${SOLE}" fill="none" stroke="rgba(207,149,73,${(.3-i*.03).toFixed(2)})" stroke-width="${(1.6/k).toFixed(2)}"/></g>`).join('');
   // Le héros garde l'illustration : les photos de l'atelier portent leur
   // décor (canapé, parquet, marbre), qui ferait une boîte claire au milieu du
@@ -57,7 +58,7 @@ function renderGrid(){
                    :((p.vedette?c===p.vedette:i===0)&&p.flag
                        ?`<span class="card-flag">${p.flag}</span>`:'');
     return `<button class="card" data-act="open" data-id="${p.id}" data-c="${c}">
-      <div class="card-art">${ruban}${visuel(p,c)}<span class="card-discover">Découvrir <span aria-hidden="true">↗</span></span></div>
+      <div class="card-art">${ruban}${visuel(p,c)}<span class="card-discover">Découvrir</span></div>
       <div><div class="card-name"><h3>${p.name} <span>${COLORS[c].n}</span></h3><span class="p num">${fmt(priceOf(p))}</span></div>
       <div class="card-meta"><span>${p.sub}</span><span class="dots"><i style="background:linear-gradient(135deg,${COLORS[c].c},${COLORS[c].d})"></i></span></div></div>
     </button>`;}).join('');
