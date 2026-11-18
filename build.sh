@@ -20,7 +20,7 @@
 set -e
 cd "$(dirname "$0")"
 URL="${SITE_URL:-https://www.benkashoes.ma/}"
-TITRE="Benkashoes — mocassins-mules en daim, atelier marocain"
+TITRE="Black Friday — Benka Shoes | Mocassins en daim"
 DESC="Benkashoes — la mule Opus en daim de veau, première en mousse estampée, doublure cuir pleine fleur. Huit coloris, pointures 37 à 41, 279 DH. Livraison offerte partout au Maroc."
 PARTAGE="assets/marque/partage-1200x630.jpg"
 # L'icône d'onglet : l'empreinte de la marque, relevée sur le fichier de logo
@@ -104,8 +104,7 @@ cat <<HEAD
 <meta name="author" content="Benkashoes">
 <meta name="geo.region" content="MA">
 <meta name="geo.placename" content="Maroc">
-$VERIF<link rel="preload" as="image" href="assets/videos/collection-affiche.jpg" media="(min-width:901px)" fetchpriority="high">
-<link rel="preload" as="image" href="assets/videos/collection-affiche-etroite.jpg" media="(max-width:900px)" fetchpriority="high">
+$VERIF<link rel="preload" as="image" href="assets/produits/opus-noir-1-960.jpg" imagesrcset="assets/produits/opus-noir-1-480.webp 480w, assets/produits/opus-noir-1-640.webp 640w, assets/produits/opus-noir-1-960.webp 960w" imagesizes="(max-width:860px) calc(100vw - 40px), 46vw" fetchpriority="high">
 <link rel="preload" as="font" type="font/woff2" href="assets/polices/archivo.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="assets/polices/archivo-black.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="assets/polices/baloo2.woff2" crossorigin>

@@ -37,7 +37,8 @@ const BRAND={logo:'assets/marque/benka.png',logoClair:'assets/marque/benka-clair
    vidéo ne se télécharge qu'ensuite, et seulement si les conditions sont
    réunies (voir fondVideo() dans 10-revelations.js). Sans affiche, la
    section resterait noire le temps du chargement. */
-const VIDEOS={top:'assets/videos/collection'};
+// La campagne utilise une photo produit prioritaire, sans vidéo de fond.
+const VIDEOS={};
 
 /* Surcharge manuelle, pour une photo isolée qui ne suit pas la convention de
    nommage. Le cas normal passe par assets/produits/ et images.py. */
@@ -122,7 +123,7 @@ function poserLogo(){
   // l'emplacement : le logo de l'en-tête y disparaissait.
   const sombre=themeSombre();
   document.querySelectorAll('.brand').forEach(el=>{
-    const clair=sombre||!!el.closest('.ftr,.adm-hd,.hero');
+    const clair=sombre||!!el.closest('.ftr,.adm-hd,.hero,.black-friday .hdr');
     el.innerHTML=BRAND.logo
       ? `<img class="brand-logo" src="${(clair&&BRAND.logoClair)||BRAND.logo}"`
         +` width="${BRAND.larg}" height="${BRAND.haut}" alt="Benkashoes">`
