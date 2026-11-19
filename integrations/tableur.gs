@@ -464,6 +464,29 @@ function nouvelleReference(f) {
   return 'BS-' + aa + '-' + Date.now().toString(36).toUpperCase();
 }
 
+/* Une offre par lot complet de trois Opus, couleurs et pointures au choix.
+   Les lignes remisées portent leur prix net : exports, reçus et stock restent
+   cohérents même quand une ligne contient à la fois un lot et une paire seule.
+   Les serveurs appellent cette fonction APRÈS avoir validé le catalogue. */
+function prixBlackFriday(items, active = true) {
+  const eligible = i => i.id === 'opus' && i.unit === 279;
+  const count = items.reduce((n, i) => n + (eligible(i) ? i.q : 0), 0);
+  const packs = active ? Math.floor(count / 3) : 0;
+  let remaining = packs * 3;
+  const net = [];
+  for (const item of items) {
+    const discounted = eligible(item) ? Math.min(remaining, item.q) : 0;
+    if (discounted) {
+      net.push({...item, q: discounted, unit: 233});
+      remaining -= discounted;
+    }
+    if (item.q > discounted) net.push({...item, q: item.q - discounted});
+  }
+  const gross = items.reduce((n, i) => n + i.unit * i.q, 0);
+  const sub = net.reduce((n, i) => n + i.unit * i.q, 0);
+  return {items: net, count, packs, gross, sub, discount: gross - sub};
+}
+
 /* ───────── validation de la commande ───────── */
 
 function construireCommande(entree) {
@@ -508,7 +531,18 @@ function construireCommande(entree) {
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(client.email))
     return { erreur: 'Adresse e-mail invalide.' };
 
-  var livraison = sousTotal >= LIVR_OFFERTE ? 0 : LIVR_PRIX;
+  var pricing = prixBlackFriday(lignes.map(function(l) {
+    return Object.assign({}, l, {unit:l.prix});
+  }));
+  lignes = pricing.items.map(function(l) {
+    l.prix = l.unit;
+    delete l.unit;
+    return l;
+  });
+  sousTotal = pricing.sub;
+  var livraison = pricing.packs || sousTotal >= LIVR_OFFERTE ? 0 : LIVR_PRIX;
+  if (entree.expectedTotal !== undefined && Number(entree.expectedTotal) !== sousTotal + livraison)
+    return {erreur:'Le montant a changé. Actualisez votre panier avant de commander.'};
   return {
     commande: {
       articles: articles.join(' | '),
@@ -517,6 +551,8 @@ function construireCommande(entree) {
       client: client,
       note: texte(entree.note, 500),
       sousTotal: sousTotal,
+      remise: pricing.discount,
+      packs: pricing.packs,
       livraison: livraison,
       total: sousTotal + livraison
     }
@@ -896,5 +932,6 @@ function doGet() {
   }
   return reponse({ service: 'Benkashoes — réception des commandes', methode: 'POST',
                    alerte: ALERTE_EMAIL ? 'armée' : 'absente',
+                   promotion: {version:'bf-3-699-v1',modele:'opus',quantite:3,prix:699,livraison:0},
                    stock: stock });
 }

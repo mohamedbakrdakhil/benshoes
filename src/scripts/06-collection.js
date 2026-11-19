@@ -64,7 +64,12 @@ function renderGrid(){
     </button>`;}).join('');
 }
 function cartCount(){return S.cart.reduce((a,i)=>a+i.q,0);}
-function cartSub(){return S.cart.reduce((a,i)=>a+priceOf(prod(i.id))*i.q,0);}
+function cartPricing(){
+  return prixBlackFriday(S.cart.map(i=>{const p=prod(i.id);return {
+    id:p.id,name:p.name,color:COLORS[i.c].n,colorKey:i.c,size:i.s,q:i.q,unit:priceOf(p)
+  };}));
+}
+function cartSub(){return cartPricing().sub;}
 function shipCost(){return S.cart.length===0?0:(cartSub()>=SHIPFREE?0:SHIPCOST);}
 function syncCart(){$('#cartcount').textContent=cartCount();
   // Le compteur seul ne dit rien à qui n'a pas l'écran.

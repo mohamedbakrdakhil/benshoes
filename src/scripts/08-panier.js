@@ -1,6 +1,6 @@
 /* ======================= panier & commande ======================= */
 function cartHTML(){
-  const sub=cartSub(),ship=shipCost();
+  const pricing=cartPricing(),sub=pricing.sub,ship=shipCost();
   let body,foot;
   if(S.step===3&&S.lastOrder){const o=S.lastOrder;
     body=`<div style="text-align:center;padding-top:18px">
@@ -17,7 +17,7 @@ function cartHTML(){
         <p class="note" style="margin-top:10px">ou copiez le texte ci-dessous et envoyez-le à ${esc(SHOP.email)}</p>`}</div>
       ${o.saved?'':`<div class="callout" style="margin-top:20px"><b>Pourquoi cette étape ?</b> Le paiement en ligne n'est pas encore branché sur cette boutique. L'atelier confirme la disponibilité, puis vous règlez à la livraison ou par virement.</div>
       <textarea id="summ" readonly style="width:100%;height:176px;margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:3px;background:var(--surface);font-size:.8rem;font-family:var(--fu);line-height:1.55">${esc(orderText(o))}</textarea>`}
-      <ul class="spec" style="margin-top:18px">${o.items.map(i=>`<li><span>${i.q} × ${esc(i.name)} · ${esc(i.color)} · ${i.size}</span><span class="num">${fmt(i.unit*i.q)}</span></li>`).join('')}
+      ${o.discount?`<p class="bf-cart-saved">Black Friday : ${fmt(o.discount)} économisés · prix remisés ci-dessous</p>`:''}<ul class="spec" style="margin-top:18px">${o.items.map(i=>`<li><span>${i.q} × ${esc(i.name)} · ${esc(i.color)} · ${i.size}</span><span class="num">${fmt(i.unit*i.q)}</span></li>`).join('')}
         <li><span>Livraison</span><span class="num">${o.ship?fmt(o.ship):'Offerte'}</span></li>
         <li style="font-weight:700"><span>Total</span><span class="num">${fmt(o.total)}</span></li></ul>`;
     foot=`${o.saved?'':`<button class="btn btn-pri" data-act="copysum" style="justify-content:center">Copier le récapitulatif</button>`}
@@ -36,7 +36,7 @@ function cartHTML(){
       <input id="f_site" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
       </div>
       <div class="callout" style="margin-top:18px"><b>Aucun paiement maintenant.</b> L'atelier vérifie la disponibilité, vous recevez la confirmation, puis vous réglez à la livraison ou par virement.</div>`;
-    foot=`<div class="totals"><div><span>Sous-total</span><span class="num">${fmt(sub)}</span></div>
+    foot=`<div class="totals"><div><span>Sous-total</span><span class="num">${fmt(pricing.gross)}</span></div>${pricing.discount?`<div class="bf-discount"><span>Black Friday · ${pricing.packs} lot${pricing.packs>1?'s':''} de 3</span><span class="num">−${fmt(pricing.discount)}</span></div>`:''}
       <div><span>Livraison</span><span class="num">${ship?fmt(ship):'Offerte'}</span></div>
       <div class="grand"><span>Total</span><span class="num">${fmt(sub+ship)}</span></div></div>
       <button class="btn btn-pri" data-act="place" style="justify-content:center">Valider la commande</button>
@@ -46,14 +46,14 @@ function cartHTML(){
       <a class="btn btn-out btn-sm" href="#modeles" data-act="closep" style="margin-top:18px">Voir la collection</a></div>`;
     foot='';
   } else {
-    body=`<div class="steps" style="margin-bottom:16px"><b data-on="1">Panier</b><i></i><b>Livraison</b><i></i><b>Confirmation</b></div>`
+    body=blackFridayCartNote(pricing)+`<div class="steps" style="margin-bottom:16px"><b data-on="1">Panier</b><i></i><b>Livraison</b><i></i><b>Confirmation</b></div>`
       +S.cart.map((it,n)=>{const p=prod(it.id);return `<div class="citem">
         <div class="cthumb">${visuel(p,it.c)}</div>
         <div><h4>${p.name}</h4><div class="meta">${COLORS[it.c].n} · Pointure ${it.s}</div>
           <div class="qty"><button data-act="qty" data-n="${n}" data-d="-1" aria-label="Retirer un">−</button><span class="num">${it.q}</span><button data-act="qty" data-n="${n}" data-d="1" aria-label="Ajouter un">+</button></div></div>
         <div class="right"><b class="num">${fmt(priceOf(p)*it.q)}</b><button class="lnk" data-act="rm" data-n="${n}">Retirer</button></div></div>`;}).join('')
       +`<p class="note" style="margin-top:16px">${SHIPFREE===0||SHIPCOST===0?'Livraison offerte, partout au Maroc.':(sub>=SHIPFREE?'Livraison offerte sur cette commande.':`Encore ${fmt(SHIPFREE-sub)} pour la livraison offerte.`)}</p>`;
-    foot=`<div class="totals"><div><span>Sous-total</span><span class="num">${fmt(sub)}</span></div>
+    foot=`<div class="totals"><div><span>Sous-total</span><span class="num">${fmt(pricing.gross)}</span></div>${pricing.discount?`<div class="bf-discount"><span>Black Friday · ${pricing.packs} lot${pricing.packs>1?'s':''} de 3</span><span class="num">−${fmt(pricing.discount)}</span></div>`:''}
       <div><span>Livraison</span><span class="num">${ship?fmt(ship):'Offerte'}</span></div>
       <div class="grand"><span>Total</span><span class="num">${fmt(sub+ship)}</span></div></div>
       <button class="btn btn-pri" data-act="next" style="justify-content:center">Passer à la livraison</button>`;
@@ -63,11 +63,19 @@ function cartHTML(){
       <button class="close" data-act="closep" aria-label="Fermer">✕</button></div>
     <div class="panel-bd">${body}</div>${foot?`<div class="panel-ft">${foot}</div>`:''}</div>`;
 }
+function blackFridayCartNote(pricing){
+  const missing=3-pricing.count%3;
+  return `<div class="bf-cart-offer"><b>BLACK FRIDAY · 3 PAIRES = 699 DH</b>
+    <p>${pricing.packs?`Offre appliquée : vous économisez ${fmt(pricing.discount)}.`:`Encore ${missing} paire${missing>1?'s':''} pour votre lot à 699 DH.`}</p>
+    <small>Couleurs et pointures au choix · Livraison offerte au Maroc</small>
+    ${pricing.packs?'<small>Chaque lot de 3 : 699 DH. Paire hors lot : 279 DH.</small>':''}</div>`;
+}
 function waLink(o){return SHOP.whatsapp?`https://wa.me/${SHOP.whatsapp}?text=${encodeURIComponent(orderText(o))}`:'';}
 function mailLink(o){return `mailto:${SHOP.email}?subject=${encodeURIComponent('Commande '+o.ref)}&body=${encodeURIComponent(orderText(o))}`;}
 function orderText(o){
   return `COMMANDE ${o.ref} — ${SHOP.site}\n${new Date(o.createdAt).toLocaleString('fr-FR')}\n\n`
     +o.items.map(i=>`${i.q} × ${i.name} — ${i.color} — pointure ${i.size} — ${fmt(i.unit*i.q)}`).join('\n')
+    +(o.discount?`\nBlack Friday : ${fmt(o.discount)} économisés (prix remisés ci-dessus).`:'')
     +`\n\nLivraison : ${o.ship?fmt(o.ship):'offerte'}\nTOTAL : ${fmt(o.total)}\n\n`
     +`${o.customer.name}\n${o.customer.phone}\n${o.customer.email}\n${o.customer.addr}\n${o.customer.city}\n${o.customer.country}`
     +(o.note?`\n\nNote : ${o.note}`:'');
@@ -91,9 +99,20 @@ function cleCommande(){
   return Array.from(a,b=>('0'+b.toString(16)).slice(-2)).join('');
 }
 async function envoyerAuTableur(o,cle,leurre){
+  // Ne jamais envoyer un total remisé à un ancien déploiement qui facturerait
+  // encore trois prix unitaires. Cette lecture ne crée aucune commande.
+  if(o.discount){
+    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);
+    try{
+      const check=await fetch(SHOP.tableur,{method:'GET',signal:controller.signal});
+      const data=await check.json();
+      if(!check.ok||data?.promotion?.version!=='bf-3-699-v1')throw new Error('offre indisponible');
+    }catch(e){return {ok:false,refus:true,message:'L’offre Black Friday est momentanément indisponible. Votre panier est conservé ; réessayez dans un moment.'};}
+    finally{clearTimeout(timeout);}
+  }
   const charge=JSON.stringify({cle,
-    items:o.items.map(i=>({id:i.id,colorKey:i.colorKey,size:i.size,q:i.q})),
-    customer:o.customer,note:o.note,site:leurre||''});
+    items:o.requestItems||o.items.map(i=>({id:i.id,colorKey:i.colorKey,size:i.size,q:i.q})),
+    customer:o.customer,note:o.note,expectedTotal:o.total,pricingVersion:'bf-3-699-v1',site:leurre||''});
   const envoi=m=>fetch(SHOP.tableur,{method:'POST',mode:m,
     headers:{'Content-Type':'text/plain;charset=utf-8'},body:charge});
   try{
@@ -127,17 +146,18 @@ async function placeOrder(){
   if(miss.length){document.querySelectorAll('label.f').forEach(l=>l.classList.remove('bad'));
     miss.forEach(k=>$('#f_'+k)?.closest('label')?.classList.add('bad'));
     toast('Complétez les champs en rouge');$('#f_'+miss[0])?.focus();return;}
-  const sub=cartSub(),ship=shipCost();
+  const pricing=cartPricing(),sub=pricing.sub,ship=shipCost();
   const o={ref:newRef(),createdAt:new Date().toISOString(),status:'nouvelle',source:'boutique',
-    items:S.cart.map(i=>{const p=prod(i.id);return {id:p.id,name:p.name,color:COLORS[i.c].n,colorKey:i.c,size:i.s,q:i.q,unit:priceOf(p)};}),
+    items:pricing.items,
+    requestItems:S.cart.map(i=>({id:i.id,colorKey:i.c,size:i.s,q:i.q})),
     customer:{name:f.name,phone:f.phone,email:f.email,addr:f.addr,zip:f.zip,city:f.city,country:f.country},
-    note:f.note,sub,ship,total:sub+ship,currency:'MAD'};
+    note:f.note,discount:pricing.discount,packs:pricing.packs,sub,ship,total:sub+ship,currency:'MAD'};
   /* Un seul identifiant pour toute la commande, quel que soit le chemin
      qu'elle prend. Il sert d'abord de clé d'idempotence vers le tableur, et
      de dédoublonnage entre le pixel et l'API Conversions. */
   const cle=cleCommande();
   if(MODE==='api'){
-    try{const r=await api('orders',{method:'POST',body:{items:o.items,customer:o.customer,note:o.note}});
+    try{const r=await api('orders',{method:'POST',body:{items:o.requestItems,customer:o.customer,note:o.note,expectedTotal:o.total}});
       mesurerAchat(o,cle);S.lastOrder=Object.assign({},nettoyerCommande(r.order)||o,{saved:true});S.cart=[];syncCart();S.step=3;S.form=null;
       await refreshCatalog();draw();return;}
     catch(e){toast(e.message);return;}}

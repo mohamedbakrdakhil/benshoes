@@ -7,6 +7,7 @@ const fs = require('node:fs');
 const fsp = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const {prixBlackFriday} = require('./src/scripts/02b-black-friday-prix.js');
 
 const PORT = process.env.PORT || 3000;
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '.data');
@@ -31,7 +32,7 @@ const SEED = {
   stepy:   { price: 259, colors: ['beige','noir','marron','gris','marine'],                            stock: [7,13,17,14,8] },
   western: { price: 359, colors: ['noir'],                                                             stock: [4,7,9,8,5] },
 };
-const SHIP_FREE = 400, SHIP_COST = 35;
+const SHIP_FREE = 0, SHIP_COST = 0;
 const STATUSES = ['nouvelle','confirmee','expediee','livree','annulee'];
 
 /* ---------- stockage : un fichier JSON, écritures sérialisées ---------- */
@@ -175,7 +176,7 @@ function readBody(req, limit = 64 * 1024) {
 function buildOrder(input, source) {
   const rawItems = Array.isArray(input.items) ? input.items.slice(0, 20) : [];
   if (!rawItems.length) return { error: 'Aucun article dans la commande.' };
-  const items = [];
+  let items = [];
   for (const it of rawItems) {
     const p = SEED[it && it.id];
     if (!p) return { error: 'Modèle inconnu.' };
@@ -206,8 +207,12 @@ function buildOrder(input, source) {
     for (const k of ['phone', 'addr', 'city']) if (!customer[k]) return { error: 'Coordonnées de livraison incomplètes.' };
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(customer.email)) return { error: 'Adresse e-mail invalide.' };
   }
-  const sub = items.reduce((a, i) => a + i.unit * i.q, 0);
-  const ship = sub >= SHIP_FREE ? 0 : SHIP_COST;
+  const pricing = prixBlackFriday(items, source === 'boutique');
+  items = pricing.items;
+  const sub = pricing.sub;
+  const ship = pricing.packs || sub >= SHIP_FREE ? 0 : SHIP_COST;
+  if (input.expectedTotal !== undefined && Number(input.expectedTotal) !== sub + ship)
+    return { error: 'Le montant a changé. Actualisez votre panier avant de commander.' };
   // décrément du stock
   for (const [k, q] of Object.entries(need)) {
     const [id, colorKey, size] = k.split(':');
@@ -219,7 +224,7 @@ function buildOrder(input, source) {
   }
   return { order: { ref: newRef(), createdAt: new Date().toISOString(),
     status: source === 'atelier' ? 'confirmee' : 'nouvelle', source, items, customer,
-    note: str(input.note, 500), sub, ship, total: sub + ship, currency: 'MAD', stockDeducted: true } };
+    note: str(input.note, 500), discount: pricing.discount, packs: pricing.packs, sub, ship, total: sub + ship, currency: 'MAD', stockDeducted: true } };
 }
 
 /* ---------- fichiers statiques ---------- */

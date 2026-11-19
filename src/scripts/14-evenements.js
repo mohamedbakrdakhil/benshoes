@@ -101,7 +101,16 @@ document.addEventListener('click',async e=>{
   if(cp){const ok=await copy($('#'+cp.dataset.copy).textContent.trim());toast(ok?'Copié':'Copie refusée par le navigateur');return;}
   if(e.target.closest('#cartbtn')){S.panel='cart';S.step=S.cart.length?1:1;S.lastOrder=null;draw();return;}
   const t=e.target.closest('[data-act]');if(!t)return;const a=t.dataset.act,d=t.dataset;
-  if(a==='skipvisite'){const m=$('#modeles');if(m)window.scrollTo({top:m.offsetTop-70,behavior:'smooth'});}
+  if(a==='skipvisite'){
+    e.preventDefault();
+    const m=$('#modeles');
+    if(m){
+      // La collection possède désormais son propre cadre positionné :
+      // offsetTop serait relatif à ce cadre, et ramènerait en haut du site.
+      const entete=$('.hdr')?.getBoundingClientRect().bottom||62;
+      window.scrollTo({top:Math.max(0,m.getBoundingClientRect().top+window.scrollY-entete-12),behavior:MOTION?'smooth':'auto'});
+    }
+  }
   else if(a==='qa'){const qa=t.closest('.qa');const o=qa.dataset.open==='1';
     qa.parentElement.querySelectorAll('.qa').forEach(x=>{x.dataset.open='0';x.querySelector('.qa-q').setAttribute('aria-expanded','false');});
     if(!o){qa.dataset.open='1';t.setAttribute('aria-expanded','true');}}

@@ -63,7 +63,7 @@ function nettoyerCommande(o){
     customer:{name:txt(c.name,80),phone:txt(c.phone,40),email:txt(c.email,120),
       addr:txt(c.addr,200),zip:txt(c.zip,20),city:txt(c.city,80),country:txt(c.country,60)||'Maroc'},
     note:txt(o.note,500),sub:num(o.sub,sub),ship:num(o.ship,0),total:num(o.total,sub),
-    stockDeducted:!!o.stockDeducted,saved:!!o.saved};
+    discount:num(o.discount,0),packs:num(o.packs,0),stockDeducted:!!o.stockDeducted,saved:!!o.saved};
 }
 const nettoyerListe=v=>(Array.isArray(v)?v:[]).slice(0,2000).map(nettoyerCommande).filter(Boolean);
 const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
