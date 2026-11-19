@@ -36,7 +36,7 @@ function cartHTML(){
       <input id="f_site" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
       </div>
       <div class="callout" style="margin-top:18px"><b>Aucun paiement maintenant.</b> L'atelier vérifie la disponibilité, vous recevez la confirmation, puis vous réglez à la livraison ou par virement.</div>`;
-    foot=`<div class="totals"><div><span>Sous-total</span><span class="num">${fmt(pricing.gross)}</span></div>${pricing.discount?`<div class="bf-discount"><span>Black Friday · ${pricing.packs} lot${pricing.packs>1?'s':''} de 3</span><span class="num">−${fmt(pricing.discount)}</span></div>`:''}
+    foot=`<div class="totals"><div><span>Sous-total</span><span class="num">${fmt(pricing.gross)}</span></div>${pricing.discount?`<div class="bf-discount"><span>Black Friday · Trio de 3 paires</span><span class="num">−${fmt(pricing.discount)}</span></div>`:''}
       <div><span>Livraison</span><span class="num">${ship?fmt(ship):'Offerte'}</span></div>
       <div class="grand"><span>Total</span><span class="num">${fmt(sub+ship)}</span></div></div>
       <button class="btn btn-pri" data-act="place" style="justify-content:center">Valider la commande</button>
@@ -53,7 +53,7 @@ function cartHTML(){
           <div class="qty"><button data-act="qty" data-n="${n}" data-d="-1" aria-label="Retirer un">−</button><span class="num">${it.q}</span><button data-act="qty" data-n="${n}" data-d="1" aria-label="Ajouter un">+</button></div></div>
         <div class="right"><b class="num">${fmt(priceOf(p)*it.q)}</b><button class="lnk" data-act="rm" data-n="${n}">Retirer</button></div></div>`;}).join('')
       +`<p class="note" style="margin-top:16px">${SHIPFREE===0||SHIPCOST===0?'Livraison offerte, partout au Maroc.':(sub>=SHIPFREE?'Livraison offerte sur cette commande.':`Encore ${fmt(SHIPFREE-sub)} pour la livraison offerte.`)}</p>`;
-    foot=`<div class="totals"><div><span>Sous-total</span><span class="num">${fmt(pricing.gross)}</span></div>${pricing.discount?`<div class="bf-discount"><span>Black Friday · ${pricing.packs} lot${pricing.packs>1?'s':''} de 3</span><span class="num">−${fmt(pricing.discount)}</span></div>`:''}
+    foot=`<div class="totals"><div><span>Sous-total</span><span class="num">${fmt(pricing.gross)}</span></div>${pricing.discount?`<div class="bf-discount"><span>Black Friday · Trio de 3 paires</span><span class="num">−${fmt(pricing.discount)}</span></div>`:''}
       <div><span>Livraison</span><span class="num">${ship?fmt(ship):'Offerte'}</span></div>
       <div class="grand"><span>Total</span><span class="num">${fmt(sub+ship)}</span></div></div>
       <button class="btn btn-pri" data-act="next" style="justify-content:center">Passer à la livraison</button>`;
@@ -64,11 +64,16 @@ function cartHTML(){
     <div class="panel-bd">${body}</div>${foot?`<div class="panel-ft">${foot}</div>`:''}</div>`;
 }
 function blackFridayCartNote(pricing){
-  const missing=3-pricing.count%3;
+  const missing=3-pricing.quantity;
+  const message=pricing.packs
+    ? `Offre appliquée : vous économisez ${fmt(pricing.discount)}.`
+    : pricing.quantity<3 && pricing.count===pricing.quantity
+      ? `Encore ${missing} paire${missing>1?'s':''} pour votre trio à 699 DH.`
+      : 'Tarif normal appliqué : cette offre est réservée à un panier de exactement 3 paires Opus.';
   return `<div class="bf-cart-offer"><b>BLACK FRIDAY · 3 PAIRES = 699 DH</b>
-    <p>${pricing.packs?`Offre appliquée : vous économisez ${fmt(pricing.discount)}.`:`Encore ${missing} paire${missing>1?'s':''} pour votre lot à 699 DH.`}</p>
+    <p>${message}</p>
     <small>Couleurs et pointures au choix · Livraison offerte au Maroc</small>
-    ${pricing.packs?'<small>Chaque lot de 3 : 699 DH. Paire hors lot : 279 DH.</small>':''}</div>`;
+    <small>Uniquement pour un panier de exactement 3 paires Opus. Offre non cumulable.</small></div>`;
 }
 function waLink(o){return SHOP.whatsapp?`https://wa.me/${SHOP.whatsapp}?text=${encodeURIComponent(orderText(o))}`:'';}
 function mailLink(o){return `mailto:${SHOP.email}?subject=${encodeURIComponent('Commande '+o.ref)}&body=${encodeURIComponent(orderText(o))}`;}
@@ -106,13 +111,13 @@ async function envoyerAuTableur(o,cle,leurre){
     try{
       const check=await fetch(SHOP.tableur,{method:'GET',signal:controller.signal});
       const data=await check.json();
-      if(!check.ok||data?.promotion?.version!=='bf-3-699-v1')throw new Error('offre indisponible');
+      if(!check.ok||data?.promotion?.version!=='bf-exact3-699-v2')throw new Error('offre indisponible');
     }catch(e){return {ok:false,refus:true,message:'L’offre Black Friday est momentanément indisponible. Votre panier est conservé ; réessayez dans un moment.'};}
     finally{clearTimeout(timeout);}
   }
   const charge=JSON.stringify({cle,
     items:o.requestItems||o.items.map(i=>({id:i.id,colorKey:i.colorKey,size:i.size,q:i.q})),
-    customer:o.customer,note:o.note,expectedTotal:o.total,pricingVersion:'bf-3-699-v1',site:leurre||''});
+    customer:o.customer,note:o.note,expectedTotal:o.total,pricingVersion:'bf-exact3-699-v2',site:leurre||''});
   const envoi=m=>fetch(SHOP.tableur,{method:'POST',mode:m,
     headers:{'Content-Type':'text/plain;charset=utf-8'},body:charge});
   try{

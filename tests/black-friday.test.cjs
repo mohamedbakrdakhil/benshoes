@@ -12,7 +12,7 @@ function scriptOrder(items,extra={}) {
   return JSON.parse(vm.runInContext('JSON.stringify(construireCommande(JSON.parse(input)))',context));
 }
 function row(q,colorKey='noir',size=38){return {id:'opus',colorKey,size,q,unit:279};}
-for(const [q,expected] of [[1,279],[2,558],[3,699],[4,978],[5,1257],[6,1398],[7,1677],[9,2097],[10,2376]]) {
+for(const [q,expected] of [[1,279],[2,558],[3,699],[4,1116],[5,1395],[6,1674],[7,1953],[9,2511],[10,2790]]) {
   test(`${q} paires : panier et Apps Script = ${expected} DH`,()=>{
     const items=[row(q)];
     const p=prixBlackFriday(items);
@@ -34,9 +34,9 @@ test('trio réparti entre couleurs et pointures, prix client falsifié ignoré',
   assert.deepEqual(o.lignes.map(i=>i.prix),[233,233,233]);
   assert.deepEqual(o.lignes.map(i=>i.pointure),[37,39,41]);
 });
-test('ligne de 4 : séparation 3 à 233 et 1 à 279 sans perdre le stock',()=>{
+test('ligne de 4 : tarif normal pour toutes les paires',()=>{
   const o=scriptOrder([row(4)]).commande;
-  assert.deepEqual(o.lignes.map(i=>[i.q,i.prix]),[[3,233],[1,279]]);
+  assert.deepEqual(o.lignes.map(i=>[i.q,i.prix]),[[4,279]]);
   const need=o.lignes.reduce((n,i)=>n+i.q,0);assert.equal(need,4);
 });
 test('suppression de la troisième paire enlève la remise',()=>{
@@ -84,11 +84,33 @@ test('récepteur à jour : lignes de quantité originale et total attendu transm
   const source=fs.readFileSync('src/scripts/08-panier.js','utf8');
   let sent;
   const env=vm.createContext({SHOP:{tableur:'https://example.invalid'},AbortController,setTimeout,clearTimeout,fetch:async(u,opt)=>{
-    if(opt.method==='GET')return {ok:true,json:async()=>({promotion:{version:'bf-3-699-v1'}})};
-    sent=JSON.parse(opt.body);return {ok:true,json:async()=>({ok:true,ref:'TEST',total:978})};
+    if(opt.method==='GET')return {ok:true,json:async()=>({promotion:{version:'bf-exact3-699-v2'}})};
+    sent=JSON.parse(opt.body);return {ok:true,json:async()=>({ok:true,ref:'TEST',total:699})};
   }});
   vm.runInContext(source,env);
-  env.order={discount:138,items:prixBlackFriday([row(4)]).items,requestItems:[row(4)],customer,total:978};
+  env.order={discount:138,items:prixBlackFriday([row(3)]).items,requestItems:[row(3)],customer,total:699};
   const result=await vm.runInContext('envoyerAuTableur(order,"test-only","")',env);
-  assert.equal(result.ok,true);assert.equal(sent.items.length,1);assert.equal(sent.items[0].q,4);assert.equal(sent.expectedTotal,978);
+  assert.equal(result.ok,true);assert.equal(sent.items.length,1);assert.equal(sent.items[0].q,3);assert.equal(sent.expectedTotal,699);
+});
+
+test('ajouter une quatrième paire retire la remise ; revenir à trois la rétablit',()=>{
+  assert.equal(prixBlackFriday([row(3)]).sub,699);
+  assert.equal(prixBlackFriday([row(3),row(1,'beige')]).sub,1116);
+  assert.equal(prixBlackFriday([row(2),row(1,'beige')]).sub,699);
+});
+test('six paires réparties en deux trios ne cumulent pas l’offre',()=>{
+  const items=[row(3),row(3,'beige')];
+  assert.equal(prixBlackFriday(items).discount,0);
+  assert.equal(scriptOrder(items).commande.total,1674);
+});
+test('trois Opus et un autre article ne constituent pas un panier de trois',()=>{
+  const p=prixBlackFriday([row(3),{id:'autre',q:1,unit:100}]);
+  assert.equal(p.discount,0);assert.equal(p.sub,937);
+});
+test('le panier de quatre annonce le tarif normal, sans inviter à acheter un autre lot',()=>{
+  const env=vm.createContext({fmt:n=>n+' DH'});
+  vm.runInContext(fs.readFileSync('src/scripts/08-panier.js','utf8'),env);
+  env.pricing=prixBlackFriday([row(4)]);
+  const html=vm.runInContext('blackFridayCartNote(pricing)',env);
+  assert.match(html,/Tarif normal appliqué/);assert.doesNotMatch(html,/Encore/);
 });

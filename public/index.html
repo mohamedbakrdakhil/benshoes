@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; script-src 'self' 'sha256-TFjnJQ7EaHXWMyQ3Q2ddzGSt1VijfulZkJedXPmF/IA=' https://connect.facebook.net; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://www.facebook.com; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://www.facebook.com https://connect.facebook.net; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; script-src 'self' 'sha256-5/EkAlb/MscJZuaEuE6qG2/HsnQRNJl4RB8Qt3wLmTM=' https://connect.facebook.net; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://www.facebook.com; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://www.facebook.com https://connect.facebook.net; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
 <meta name="benka-api" content="oui">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Black Friday — Benka Shoes | Mocassins en daim</title>
@@ -89,7 +89,7 @@
 </div>
 <p class="bf-tagline">Trois paires. Toutes vos envies.</p>
 <div class="bf-offer"><span>LE LOT DE 3 PAIRES</span><div><strong>699 <small>DH</small></strong><s>837 DH</s><b>138 DH économisés</b></div><p>Livraison offerte au Maroc · Couleurs et pointures au choix</p></div>
-<p class="bf-description">Composez votre trio parmi nos huit nuances d’Opus. La réduction s’applique automatiquement dans votre panier, sans code.</p>
+<p class="bf-description">Composez votre trio parmi nos huit nuances d’Opus. La réduction s’applique automatiquement à un panier de exactement 3 paires, sans code.</p>
 <div class="hero-cta">
 <a class="btn btn-hero" href="#modeles">Composer mon trio</a>
 <a class="bf-secondary" href="#tailles">Trouver ma pointure</a>
@@ -180,7 +180,7 @@
 </div>
 <p class="serif">3 paires à 699 DH, livraison offerte au Maroc. Mélangez les couleurs et les pointures : votre lot se compose dans le panier.</p>
 </div>
-<div class="bf-pack-banner"><strong>VOTRE TRIO À 699 DH</strong><span>3 × 279 DH = 837 DH → <b>138 DH économisés</b></span><small>Chaque lot complet de 3 Opus : 699 DH. Paire hors lot : 279 DH. Sans code.</small></div>
+<div class="bf-pack-banner"><strong>VOTRE TRIO À 699 DH</strong><span>3 × 279 DH = 837 DH → <b>138 DH économisés</b></span><small>Offre réservée à un panier de exactement 3 paires Opus. Non cumulable. Autres quantités : 279 DH la paire.</small></div>
 <div class="collection-toolbar"><div class="filters" id="filters" aria-label="Filtrer la collection"></div><span id="collection-count" class="collection-count" role="status"></span></div>
 <div class="grid" id="grid"></div>
 <noscript><div class="repli-catalogue"><ul><li><h3>Benkashoes Opus — mocassin-mule à bride penny</h3><p><strong>279 DH</strong> · pointures 37 à 41 · en stock</p><p>La bride penny ajourée, posée sur un daim souple monté à la main sur forme. Talon ouvert : on l’enfile d’un geste, il tient par le cou-de-pied. Huit daims au choix, du beige au noir, c’est le modèle sur lequel l’atelier a bâti sa réputation.</p><p>Cuirs : Beige, Marron taupe, Marron, Tabac, Burgundy, Gris, Marine, Noir.</p></li></ul><p>Livraison au Maroc 0 DH, offerte à partir de 0 DH d'achat.</p></div></noscript>
@@ -425,20 +425,12 @@ const SHIPFREE=0, SHIPCOST=0;
 function prixBlackFriday(items, active = true) {
   const eligible = i => i.id === 'opus' && i.unit === 279;
   const count = items.reduce((n, i) => n + (eligible(i) ? i.q : 0), 0);
-  const packs = active ? Math.floor(count / 3) : 0;
-  let remaining = packs * 3;
-  const net = [];
-  for (const item of items) {
-    const discounted = eligible(item) ? Math.min(remaining, item.q) : 0;
-    if (discounted) {
-      net.push({...item, q: discounted, unit: 233});
-      remaining -= discounted;
-    }
-    if (item.q > discounted) net.push({...item, q: item.q - discounted});
-  }
+  const quantity = items.reduce((n, i) => n + i.q, 0);
+  const packs = active && count === 3 && quantity === 3 ? 1 : 0;
+  const net = items.map(item => ({...item, unit: packs ? 233 : item.unit}));
   const gross = items.reduce((n, i) => n + i.unit * i.q, 0);
   const sub = net.reduce((n, i) => n + i.unit * i.q, 0);
-  return {items: net, count, packs, gross, sub, discount: gross - sub};
+  return {items: net, count, quantity, packs, gross, sub, discount: gross - sub};
 }
 if (typeof module !== 'undefined' && module.exports) module.exports = {prixBlackFriday};
 const SOLE="M100 14C136 14 168 40 172 84C176 116 166 152 156 190C148 220 142 248 142 276C142 308 146 340 146 368C146 404 128 430 100 430C72 430 54 404 54 368C54 340 58 308 58 276C58 248 52 220 44 190C34 152 24 116 28 84C32 40 64 14 100 14Z";
@@ -780,7 +772,7 @@ function cartHTML(){
       <input id="f_site" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
       </div>
       <div class="callout" style="margin-top:18px"><b>Aucun paiement maintenant.</b> L'atelier vérifie la disponibilité, vous recevez la confirmation, puis vous réglez à la livraison ou par virement.</div>`;
-    foot=`<div class="totals"><div><span>Sous-total</span><span class="num">${fmt(pricing.gross)}</span></div>${pricing.discount?`<div class="bf-discount"><span>Black Friday · ${pricing.packs} lot${pricing.packs>1?'s':''} de 3</span><span class="num">−${fmt(pricing.discount)}</span></div>`:''}
+    foot=`<div class="totals"><div><span>Sous-total</span><span class="num">${fmt(pricing.gross)}</span></div>${pricing.discount?`<div class="bf-discount"><span>Black Friday · Trio de 3 paires</span><span class="num">−${fmt(pricing.discount)}</span></div>`:''}
       <div><span>Livraison</span><span class="num">${ship?fmt(ship):'Offerte'}</span></div>
       <div class="grand"><span>Total</span><span class="num">${fmt(sub+ship)}</span></div></div>
       <button class="btn btn-pri" data-act="place" style="justify-content:center">Valider la commande</button>
@@ -797,7 +789,7 @@ function cartHTML(){
           <div class="qty"><button data-act="qty" data-n="${n}" data-d="-1" aria-label="Retirer un">−</button><span class="num">${it.q}</span><button data-act="qty" data-n="${n}" data-d="1" aria-label="Ajouter un">+</button></div></div>
         <div class="right"><b class="num">${fmt(priceOf(p)*it.q)}</b><button class="lnk" data-act="rm" data-n="${n}">Retirer</button></div></div>`;}).join('')
       +`<p class="note" style="margin-top:16px">${SHIPFREE===0||SHIPCOST===0?'Livraison offerte, partout au Maroc.':(sub>=SHIPFREE?'Livraison offerte sur cette commande.':`Encore ${fmt(SHIPFREE-sub)} pour la livraison offerte.`)}</p>`;
-    foot=`<div class="totals"><div><span>Sous-total</span><span class="num">${fmt(pricing.gross)}</span></div>${pricing.discount?`<div class="bf-discount"><span>Black Friday · ${pricing.packs} lot${pricing.packs>1?'s':''} de 3</span><span class="num">−${fmt(pricing.discount)}</span></div>`:''}
+    foot=`<div class="totals"><div><span>Sous-total</span><span class="num">${fmt(pricing.gross)}</span></div>${pricing.discount?`<div class="bf-discount"><span>Black Friday · Trio de 3 paires</span><span class="num">−${fmt(pricing.discount)}</span></div>`:''}
       <div><span>Livraison</span><span class="num">${ship?fmt(ship):'Offerte'}</span></div>
       <div class="grand"><span>Total</span><span class="num">${fmt(sub+ship)}</span></div></div>
       <button class="btn btn-pri" data-act="next" style="justify-content:center">Passer à la livraison</button>`;
@@ -808,11 +800,16 @@ function cartHTML(){
     <div class="panel-bd">${body}</div>${foot?`<div class="panel-ft">${foot}</div>`:''}</div>`;
 }
 function blackFridayCartNote(pricing){
-  const missing=3-pricing.count%3;
+  const missing=3-pricing.quantity;
+  const message=pricing.packs
+    ? `Offre appliquée : vous économisez ${fmt(pricing.discount)}.`
+    : pricing.quantity<3 && pricing.count===pricing.quantity
+      ? `Encore ${missing} paire${missing>1?'s':''} pour votre trio à 699 DH.`
+      : 'Tarif normal appliqué : cette offre est réservée à un panier de exactement 3 paires Opus.';
   return `<div class="bf-cart-offer"><b>BLACK FRIDAY · 3 PAIRES = 699 DH</b>
-    <p>${pricing.packs?`Offre appliquée : vous économisez ${fmt(pricing.discount)}.`:`Encore ${missing} paire${missing>1?'s':''} pour votre lot à 699 DH.`}</p>
+    <p>${message}</p>
     <small>Couleurs et pointures au choix · Livraison offerte au Maroc</small>
-    ${pricing.packs?'<small>Chaque lot de 3 : 699 DH. Paire hors lot : 279 DH.</small>':''}</div>`;
+    <small>Uniquement pour un panier de exactement 3 paires Opus. Offre non cumulable.</small></div>`;
 }
 function waLink(o){return SHOP.whatsapp?`https://wa.me/${SHOP.whatsapp}?text=${encodeURIComponent(orderText(o))}`:'';}
 function mailLink(o){return `mailto:${SHOP.email}?subject=${encodeURIComponent('Commande '+o.ref)}&body=${encodeURIComponent(orderText(o))}`;}
@@ -842,13 +839,13 @@ async function envoyerAuTableur(o,cle,leurre){
     try{
       const check=await fetch(SHOP.tableur,{method:'GET',signal:controller.signal});
       const data=await check.json();
-      if(!check.ok||data?.promotion?.version!=='bf-3-699-v1')throw new Error('offre indisponible');
+      if(!check.ok||data?.promotion?.version!=='bf-exact3-699-v2')throw new Error('offre indisponible');
     }catch(e){return {ok:false,refus:true,message:'L’offre Black Friday est momentanément indisponible. Votre panier est conservé ; réessayez dans un moment.'};}
     finally{clearTimeout(timeout);}
   }
   const charge=JSON.stringify({cle,
     items:o.requestItems||o.items.map(i=>({id:i.id,colorKey:i.colorKey,size:i.size,q:i.q})),
-    customer:o.customer,note:o.note,expectedTotal:o.total,pricingVersion:'bf-3-699-v1',site:leurre||''});
+    customer:o.customer,note:o.note,expectedTotal:o.total,pricingVersion:'bf-exact3-699-v2',site:leurre||''});
   const envoi=m=>fetch(SHOP.tableur,{method:'POST',mode:m,
     headers:{'Content-Type':'text/plain;charset=utf-8'},body:charge});
   try{
