@@ -138,11 +138,11 @@ Trois façons, de la plus simple à la plus confortable.
 **1 · Télécharger ponctuellement**
 Dans la feuille : **Fichier → Télécharger → Microsoft Excel (.xlsx)**.
 
-**2 · Excel se met à jour tout seul** — le plus confortable au quotidien.
-Dans la feuille : **Fichier → Partager → Publier sur le Web**, choisissez
-l'onglet *Commandes* et le format **.csv**, copiez l'adresse. Puis dans Excel :
-**Données → À partir du Web**, collez l'adresse. Ensuite un seul clic sur
-**Actualiser tout** suffit : vos filtres, vos couleurs et vos formules restent.
+**2 · Conserver les commandes privées**
+
+Ne publiez jamais l’onglet des commandes sur le Web : il contient des noms,
+adresses et téléphones. Téléchargez le classeur avec votre compte autorisé
+ou utilisez une connexion authentifiée à votre Drive pour l’importer dans Excel.
 
 **3 · Sans rien installer du tout**
 L'espace commandes du site (`/#admin`) a un bouton **Exporter Excel** qui

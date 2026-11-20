@@ -1,31 +1,47 @@
 /* ======================= rendu + interactions ======================= */
-let panneauAffiche=null;
+let panneauAffiche=null,retourFocus=null;
 function draw(){
   const mobile=matchMedia('(max-width:860px)').matches;
-  const memePanneau=mobile&&S.panel&&S.panel===panneauAffiche;
+  const memePanneau=S.panel&&S.panel===panneauAffiche;
+  if(S.panel==='cart'&&S.step===2&&$('#f_name'))S.form=readForm();
   const defilement=$('#overlays .panel-bd')?.scrollTop||0;
   const galerieX=$('#overlays .galerie')?.scrollLeft||0;
   const focus=document.activeElement;
   const action=focus?.dataset.act;
   const cle=focus?.dataset.k,taille=focus?.dataset.s;
+  const ligne=focus?.dataset.n,sens=focus?.dataset.d,focusId=focus?.id;
+  const selection=focus&&['text','email','tel'].includes(focus.type)?[focus.selectionStart,focus.selectionEnd]:null;
+  if(S.panel&&!panneauAffiche)retourFocus=focus;
   const adm=location.hash==='#admin';
   $('#shopview').hidden=adm;$('#admview').hidden=!adm;
   if(adm)$('#admview').innerHTML=admHTML();else if(renderGrid()){revelations();}
   poserLogo();
   const o=$('#overlays');
   o.innerHTML=S.panel==='sheet'?sheetHTML():S.panel==='cart'?cartHTML():S.panel==='manual'?manualHTML():'';
+  $('#shopview').inert=!!S.panel;$('#admview').inert=!!S.panel;
+  if(memePanneau)o.classList.add('panel-update');else o.classList.remove('panel-update');
   if(S.panel){o.insertAdjacentHTML('afterbegin','<div class="scrim" data-act="closep"></div>');
-    let cible=null;
+    let cible=memePanneau&&focusId?document.getElementById(focusId):null;
     if(memePanneau&&action){
-      cible=[...o.querySelectorAll('[data-act]')].find(el=>el.dataset.act===action&&el.dataset.k===cle&&el.dataset.s===taille);
+      cible=[...o.querySelectorAll('[data-act]')].find(el=>el.dataset.act===action&&el.dataset.k===cle&&el.dataset.s===taille&&el.dataset.n===ligne&&el.dataset.d===sens&&!el.disabled);
     }
-    (cible||o.querySelector('.close'))?.focus({preventScroll:mobile});
+    (cible||o.querySelector('.close'))?.focus({preventScroll:true});
+    if(cible&&selection&&selection[0]!==null)try{cible.setSelectionRange(...selection);}catch(e){}
   }
   if(memePanneau){
     const bd=o.querySelector('.panel-bd'),g=o.querySelector('.galerie');
     if(bd)bd.scrollTop=defilement;if(g)g.scrollLeft=galerieX;
   }
   panneauAffiche=S.panel;
+  if(!S.panel&&retourFocus){
+    const retour=retourFocus.isConnected?retourFocus:$('#cartbtn');
+    retour?.focus({preventScroll:true});retourFocus=null;
+  }
+  if(S.envoi&&S.panel==='cart'){
+    o.querySelectorAll('input,select,textarea,[data-act="place"],[data-act="back"],[data-act="qty"],[data-act="rm"],[data-act="next"]').forEach(el=>el.disabled=true);
+    o.querySelector('.panel')?.setAttribute('aria-busy','true');
+    const b=o.querySelector('[data-act="place"]');if(b)b.textContent='Envoi en cours…';
+  }
   if(mobile)mesurerEcranMobile();
   // Sans condition : c'est aussi ce passage qui éteint la rotation du
   // tourne-disque quand la fiche se ferme. Un appel conditionnel laissait
@@ -101,8 +117,9 @@ async function exportCSV(){
 document.addEventListener('click',async e=>{
   const cp=e.target.closest('[data-copy]');
   if(cp){const ok=await copy($('#'+cp.dataset.copy).textContent.trim());toast(ok?'Copié':'Copie refusée par le navigateur');return;}
-  if(e.target.closest('#cartbtn')){S.panel='cart';S.step=S.cart.length?1:1;S.lastOrder=null;draw();return;}
+  if(e.target.closest('#cartbtn')){S.panel='cart';S.step=!S.cart.length&&S.lastOrder?3:1;draw();return;}
   const t=e.target.closest('[data-act]');if(!t)return;const a=t.dataset.act,d=t.dataset;
+  if(S.envoi&&['add','qty','rm','next','place'].includes(a)){toast('Votre commande est en cours d’envoi.');return;}
   if(a==='skipvisite'){
     e.preventDefault();
     const m=$('#modeles');
@@ -114,35 +131,39 @@ document.addEventListener('click',async e=>{
     }
   }
   else if(a==='qa'){const qa=t.closest('.qa');const o=qa.dataset.open==='1';
-    qa.parentElement.querySelectorAll('.qa').forEach(x=>{x.dataset.open='0';x.querySelector('.qa-q').setAttribute('aria-expanded','false');});
-    if(!o){qa.dataset.open='1';t.setAttribute('aria-expanded','true');}}
+    qa.parentElement.querySelectorAll('.qa').forEach(x=>{x.dataset.open='0';x.querySelector('.qa-q').setAttribute('aria-expanded','false');x.querySelector('.qa-a').setAttribute('aria-hidden','true');});
+    if(!o){qa.dataset.open='1';t.setAttribute('aria-expanded','true');qa.querySelector('.qa-a').setAttribute('aria-hidden','false');}}
   else if(a==='tab'){S.tab=d.k;draw();}
   else if(a==='fam'){S.filter=d.k;draw();}
   else if(a==='col'){S.colorFilter=S.colorFilter===d.k?null:d.k;draw();}
+  else if(a==='filters-reset'){S.colorFilter=null;S.sizeFilter=null;S.filter='tous';draw();}
+  else if(a==='photos'){const g=$('#overlays .galerie');if(g)g.scrollBy({left:+d.d*g.clientWidth,behavior:MOTION?'smooth':'auto'});}
   else if(a==='open'){const p=prod(d.id),c=d.c||p.colors[0];
-    S.sheet={id:p.id,c:c,s:null};S.tab='fiche';S.panel='sheet';draw();
+    e.preventDefault();
+    S.sheet={id:p.id,c:c,s:S.sizeFilter&&stockCol(p,c,SIZES.indexOf(S.sizeFilter))>0?S.sizeFilter:null};S.tab='fiche';S.panel='sheet';draw();
     poserLien('#'+p.id+'-'+c);
     mesure('ViewContent',{content_type:'product',content_ids:[refMeta(p.id,c)],
       content_name:p.name+' '+(COLORS[c]||{}).n,value:priceOf(p),currency:'MAD'});}
-  else if(a==='closep'){S.panel=null;S.manual=null;draw();
-    if(depuisLien())poserLien('');}
-  else if(a==='setcol'){poserLien('#'+S.sheet.id+'-'+d.k);S.sheet.c=d.k;draw();}
+  else if(a==='closep'){fermerPanneau();}
+  else if(a==='setcol'){poserLien('#'+S.sheet.id+'-'+d.k);S.sheet.c=d.k;
+    if(S.sheet.s&&!stockCol(prod(S.sheet.id),d.k,SIZES.indexOf(S.sheet.s)))S.sheet.s=null;draw();}
   else if(a==='setsize'){S.sheet.s=+d.s;draw();}
   else if(a==='add'){const{id,c,s}=S.sheet;
     // le bouton est désactivé sans pointure, mais une ligne sans pointure
     // fausserait le panier et la commande : on refuse aussi ici.
     if(!prod(id)||!COLORS[c]||!SIZES.includes(s)){toast('Choisissez une pointure');return;}
     const ex=S.cart.find(i=>i.id===id&&i.c===c&&i.s===s);
-    const max=stockCol(prod(id),c,SIZES.indexOf(s));
+    const max=Math.min(10,stockCol(prod(id),c,SIZES.indexOf(s)));
+    if(max<1){toast('Cette pointure est épuisée. Choisissez-en une autre.');draw();return;}
     if(ex){if(ex.q>=max){toast('Stock atteint pour cette pointure');return;}ex.q++;}else S.cart.push({id,c,s,q:1});
     syncCart();S.panel='cart';S.step=1;draw();bumpCart();toast('Ajouté au panier');
     const pr=prod(id);
     mesure('AddToCart',{content_type:'product',content_ids:[refMeta(id,c)],
       content_name:pr.name+' '+(COLORS[c]||{}).n,value:priceOf(pr),currency:'MAD'});}
-  else if(a==='qty'){const i=S.cart[+d.n];const max=stockCol(prod(i.id),i.c,SIZES.indexOf(i.s));
+  else if(a==='qty'){const i=S.cart[+d.n];if(!i)return;const max=Math.min(10,stockCol(prod(i.id),i.c,SIZES.indexOf(i.s)));
     i.q+=+d.d;if(i.q>max){i.q=max;toast('Stock atteint');}if(i.q<1)S.cart.splice(+d.n,1);syncCart();draw();}
   else if(a==='rm'){S.cart.splice(+d.n,1);syncCart();draw();}
-  else if(a==='next'){S.step=2;draw();
+  else if(a==='next'){if(!S.cart.length)return;S.checkoutError='';S.step=2;draw();
     mesure('InitiateCheckout',{content_type:'product',
       content_ids:S.cart.map(i=>refMeta(i.id,i.c)),
       num_items:cartCount(),value:cartSub()+shipCost(),currency:'MAD'});}
@@ -211,6 +232,7 @@ async function saveManual(){readManual();const m=S.manual;
   S.panel=null;S.manual=null;S.openRow=o.ref;draw();toast('Commande '+o.ref+' enregistrée');
 }
 document.addEventListener('change',e=>{
+  if(e.target.id==='size-filter'){S.sizeFilter=SIZES.includes(+e.target.value)?+e.target.value:null;draw();return;}
   const c=e.target.closest('[data-ch]');
   if(c){const v=Math.max(0,Math.round(+e.target.value||0));
     if(c.dataset.ch==='price'){S.ov.prices[c.dataset.id]=v;}
@@ -234,7 +256,7 @@ document.addEventListener('change',e=>{
     const seen=new Set(S.orders.map(o=>o.ref));
     const add=nettoyerListe(v.orders).filter(o=>!seen.has(o.ref));
     S.orders=add.concat(S.orders).sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
-    if(v.catalog&&v.catalog.prices)S.ov=v.catalog;
+    if(v.catalog)S.ov=nettoyerCatalogue(v.catalog);
     saveLocal();if(STATIC)lsSet('benkashoes.catalog',S.ov);draw();
     toast(add.length+' commande(s) restaurée(s)');
   }catch(err){toast('Fichier de sauvegarde illisible');}};
@@ -254,7 +276,18 @@ document.addEventListener('change',e=>{
 })();
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&e.target.id==='pw'){e.preventDefault();document.querySelector('[data-act="login"]')?.click();return;}
-  if(e.key==='Escape'&&S.panel){S.panel=null;S.manual=null;draw();}});
+  if(e.key==='Escape'&&S.panel){fermerPanneau();return;}
+  if(e.key==='Tab'&&S.panel){
+    const els=[...document.querySelectorAll('#overlays .panel button:not([disabled]),#overlays .panel a[href],#overlays .panel input:not([disabled]),#overlays .panel select:not([disabled]),#overlays .panel textarea:not([disabled]),#overlays .panel summary,#overlays .panel [tabindex]')].filter(el=>el.tabIndex>=0&&el.getClientRects().length&&!el.closest('[hidden]'));
+    const premier=els[0],dernier=els[els.length-1];
+    if(e.shiftKey&&document.activeElement===premier){e.preventDefault();dernier?.focus();}
+    else if(!e.shiftKey&&document.activeElement===dernier){e.preventDefault();premier?.focus();}
+  }
+});
+function fermerPanneau(){
+  if(S.panel==='cart'&&S.step===2&&$('#f_name'))S.form=readForm();
+  S.panel=null;S.manual=null;draw();if(depuisLien())poserLien('');
+}
 /* ───────── l'adresse désigne une fiche ─────────
 
    « benkashoes.ma/#opus-tabac » ouvre le tabac directement. Sans ça, une
@@ -265,7 +298,7 @@ document.addEventListener('keydown',e=>{
    bouton « retour » du téléphone referme le panneau au lieu de quitter le
    site. */
 function depuisLien(){
-  const h=decodeURIComponent(location.hash||'').replace(/^#/,'');
+  let h;try{h=decodeURIComponent(location.hash||'').replace(/^#/,'');}catch(e){return null;}
   if(!h||h==='admin')return null;
   const t=h.split('-');
   if(t.length<2)return null;
@@ -285,6 +318,7 @@ function poserLien(h){
 let ancienAdmin=location.hash==='#admin';
 addEventListener('hashchange',()=>{
   if(lienInterne)return;
+  if(S.panel==='cart'&&S.step===2&&$('#f_name'))S.form=readForm();
   const admin=location.hash==='#admin';
   const fiche=depuisLien();
   if(fiche){S.sheet=fiche;S.tab='fiche';S.panel='sheet';draw();ancienAdmin=admin;return;}
@@ -293,3 +327,12 @@ addEventListener('hashchange',()=>{
   ancienAdmin=admin;
 });
 
+
+// Les détails 360° ne chargent leur planche qu'à la demande.
+document.addEventListener('toggle',e=>{if(e.target.matches?.('.product-360'))majRotor();},true);
+document.addEventListener('keydown',e=>{
+  const tab=e.target.closest('[role="tab"]');if(!tab||!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
+  const tabs=[...tab.parentElement.querySelectorAll('[role="tab"]')],i=tabs.indexOf(tab);
+  const suivant=e.key==='Home'?0:e.key==='End'?tabs.length-1:(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;
+  e.preventDefault();S.tab=tabs[suivant].dataset.k;draw();$('#tab-'+S.tab)?.focus({preventScroll:true});
+});

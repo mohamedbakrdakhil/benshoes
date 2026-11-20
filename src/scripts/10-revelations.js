@@ -16,16 +16,7 @@ function initMotion(){
       if(Math.abs(y-yPrec)>.5){yPrec=y;
         topo.style.transform=`translate3d(0,${(y*.22).toFixed(1)}px,0) scale(${(1+y*.00022).toFixed(4)})`;}
       return false;});}
-  // boutons magnétiques
-  document.addEventListener('pointermove',e=>{
-    if(e.pointerType==='touch')return;
-    const b=e.target.closest('.btn-pri,.btn-hero,.cartbtn');
-    if(!b){document.querySelectorAll('[data-mag]').forEach(x=>{x.style.transform='';x.removeAttribute('data-mag')});return;}
-    const r=b.getBoundingClientRect();
-    b.setAttribute('data-mag','1');
-    b.style.transform=`translate(${((e.clientX-r.left-r.width/2)*.14).toFixed(1)}px,${((e.clientY-r.top-r.height/2)*.22).toFixed(1)}px)`;
-  },{passive:true});
-  document.addEventListener('pointerleave',()=>document.querySelectorAll('[data-mag]').forEach(x=>{x.style.transform='';x.removeAttribute('data-mag')}),true);
+  // Les boutons restent une cible stable ; leurs retours visuels sont en CSS.
 
 }
 function initNav(){

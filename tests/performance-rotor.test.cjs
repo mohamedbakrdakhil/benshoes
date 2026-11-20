@@ -40,12 +40,12 @@ function harness({observer=true,motion=true}={}){
   const maj=()=>vm.runInContext('majRotor()',context);
   return {
     document,images,observers,intervals,classes,maj,
-    open(color='noir'){
+    open(color='noir',details=null){
       if(current)current.isConnected=false;
       const vue={style:{}};
       const rotor=Object.assign(cible(),{
         isConnected:true,dataset:{src:`${color}.webp`,repli:`${color}.jpg`},vue,
-        classList:{add(){},remove(){}},querySelector:()=>vue,setPointerCapture(){},
+        classList:{add(){},remove(){}},querySelector:()=>vue,closest:()=>details,setPointerCapture(){},
         remove(){this.isConnected=false;if(current===this)current=null;}
       });
       current=rotor;maj();return rotor;
@@ -54,6 +54,14 @@ function harness({observer=true,motion=true}={}){
     tick(){for(const f of [...intervals.values()])f();}
   };
 }
+
+test('la vue 360° fermée ne télécharge rien ; ouverture puis fermeture nettoient le rotor',()=>{
+  const h=harness({observer:false}),details={open:false};
+  h.open('noir',details);assert.equal(h.images.length,0);
+  details.open=true;h.maj();assert.equal(h.images.length,1);
+  h.images[0].onload();assert.equal(h.intervals.size,1);
+  details.open=false;h.maj();assert.equal(h.intervals.size,0);
+});
 
 test('une image terminée après fermeture ne relance pas un rotor détaché',()=>{
   const h=harness({observer:false}),r=h.open();

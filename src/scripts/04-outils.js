@@ -1,5 +1,5 @@
 /* ======================= état ======================= */
-const S={cart:[],sheet:null,panel:null,step:1,filter:'tous',colorFilter:null,
+const S={cart:[],sheet:null,panel:null,step:1,filter:'tous',colorFilter:null,sizeFilter:null,
   ov:{prices:{},stock:{}},orders:[],db:null,user:null,canAdmin:false,dbTried:false,
   admTab:'commandes',openRow:null,lastOrder:null,manual:null,me:'',envoi:false};
 const $=s=>document.querySelector(s);
@@ -67,9 +67,42 @@ function nettoyerCommande(o){
 }
 const nettoyerListe=v=>(Array.isArray(v)?v:[]).slice(0,2000).map(nettoyerCommande).filter(Boolean);
 const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
-function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2300);}
+function toast(m){const t=document.createElement('div');t.className='toast';t.setAttribute('role','status');t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),3500);}
 function newRef(){const d=new Date();const y=String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0');
-  let r='';for(let i=0;i<4;i++)r+='ACDEFHJKLMNPRTUVWXY34789'[Math.floor(Math.random()*24)];return `BS-${y}-${r}`;}
+  const alphabet='ACDEFHJKLMNPRTUVWXY34789';
+  let r='';for(let i=0;i<6;i++)r+=alphabet[Math.floor(Math.random()*alphabet.length)];return `BS-${y}-${r}`;}
+
+// Les données locales et les sauvegardes ne sont pas des données de confiance.
+function nettoyerCatalogue(v){
+  const net={prices:{},stock:{}};
+  if(!v||typeof v!=='object')return net;
+  CATALOG.forEach(p=>{
+    const prix=v.prices?.[p.id];
+    if(typeof prix==='number'&&Number.isFinite(prix)&&prix>=0&&prix<=1e6)net.prices[p.id]=prix;
+    const grille=v.stock?.[p.id];
+    if(!grille||typeof grille!=='object'||Array.isArray(grille))return;
+    const g={};
+    p.colors.forEach(c=>{
+      const ligne=grille[c];
+      if(Array.isArray(ligne)&&ligne.length===SIZES.length&&ligne.every(n=>typeof n==='number'&&Number.isFinite(n)&&n>=0&&n<=10000))g[c]=ligne.map(Math.floor);
+    });
+    if(Object.keys(g).length===p.colors.length)net.stock[p.id]=g;
+  });
+  return net;
+}
+function nettoyerPanier(v){
+  const lignes=[];
+  (Array.isArray(v)?v:[]).slice(0,40).forEach(i=>{
+    const p=i&&prod(i.id),q=Number(i?.q);
+    if(!p||!p.colors.includes(i.c)||!SIZES.includes(i.s)||!Number.isFinite(q)||q<1)return;
+    const max=Math.min(10,stockCol(p,i.c,SIZES.indexOf(i.s)));
+    if(max<1)return;
+    const ex=lignes.find(l=>l.id===i.id&&l.c===i.c&&l.s===i.s);
+    if(ex)ex.q=Math.min(max,ex.q+Math.floor(q));
+    else lignes.push({id:i.id,c:i.c,s:i.s,q:Math.min(max,Math.floor(q))});
+  });
+  return lignes;
+}
 
 /* La livraison, dite en français. Avec un seuil à zéro, « offerte dès 0 DH »
    n'a aucun sens : on écrit simplement qu'elle est offerte. La formule suit

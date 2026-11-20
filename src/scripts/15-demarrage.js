@@ -27,9 +27,7 @@ addEventListener('resize',()=>{mesurer();reveiller();},{passive:true});
 document.addEventListener('visibilitychange',reveiller);
 addEventListener('load',()=>{mesurer();reveiller();});
 reveiller();
-const savedCart=lsGet('benkashoes.cart');if(Array.isArray(savedCart))S.cart=savedCart.slice(0,40)
-  .filter(i=>i&&prod(i.id)&&COLORS[i.c]&&prod(i.id).colors.includes(i.c)&&SIZES.includes(i.s))
-  .map(i=>({id:i.id,c:i.c,s:i.s,q:Math.min(99,Math.max(1,Math.floor(Number(i.q))||1))}));
+S.cart=nettoyerPanier(lsGet('benkashoes.cart'));syncCart();
 draw();
 // Une adresse qui désigne un coloris ouvre sa fiche tout de suite.
 (function(){const f=depuisLien();
@@ -40,7 +38,7 @@ draw();
 if(!HASCLAUDE){
   TOKEN=lsGet('benkashoes.token')||'';
   S.canAdmin=true;loadLocal();
-  const c=lsGet('benkashoes.catalog');if(c&&c.prices)S.ov=c;
+  S.ov=nettoyerCatalogue(lsGet('benkashoes.catalog'));
   draw();
   (async function(){
     // Sur l'hébergement statique il n'y a pas de serveur : sonder /api/catalog
@@ -74,7 +72,7 @@ if(!HASCLAUDE){
       const g=d.stock[p.id];if(!g||typeof g!=='object')return;
       const n={};
       p.colors.forEach(c=>{const l=g[c];
-        if(Array.isArray(l)&&l.length===SIZES.length)
+        if(Array.isArray(l)&&l.length===SIZES.length&&l.every(v=>typeof v==='number'&&Number.isFinite(v)&&v>=0&&v<=10000))
           n[c]=l.map(v=>{const x=Math.floor(Number(v));return x>0?x:0;});});
       if(Object.keys(n).length===p.colors.length)net[p.id]=n;});
     return Object.keys(net).length?net:null;
@@ -100,7 +98,7 @@ if(!HASCLAUDE){
     try{const me=await user.me();S.me=(me&&me.name)||'';}catch(e){}}
   if(db){
     try{const snap=await db.doc('settings/catalog').get();
-      if(snap.exists){const v=snap.data()||{};S.ov={prices:v.prices||{},stock:v.stock||{}};}}catch(e){}
+      if(snap.exists)S.ov=nettoyerCatalogue(snap.data());}catch(e){}
     db.collection('orders').orderBy('createdAt','desc').limit(500).onSnapshot(
       s=>{S.orders=nettoyerListe(s.docs.map(d=>d.data()));draw();},
       ()=>{});

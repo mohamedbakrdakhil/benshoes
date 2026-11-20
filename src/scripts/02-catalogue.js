@@ -60,7 +60,7 @@ const FAQ=[
  ['Puis-je payer en ligne ?',
   "Pas encore. Vous composez votre panier et vous le validez : la commande arrive directement à l\u2019atelier avec une référence. On vous rappelle pour confirmer la disponibilité dans votre pointure, puis vous réglez à la livraison ou par virement."],
  ['Livrez-vous en dehors du Maroc ?',
-  "Oui, sur demande. L\u2019expédition sous 48 h et la livraison offerte ne valent que pour le Maroc. Pour l\u2019étranger, indiquez votre pays dans le formulaire : on vous envoie un devis de port avant de confirmer la commande."]
+  "Oui, sur demande. L\u2019expédition sous 48 h et la livraison offerte ne valent que pour le Maroc. Pour l\u2019étranger, contactez-nous par e-mail avant de commander pour obtenir un devis de livraison."]
 ];
 const STATUS={nouvelle:'Nouvelle',confirmee:'Confirmée',expediee:'Expédiée',livree:'Livrée',annulee:'Annulée'};
 // Livraison offerte partout au Maroc, sans montant minimum : le seuil de

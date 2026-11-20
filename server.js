@@ -233,7 +233,9 @@ const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=
   '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp',
   '.ico': 'image/x-icon', '.txt': 'text/plain; charset=utf-8', '.xml': 'application/xml; charset=utf-8' };
 function serveStatic(req, res, pathname) {
-  let rel = decodeURIComponent(pathname).replace(/\\+/g, '/');
+  let rel;
+  try { rel = decodeURIComponent(pathname).replace(/\\+/g, '/'); }
+  catch (_) { res.writeHead(400).end('Chemin invalide'); return; }
   if (rel.endsWith('/')) rel += 'index.html';
   if (rel.includes('\u0000')) { res.writeHead(400).end('Chemin invalide'); return; }
   const file = path.resolve(PUBLIC_DIR, '.' + path.posix.normalize('/' + rel));
