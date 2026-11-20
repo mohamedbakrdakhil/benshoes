@@ -6,7 +6,7 @@
   const nav=section?.querySelector('.fete-tour-nav');
   if(!section||!stage||!select||!nav)return;
   const art=section.querySelector('.fete-static-art');
-  if(art&&typeof feteSapin==='function')art.innerHTML=feteSapin();
+  if(art&&typeof riadPortalSVG==='function')art.innerHTML=riadPortalSVG()+'<div class="riad-static-lantern">'+riadLanternSVG()+'</div>';
   nav.hidden=false;
   const caps=[...section.querySelectorAll('.vcap')];
   select.addEventListener('change',()=>{

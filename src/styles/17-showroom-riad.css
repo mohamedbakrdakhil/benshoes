@@ -1,0 +1,159 @@
+/* Le riad Benka : matières peintes sur les plans existants du showroom.
+   Les motifs suivent --f et --k, comme la géométrie du moteur 3D. */
+.visite-riad{--riad-ivoire:#e4d4b4;--riad-cedre:#58351e;--riad-zellige:#174e42;--riad-laiton:#ba9356}
+.visite-riad .pane-riad{pointer-events:none}
+.visite-riad .riad-svg{display:block;width:100%;height:100%;pointer-events:none}
+.visite-riad .riad-frieze,.visite-riad .riad-portal{pointer-events:none}
+
+/* Tadelakt patiné, filet de laiton et lambris bas en cèdre.
+   L'extérieur de Fès conserve ses propres enduits et ses zelliges. */
+.visite-riad .zone[data-z="allee"] .pane-wall,
+.visite-riad .zone[data-z="salle"] .pane-wall{
+  background:
+    linear-gradient(180deg,transparent 0 72%,#bd9659 72% 72.6%,#233c2c 72.6% 74%,transparent 74%),
+    repeating-linear-gradient(90deg,#3b281b 0 calc(4px/var(--f)),#8d6138 calc(4px/var(--f)) calc(7px/var(--f)),transparent calc(7px/var(--f)) calc(150px/var(--f))) bottom/100% 26% no-repeat,
+    radial-gradient(ellipse at 44% 24%,#ecdcbd6b,transparent 64%),
+    linear-gradient(180deg,#a58b68,#d2bb94 32%,#baa27b 72%,#68472d 74%,#3b281c);
+  box-shadow:inset 0 0 calc(95px/var(--f)) #291c174a;
+}
+.visite-riad .zone[data-z="salle"] .pane-marbre:not(.sol){
+  background:
+    repeating-linear-gradient(118deg,transparent 0 calc(260px/var(--f)),#f8ebd315 calc(260px/var(--f)) calc(264px/var(--f)),transparent calc(264px/var(--f)) calc(540px/var(--f))),
+    radial-gradient(ellipse at 45% 28%,#f2e3c6a6,transparent 72%),
+    linear-gradient(180deg,#a58d6b,#d9c5a1 46%,#bda37b);
+}
+
+/* Caissons de cèdre, articulés par des joints sombres et des filets d'or. */
+.visite-riad .zone[data-z="allee"] .pane-ceil,
+.visite-riad .zone[data-z="salle"] .pane-ceil{
+  background:
+    repeating-linear-gradient(90deg,#231b14 0 calc(8px/var(--f)),#ad8349 calc(8px/var(--f)) calc(10px/var(--f)),transparent calc(10px/var(--f)) calc(168px/var(--f)),#986f3e calc(168px/var(--f)) calc(170px/var(--f)),#231b14 calc(170px/var(--f)) calc(180px/var(--f))),
+    repeating-linear-gradient(0deg,#231b14 0 calc(8px/var(--f)),#ad8349 calc(8px/var(--f)) calc(10px/var(--f)),transparent calc(10px/var(--f)) calc(168px/var(--f)),#986f3e calc(168px/var(--f)) calc(170px/var(--f)),#231b14 calc(170px/var(--f)) calc(180px/var(--f))),
+    repeating-conic-gradient(from 45deg,#986839 0 25%,#624126 0 50%) center/calc(90px/var(--f)) calc(90px/var(--f)),
+    linear-gradient(180deg,#634129,#352519);
+  box-shadow:inset 0 0 calc(110px/var(--f)) #1d120d91;
+}
+
+/* Marbre crème et vert, avec joints fins : le sol reste lisible en perspective. */
+.visite-riad .pane-marbre.sol{
+  background:
+    repeating-linear-gradient(90deg,#b7a17b80 0 calc(2px/var(--f)),transparent calc(2px/var(--f)) calc(180px/var(--f))),
+    repeating-linear-gradient(0deg,#b7a17b80 0 calc(2px/var(--f)),transparent calc(2px/var(--f)) calc(180px/var(--f))),
+    radial-gradient(ellipse at 50% 40%,#f7dfae2e,transparent 70%),
+    conic-gradient(#b9a17e 25%,#315247 0 50%,#b9a17e 0 75%,#315247 0) 0 0/calc(360px/var(--f)) calc(360px/var(--f));
+  box-shadow:inset 0 0 calc(160px/var(--f)) #1b20165c;
+}
+
+/* Fûts à facettes, socles de zellige et chapiteaux à gradins. */
+.visite-riad .pane-colonne{
+  background:linear-gradient(90deg,#927a57 0 13%,#cfb88d 13% 27%,#ecdcba 27% 46%,#dbc7a1 46% 65%,#b69a70 65% 84%,#796345 84%);
+  box-shadow:inset 0 calc(4px/var(--f)) #f4e3bd70;
+}
+.visite-riad .pane-colonne::after{
+  content:"";position:absolute;inset:auto 0 0;height:25%;
+  border-top:calc(8px/var(--f)) solid #ad8748;
+  border-bottom:calc(5px/var(--f)) solid #76592e;
+  background:
+    repeating-linear-gradient(45deg,transparent 0 calc(15px/var(--f)),#c3b4888c calc(15px/var(--f)) calc(17px/var(--f)),transparent calc(17px/var(--f)) calc(32px/var(--f))),
+    repeating-linear-gradient(-45deg,transparent 0 calc(15px/var(--f)),#c3b4888c calc(15px/var(--f)) calc(17px/var(--f)),transparent calc(17px/var(--f)) calc(32px/var(--f))),
+    linear-gradient(90deg,#123b32,#236451 38%,#1b5142 66%,#113b30);
+}
+.visite-riad .pane-chapiteau{
+  background:
+    repeating-linear-gradient(90deg,transparent 0 calc(19px/var(--f)),#8f764563 calc(19px/var(--f)) calc(21px/var(--f)),transparent calc(21px/var(--f)) calc(40px/var(--f))),
+    linear-gradient(180deg,#f0dfb8 0 16%,#a48a59 16% 19%,#dbc69a 19% 39%,#a18959 39% 42%,#e9d5aa 42% 64%,#9b8055 64% 67%,#c5ad80 67% 100%);
+  clip-path:polygon(0 0,100% 0,100% 18%,94% 18%,94% 40%,86% 40%,86% 65%,77% 65%,77% 100%,23% 100%,23% 65%,14% 65%,14% 40%,6% 40%,6% 18%,0 18%);
+  filter:none;
+}
+.visite-riad .pane-socle{
+  background:linear-gradient(180deg,#bda679 0 15%,#e1cda3 15% 32%,#947847 32% 36%,#ccb58a 36% 80%,#a48b5b 80%);
+  clip-path:polygon(0 100%,0 77%,7% 77%,7% 37%,15% 37%,15% 0,85% 0,85% 37%,93% 37%,93% 77%,100% 77%,100% 100%);
+}
+
+/* Moucharabieh ajouré : le vide laisse apercevoir la galerie derrière. */
+.visite-riad .pane-balustres,
+.visite-riad .pane-mouchara{
+  background:
+    repeating-linear-gradient(45deg,#59361c 0 calc(5px/var(--f)),#a4733d calc(5px/var(--f)) calc(7px/var(--f)),transparent calc(7px/var(--f)) calc(33px/var(--f))),
+    repeating-linear-gradient(-45deg,#59361c 0 calc(5px/var(--f)),#a4733d calc(5px/var(--f)) calc(7px/var(--f)),transparent calc(7px/var(--f)) calc(33px/var(--f))),
+    repeating-linear-gradient(90deg,#4b2e19 0 calc(9px/var(--f)),#a77843 calc(9px/var(--f)) calc(12px/var(--f)),transparent calc(12px/var(--f)) calc(180px/var(--f)));
+  box-shadow:inset 0 calc(7px/var(--f)) #a77b42,inset 0 calc(-7px/var(--f)) #5c391f;
+}
+.visite-riad .pane-rampe{
+  background:linear-gradient(180deg,#c49b5b 0 12%,#6a4225 12% 35%,#966735 35% 55%,#4f301c 55% 88%,#b48c4e 88%);
+}
+.visite-riad .arc-romain{
+  border-color:#dfcba5;
+  box-shadow:0 0 0 calc(2px*var(--k,1)) #997740,inset 0 0 0 calc(3px*var(--k,1)) #f4e2be;
+}
+
+/* Tapis grenat : tissage discret, losanges ivoire et bordure à plusieurs fils. */
+.visite-riad .pane-tapis{
+  background:
+    repeating-linear-gradient(0deg,#f1dbb216 0 calc(1px/var(--f)),transparent calc(1px/var(--f)) calc(5px/var(--f))),
+    repeating-linear-gradient(45deg,transparent 0 calc(74px/var(--f)),#d8b2789e calc(74px/var(--f)) calc(78px/var(--f)),transparent calc(78px/var(--f)) calc(154px/var(--f))),
+    repeating-linear-gradient(-45deg,transparent 0 calc(74px/var(--f)),#d8b2789e calc(74px/var(--f)) calc(78px/var(--f)),transparent calc(78px/var(--f)) calc(154px/var(--f))),
+    linear-gradient(180deg,#7e3041,#53232c);
+  box-shadow:inset 0 0 0 calc(8px/var(--f)) #4b2127,inset 0 0 0 calc(12px/var(--f)) #d7b780,inset 0 0 0 calc(22px/var(--f)) #264e40,inset 0 0 0 calc(25px/var(--f)) #c6a26b,inset 0 0 0 calc(36px/var(--f)) #6a2836;
+}
+
+/* Les arcs décoratifs restent derrière les vrais produits. */
+.visite-riad .niche,
+.visite-riad .n3 .nb{
+  background:radial-gradient(ellipse at 50% 17%,#376a4c,#173f32 53%,#102c24);
+  border:1px solid #b7955e;
+  box-shadow:inset 0 14px 28px #07191066;
+}
+.visite-riad .niche.decor{
+  background:
+    repeating-linear-gradient(45deg,transparent 0 24px,#e0be7929 24px 26px,transparent 26px 50px),
+    repeating-linear-gradient(-45deg,transparent 0 24px,#e0be7929 24px 26px,transparent 26px 50px),
+    linear-gradient(180deg,#245344,#102d25);
+  border-color:#d3b784;
+}
+.visite-riad .niche::before{background:#f9e2a9;box-shadow:0 0 10px 2px #e5b46855}
+.visite-riad .niche .riad-niche-art,
+.visite-riad .n3 .nb .riad-niche-art{
+  position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;
+  z-index:0;pointer-events:none;
+}
+.visite-riad .riad-niche-art .riad-svg{width:100%;height:100%;max-width:none}
+.visite-riad .niche .pv,
+.visite-riad .n3 .nb .pv{
+  position:relative;z-index:1;filter:none;
+}
+.visite-riad .niche b,.visite-riad .n3 .nb b,
+.visite-riad .niche span,.visite-riad .n3 .nb span{
+  position:relative;z-index:1;color:#f7e9ca;text-shadow:0 1px 3px #0a211c;
+}
+.visite-riad .niche span,.visite-riad .n3 .nb span{color:#dcc28c}
+.visite-riad .n3 .ns{background:linear-gradient(90deg,#8b6035,#3e2a1c)}
+.visite-riad .n3 .nt{background:linear-gradient(#a67e40,#f5d994);box-shadow:0 0 13px 3px #e5b46845}
+.visite-riad .n3 .nf{background:linear-gradient(180deg,#2d2419,#6b4a2b)}
+.visite-riad .pane-led,.visite-riad .pane-led.froide{
+  background:linear-gradient(180deg,#e0bc7640,#fbe5b6 42%,#edca8b 58%,#d3a65b33);
+  box-shadow:0 0 calc(23px*var(--k,1)) calc(4px*var(--k,1)) #e8bd6e5c;
+}
+
+/* Le bois des présentoirs prolonge celui des portes et des galeries. */
+.visite-riad .pane-podium{
+  background:linear-gradient(180deg,#b38a50 0 3%,#634227 3% 87%,#a37a40 87% 90%,#3b291c 90%);
+}
+.visite-riad .pane-podtop{background:linear-gradient(135deg,#987044,#614226)}
+
+@media(max-width:700px){
+  .visite-riad .niche,.visite-riad .n3 .nb{box-shadow:inset 0 8px 16px #07191055}
+  .visite-riad .niche::before{box-shadow:0 0 6px 1px #e5b46855}
+  .visite-riad .niche.decor{background-size:50% 50%,50% 50%,100% 100%}
+}
+
+/* Arcs de la galerie, enseigne et ornements dessinés dans leur propre plan. */
+.visite-riad .riad-arcade{position:absolute;background:#193b31;overflow:hidden}
+.visite-riad .riad-arcade .riad-svg{width:100%;height:100%}
+.visite-riad .riad-sign b{font-size:calc(47px*var(--k,1));letter-spacing:.02em}
+.visite-riad .riad-sign i{font-size:calc(8px*var(--k,1));letter-spacing:.24em;margin-top:calc(8px*var(--k,1))}
+
+.visite-riad .riad-entablement{clip-path:none}
+.visite-riad .fete-static-art{position:relative}
+.visite-riad .fete-static-art>.riad-svg{height:210px}
+.visite-riad .riad-static-lantern{position:absolute;left:40%;top:52px;width:20%;height:110px}
