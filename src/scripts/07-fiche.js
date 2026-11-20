@@ -21,7 +21,7 @@
    rien ne dit qu'elle est vivante. Au premier contact, elle se tait et
    obéit. */
 const ROT_N=24, ROT_COLS=6, ROT_RANGS=4;
-let rotorAuto=null;
+let rotorNettoyer=null, rotorGeneration=0;
 
 function rotorHTML(p,c){
   const n=(COLORS[c]||{}).n||c;
@@ -37,53 +37,88 @@ function rotorHTML(p,c){
    rotation précédente. Sans ce passage inconditionnel, fermer la fiche
    laissait un intervalle tourner sur un élément retiré du document. */
 function majRotor(){
-  if(rotorAuto){clearInterval(rotorAuto);rotorAuto=null;}
+  // Un ancien chargement peut finir APRÈS la fermeture ou le changement de
+  // coloris. Son jeton devient caduc avant tout nouveau rendu.
+  const generation=++rotorGeneration;
+  if(rotorNettoyer)rotorNettoyer();
   const r=document.querySelector('.rotor');
-  if(!r) return;
-  // Connexion comptée : on retire le tourne-disque. Les photos de la galerie
-  // restent, et elles suffisent à acheter.
+  if(!r)return;
   const co=navigator.connection||{};
   if(co.saveData===true||/^(slow-)?2g$/.test(co.effectiveType||'')){r.remove();return;}
 
-  const vue=r.querySelector('.rotor-vue');
+  const vue=r.querySelector('.rotor-vue'),boutique=document.querySelector('#shopview');
   const img=new Image();
-  /* La planche nette est en WebP. Un navigateur qui l'ignore bascule une
-     fois sur l'ancienne en JPEG — floue, mais qui tourne — au lieu de perdre
-     le tourne-disque. Une seule reprise : si le repli échoue aussi, c'est le
-     réseau, et les photos de la galerie suffisent à acheter. */
-  let repli=false;
+  img.decoding='async';
+  let repli=false,pret=false,muet=false,tenu=false,nettoye=false;
+  let i=0,x0=0,i0=0,auto=null,observateur=null;
+  let enVue=!self.IntersectionObserver;
+  const ecouteurs=[];
+  const valide=()=>!nettoye&&generation===rotorGeneration&&r.isConnected
+    &&document.querySelector('.rotor')===r;
+  const pause=()=>{if(auto!==null){clearInterval(auto);auto=null;}};
+  const pose=k=>{
+    i=((k%ROT_N)+ROT_N)%ROT_N;
+    vue.style.backgroundPosition=
+      `${(i%ROT_COLS)/(ROT_COLS-1)*100}% ${Math.floor(i/ROT_COLS)/(ROT_RANGS-1)*100}%`;
+  };
+  const animer=()=>{
+    if(!valide()){nettoyer();return;}
+    if(!pret||!MOTION||muet||!enVue||document.hidden||boutique?.classList.contains('bf-paused')){pause();return;}
+    if(auto===null)auto=setInterval(()=>{
+      if(!valide()){nettoyer();return;}
+      if(document.hidden||!enVue){pause();return;}
+      if(!tenu)pose(i+1);
+    },110);
+  };
+  function nettoyer(){
+    if(nettoye)return;
+    nettoye=true;pause();observateur?.disconnect();
+    img.onload=null;img.onerror=null;
+    document.removeEventListener('visibilitychange',animer);
+    document.removeEventListener('benka:motionchange',animer);
+    ecouteurs.forEach(([nom,fn])=>r.removeEventListener(nom,fn));
+    if(rotorNettoyer===nettoyer)rotorNettoyer=null;
+  }
+  rotorNettoyer=nettoyer;
+  document.addEventListener('visibilitychange',animer);
+  document.addEventListener('benka:motionchange',animer);
+  if(self.IntersectionObserver){
+    observateur=new IntersectionObserver(entries=>{
+      if(!valide()){nettoyer();return;}
+      enVue=entries.some(entry=>entry.target===r&&entry.isIntersecting);
+      animer();
+    });
+    observateur.observe(r);
+  }
+  const ecouter=(nom,fn)=>{r.addEventListener(nom,fn);ecouteurs.push([nom,fn]);};
+  const taire=()=>{muet=true;pause();r.classList.add('touche');};
+  /* Un seul repli JPEG ; un échec tardif d'une ancienne fiche ne déclenche
+     plus de téléchargement ni de suppression dans la fiche courante. */
   img.onerror=()=>{
+    if(!valide())return;
     if(!repli&&r.dataset.repli){repli=true;r.dataset.src=r.dataset.repli;img.src=r.dataset.repli;return;}
-    r.remove();
+    nettoyer();r.remove();
   };
   img.onload=()=>{
+    if(!valide()||pret)return;
+    pret=true;
     vue.style.backgroundImage=`url("${r.dataset.src}")`;
-    r.classList.add('prete');
-    let i=0, tenu=false, x0=0, i0=0;
-    const pose=k=>{
-      i=((k%ROT_N)+ROT_N)%ROT_N;
-      vue.style.backgroundPosition=
-        `${(i%ROT_COLS)/(ROT_COLS-1)*100}% ${Math.floor(i/ROT_COLS)/(ROT_RANGS-1)*100}%`;
-    };
-    pose(0);
-    const taire=()=>{if(rotorAuto){clearInterval(rotorAuto);rotorAuto=null;}
-                     r.classList.add('touche');};
-    if(MOTION) rotorAuto=setInterval(()=>{if(!tenu)pose(i+1);},110);
-
-    r.addEventListener('pointerdown',e=>{
-      tenu=true; taire(); x0=e.clientX; i0=i;
-      r.setPointerCapture(e.pointerId); r.classList.add('prise');});
-    r.addEventListener('pointermove',e=>{
-      // Quatorze pixels par vue : assez pour viser un angle précis, assez
-      // peu pour faire un tour complet d'un seul geste sur un téléphone.
-      if(tenu) pose(i0+Math.round((e.clientX-x0)/14));});
-    const lacher=()=>{tenu=false; r.classList.remove('prise');};
-    r.addEventListener('pointerup',lacher);
-    r.addEventListener('pointercancel',lacher);
-    // Au clavier aussi : une flèche, une vue.
-    r.addEventListener('keydown',e=>{
+    r.classList.add('prete');pose(0);
+    ecouter('pointerdown',e=>{
+      tenu=true;taire();x0=e.clientX;i0=i;
+      r.setPointerCapture(e.pointerId);r.classList.add('prise');
+    });
+    ecouter('pointermove',e=>{
+      if(tenu)pose(i0+Math.round((e.clientX-x0)/14));
+    });
+    const lacher=()=>{tenu=false;r.classList.remove('prise');};
+    ecouter('pointerup',lacher);ecouter('pointercancel',lacher);
+    ecouter('keydown',e=>{
       if(e.key==='ArrowRight'||e.key==='ArrowLeft'){
-        taire(); pose(i+(e.key==='ArrowRight'?1:-1)); e.preventDefault();}});
+        taire();pose(i+(e.key==='ArrowRight'?1:-1));e.preventDefault();
+      }
+    });
+    animer();
   };
   img.src=r.dataset.src;
 }

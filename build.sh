@@ -56,6 +56,8 @@ else
 fi
 
 # ---------- 1. concaténation des modules ----------
+# Les dessins statiques sont compilés avant le JavaScript de la page.
+node tools/generer-riad.cjs
 cat src/styles/*.css  > .build/site.css
 # Le manifeste des photos vient EN PREMIER : les modules qui suivent le lisent
 # au moment d'afficher une vignette, et une déclaration plus bas que son usage

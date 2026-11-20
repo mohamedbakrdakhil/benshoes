@@ -9,7 +9,7 @@
 .at-track{display:flex;gap:26px;padding-inline:6vw;will-change:transform;align-items:center}
 .at-ph{flex:0 0 auto;width:min(400px,70vw);margin:0}
 .at-img{overflow:hidden;aspect-ratio:3/4;background:#120806;border:1px solid var(--band-line)}
-.at-img img{width:118%;height:100%;object-fit:cover;display:block;will-change:transform;
+.at-img img{width:118%;height:100%;object-fit:cover;display:block;
   transform:translateX(var(--px,-9%))}
 .at-ph figcaption{margin-top:14px}
 .at-ph b{display:block;font-family:var(--fu);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;

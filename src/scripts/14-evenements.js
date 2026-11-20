@@ -10,7 +10,7 @@ function draw(){
   const cle=focus?.dataset.k,taille=focus?.dataset.s;
   const adm=location.hash==='#admin';
   $('#shopview').hidden=adm;$('#admview').hidden=!adm;
-  if(adm)$('#admview').innerHTML=admHTML();else{renderGrid();revelations();}
+  if(adm)$('#admview').innerHTML=admHTML();else if(renderGrid()){revelations();}
   poserLogo();
   const o=$('#overlays');
   o.innerHTML=S.panel==='sheet'?sheetHTML():S.panel==='cart'?cartHTML():S.panel==='manual'?manualHTML():'';
@@ -33,7 +33,9 @@ function draw(){
   majRotor();
   document.body.style.overflow=S.panel?'hidden':'';
   $('#cartcount').textContent=cartCount();
+  reveiller();
 }
+
 async function copy(t){try{await navigator.clipboard.writeText(t);return true}catch(e){
   const a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.opacity='0';
   document.body.appendChild(a);a.select();let ok=false;try{ok=document.execCommand('copy')}catch(_){}a.remove();return ok;}}
