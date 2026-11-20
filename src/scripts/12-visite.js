@@ -1,6 +1,6 @@
 /* ======================= la boutique en 3D =======================
-   Allée, puis grand showroom : mur de présentation de 2 800 px sur deux
-   rangées, banc central, plafond rehaussé, corniche lumineuse. */
+   Un parcours inspiré des riads de Fès : portail sculpté, allée de
+   lanternes, galerie de cèdre et huit alcôves pour la collection. */
 const VIS={HW:520,FY:320,CY:-520,FZ:-1100,Z1:-4700,
            SX:2600,SZ0:-2900,SZ1:-5700,SCY:-820,SX0:520,
            // SCY est désormais la ligne du premier étage ; SCY2 est le plafond.
@@ -30,7 +30,7 @@ const CAM=[
   // On recule d'abord : à un mètre du mur, les deux niveaux ne tiennent pas
   // dans le cadre, et la salle ne se comprend pas. Ce plan large est là pour
   // ça, et pour ça seulement.
-  [.94, 960,-4130, 90,  7],
+  [.94, 960,-4300, 90,  7],
   // Puis on revient. La visite s'arrêtait sur ce plan large, et la
   // marchandise — le seul but du voyage — y tenait sur 116 pixels par niche :
   // huit taches de couleur sous une légende qui promettait un mur de cuirs.
@@ -206,8 +206,7 @@ function mannequinSVG(id){
    bordure à grand rayon : un seul élément, pas un calque de plus. */
 function arcade(left,w,ht,top){
   if(K!==1){left*=K;w*=K;ht*=K;top*=K;}
-  return `<div class="arc-romain" style="--e:${Math.round(w*0.09)}px;left:${left+w/2}px;`
-    +`bottom:auto;top:${top}px;width:${w}px;height:${ht}px;transform:translateX(-50%)"></div>`;
+  return `<div class="riad-arcade" style="left:${left}px;top:${top}px;width:${w}px;height:${ht}px">${riadPortalSVG()}</div>`;
 }
 
 /* Un passant : le moteur réécrira sa position à chaque image, on garde donc
@@ -255,7 +254,7 @@ function photoNiche(col,nom){
 function niche(p,left,w,ht,top,plate,col){
   if(K!==1){left*=K;w*=K;ht*=K;top*=K;}
   const c=col||p.colors[0];
-  const corps=`${photoNiche(c,p.name)}<b>${p.name}</b><span>${(COLORS[c]||{}).n||''}</span>`;
+  const corps=`<div class="riad-niche-art" aria-hidden="true">${riadNicheSVG()}</div>${photoNiche(c,p.name)}<b>${p.name}</b><span>${(COLORS[c]||{}).n||''}</span>`;
   if(!RICHE) return `<div class="niche" style="left:${left}px;top:${top}px;width:${w}px;height:${ht}px">${corps}</div>`;
   return `<div class="n3${plate?' plate':''}" style="left:${left}px;top:${top}px;width:${w}px;height:${ht}px">
       <div class="nb">${corps}</div><div class="ns nl"></div><div class="ns nr"></div>
@@ -283,7 +282,6 @@ function buildWorld(){
   w.style.setProperty('--k',K);
   const V=VIS,F=FES,H=850,CYm=(V.CY+V.FY)/2;
   const fes=[],seuil=[],allee=[],salle=[];
-  const kx=v=>Math.round(v*K);
 
   /* =============== Fès : la médina =============== */
   // Le ciel : la porte s'arrête assez bas pour qu'on voie le jour se lever
@@ -295,12 +293,12 @@ function buildWorld(){
   // Elle s'arrête à -950 pour qu'une bande de ciel reste visible au-dessus.
   fes.push(pane('pane-zellige',3800,1470,`translate3d(-2300px,-215px,${F.ZP}px)`));
   fes.push(pane('pane-zellige',3800,1470,`translate3d(2300px,-215px,${F.ZP}px)`));
-  fes.push(pane('pane-zellige',900,340,`translate3d(0px,-780px,${F.ZP}px)`));
+  fes.push(pane('pane-zellige',900,160,`translate3d(0px,-920px,${F.ZP}px)`));
   fes.push(pane('pane-cedre',9000,120,`translate3d(0px,-1010px,${F.ZP+20}px)`));
   // créneaux : la silhouette de la porte se découpe sur le jour qui se lève
   fes.push(pane('pane-creneaux',9000,120,`translate3d(0px,-1130px,${F.ZP+22}px)`));
-  fes.push(pane('pane-vide',900,1080,`translate3d(0px,-220px,${F.ZP-20}px)`,
-    `<div class="arche" style="width:${kx(820)}px;height:${kx(1040)}px"><i></i></div>`));
+  fes.push(pane('pane-riad riad-portal',1100,1320,`translate3d(0px,-340px,${F.ZP+28}px)`,riadPortalSVG()));
+  [-680,680].forEach(x=>fes.push(pane('pane-riad riad-lantern',180,420,`translate3d(${x}px,-260px,${F.ZP+42}px)`,riadLanternSVG())));
   // les murs de la ruelle : chaux, zellige en bas, cèdre en haut
   const rl=F.ZR0-F.ZR1, rc=(F.ZR0+F.ZR1)/2, mh=F.SOL-F.HAUT, mz=(F.SOL+F.HAUT)/2;
   fes.push(pane('pane-chaux',rl,mh,`translate3d(${-F.HW}px,${mz}px,${rc}px) rotateY(90deg)`));
@@ -314,7 +312,7 @@ function buildWorld(){
   });
   // lanternes de cuivre accrochées aux murs
   [[-F.HW+14,2050,90],[F.HW-14,2300,-90],[-F.HW+14,900,90],[F.HW-14,600,-90],[-F.HW+14,-300,90]]
-    .forEach(([lx,lz,ry])=>fes.push(pane('pane-lampe',58,80,`translate3d(${lx}px,-470px,${lz}px) rotateY(${ry}deg)`)));
+    .forEach(([lx,lz,ry])=>fes.push(pane('pane-riad riad-lantern',115,268,`translate3d(${lx}px,-430px,${lz}px) rotateY(${ry}deg)`,riadLanternSVG())));
   // le toit de claies au-dessus de la ruelle
   fes.push(pane('pane-claie',2*F.HW+40,rl,`translate3d(0px,${F.HAUT}px,${rc}px) rotateX(-90deg)`));
   // Des passants dans la derb. Ils marchent le long de la rue, à contresens
@@ -340,8 +338,9 @@ function buildWorld(){
   /* =============== le seuil : la façade =============== */
   seuil.push(pane('pane-wall',1880,1500,`translate3d(-1270px,-220px,${V.FZ}px)`));
   seuil.push(pane('pane-wall',1880,1500,`translate3d(1270px,-220px,${V.FZ}px)`));
-  seuil.push(pane('pane-wall',640,700,`translate3d(0px,-550px,${V.FZ}px)`));
-  seuil.push(pane('pane-sign',600,200,`translate3d(0px,-560px,${V.FZ+14}px)`,'<div><b>benka</b><i>MOCASSINS · FÈS → CASABLANCA</i></div>'));
+  seuil.push(pane('pane-wall',640,300,`translate3d(0px,-850px,${V.FZ}px)`));
+  seuil.push(pane('pane-riad riad-portal',850,1020,`translate3d(0px,-190px,${V.FZ+22}px)`,riadPortalSVG()));
+  seuil.push(pane('pane-sign riad-sign',350,100,`translate3d(0px,-640px,${V.FZ+28}px)`,'<div><b>benka</b><i>LA MAISON DES COULEURS</i></div>'));
   seuil.push(pane('pane-glass',700,430,`translate3d(-1000px,-120px,${V.FZ+10}px)`));
   seuil.push(pane('pane-glass',700,430,`translate3d(1000px,-120px,${V.FZ+10}px)`));
   // plinthe de zellige : 125 de haut, sous les vitrines, pour ne rien couper
@@ -349,7 +348,7 @@ function buildWorld(){
   seuil.push(pane('pane-zellige fin bas',1880,125,`translate3d(1270px,${V.FY-62}px,${V.FZ+6}px)`));
   seuil.push(pane('pane-jamb',140,520,`translate3d(-320px,60px,${V.FZ-70}px) rotateY(90deg)`));
   seuil.push(pane('pane-jamb',140,520,`translate3d(320px,60px,${V.FZ-70}px) rotateY(-90deg)`));
-  seuil.push(pane('pane-jamb',640,140,`translate3d(0px,-200px,${V.FZ-70}px) rotateX(-90deg)`));
+  seuil.push(pane('pane-jamb',640,140,`translate3d(0px,-575px,${V.FZ-70}px) rotateX(-90deg)`));
 
   /* =============== l'allée =============== */
   allee.push(pane('pane-floor',1500,4600,`translate3d(0px,${V.FY}px,-1900px) rotateX(90deg)`));
@@ -364,7 +363,7 @@ function buildWorld(){
      l'effet de vitrine, sans la promesse qu'on ne peut pas tenir. Les
      chaussures se regardent au mur du fond, de face. */
   const alcove=(left,w,ht,top)=>
-    `<div class="niche decor" style="left:${left*K}px;top:${top*K}px;width:${w*K}px;height:${ht*K}px"></div>`;
+    `<div class="niche decor" style="left:${left*K}px;top:${top*K}px;width:${w*K}px;height:${ht*K}px"><div class="riad-niche-art">${riadNicheSVG()}</div></div>`;
   let li=''; [0,1,2].forEach(k=>{li+=alcove(420+k*900,420,430,200);});
   allee.push(pane('pane-wall',3400,H,`translate3d(${-V.HW}px,${CYm}px,-3000px) rotateY(90deg)`,li));
   allee.push(pane('pane-zellige fin bas',3400,125,`translate3d(${-V.HW+6}px,${V.FY-62}px,-3000px) rotateY(90deg)`));
@@ -372,12 +371,14 @@ function buildWorld(){
   allee.push(pane('pane-wall',1500,H,`translate3d(${V.HW}px,${CYm}px,-2050px) rotateY(-90deg)`,ri));
   allee.push(pane('pane-zellige fin bas',1500,125,`translate3d(${V.HW-6}px,${V.FY-62}px,-2050px) rotateY(-90deg)`));
   allee.push(pane('pane-wall',1040,H,`translate3d(0px,${CYm}px,${V.Z1}px)`));
-  allee.push(pane('pane-strip',170,3000,`translate3d(0px,${V.CY+16}px,-2900px) rotateX(-90deg)`));
+  allee.push(pane('pane-strip',80,3000,`translate3d(0px,${V.CY+16}px,-2900px) rotateX(-90deg)`));
+  (PETIT?[-1250]:[-1450,-1750]).forEach(z=>allee.push(pane('pane-riad riad-portal',1040,870,`translate3d(0px,-115px,${z}px)`,riadPortalSVG())));
+  [-1550,-2350,-3150].forEach(z=>allee.push(pane('pane-riad riad-lantern',105,245,`translate3d(0px,-380px,${z}px)`,riadLanternSVG())));
   if(RICHE) for(let i=0;i<5;i++) allee.push(pane('pane-beam',1040,46,`translate3d(0px,${V.CY+34}px,${-1500-i*680}px) rotateX(-90deg)`));
   if(RICHE) [[-300,-2050],[300,-2850]].forEach(([px,pz])=>{
     allee.push(pane('pane-podium',300,250,`translate3d(${px}px,${V.FY-125}px,${pz+150}px)`));
     allee.push(pane('pane-podtop',300,300,`translate3d(${px}px,${V.FY-250}px,${pz}px) rotateX(90deg)`));
-    allee.push(pane('pane-boite',230,130,`translate3d(${px}px,${V.FY-315}px,${pz}px)`,'<i></i>'));
+    allee.push(pane('pane-riad riad-lantern',130,303,`translate3d(${px}px,${V.FY-401.5}px,${pz}px)`,riadLanternSVG()));
   });
 
   /* =============== la grande salle =============== */
@@ -398,13 +399,16 @@ function buildWorld(){
     mi+=niche(p,marge+i*(cw+gap),cw,ch,170,true,c);
   }
   salle.push(pane('pane-wall',SL,SH,`translate3d(${V.SX}px,${SYm}px,${SZc}px) rotateY(-90deg)`,mi));
+  salle.push(pane('pane-riad riad-frieze',SL,150,`translate3d(${V.SX-20}px,-735px,${SZc}px) rotateY(-90deg)`,riadFriezeSVG()));
+  salle.push(pane('pane-riad riad-medallion',900,900,`translate3d(1650px,${V.SCY2+10}px,${SZc}px) rotateX(-90deg)`,riadMedallionSVG()));
+  salle.push(pane('pane-riad riad-fountain',540,540,`translate3d(2260px,50px,-5480px) rotateY(-90deg)`,riadFountainSVG()));
 
   /* ---- l'étage ---- */
   const ENT=-880, HAUT=V.SCY2;                 // entablement, puis plafond
   const SH2=ENT-HAUT, SY2=(ENT+HAUT)/2;        // hauteur et milieu du mur haut
   // Entablement : la ligne qui sépare les deux niveaux.
-  salle.push(pane('pane-chapiteau',SL,130,`translate3d(${V.SX-30}px,${ENT+10}px,${SZc}px) rotateY(-90deg)`));
-  // Mur du premier, percé d'une loggia à arcs romains.
+  salle.push(pane('pane-chapiteau riad-entablement',SL,130,`translate3d(${V.SX-30}px,${ENT+10}px,${SZc}px) rotateY(-90deg)`));
+  // Mur du premier, percé d’une galerie à arcs marocains sculptés.
   let arcs='';
   const na=PETIT?3:5, aw=Math.round(SL/(na+1.4)), amarge=(SL-na*aw-(na-1)*90)/2;
   // Les arcs se tiennent dans la moitié basse de l'étage : plus haut, le
@@ -422,13 +426,13 @@ function buildWorld(){
      jamais devant les niches : la marchandise passe avant l'architecture.
      Les niches occupent le centre du mur, de -5195 à -3405 au bureau et de
      -4805 à -3795 sur téléphone ; les fûts restent en dehors. */
-  const cz = PETIT ? [-3550,-5050] : [-3310,-3020,-5290,-5580];
+  const cz = PETIT ? [-3300,-5500] : [-3310,-3020,-5290,-5580];
   cz.forEach(z=>{
     salle.push(pane('pane-colonne',140,1150,`translate3d(2300px,${V.FY-625}px,${z}px) rotateY(-90deg)`));
     salle.push(pane('pane-chapiteau',185,110,`translate3d(2300px,${V.FY-1255}px,${z}px) rotateY(-90deg)`));
     salle.push(pane('pane-socle',185,90,`translate3d(2300px,${V.FY-45}px,${z}px) rotateY(-90deg)`));
   });
-  salle.push(pane('pane-zellige',SL,125,`translate3d(${V.SX-8}px,${V.FY-62}px,${SZc}px) rotateY(-90deg)`));
+  salle.push(pane('pane-zellige',SL,240,`translate3d(${V.SX-8}px,${V.FY-120}px,${SZc}px) rotateY(-90deg)`));
   salle.push(pane('pane-wall',2080,SH,`translate3d(1560px,${SYm}px,${V.SZ1-100}px)`));
   salle.push(pane('pane-wall',2080,SH2,`translate3d(1560px,${SY2}px,${V.SZ1-100}px)`));
   // Côté entrée : sans ce mur, le virage ouvrait sur le vide derrière la caméra.
@@ -439,15 +443,15 @@ function buildWorld(){
   salle.push(pane('pane-zellige fin bas',2080,125,`translate3d(1560px,${V.FY-62}px,${V.SZ0-8}px) rotateY(180deg)`));
   // et le retour du mur proche, qui ferme l'angle au fond
   salle.push(pane('pane-wall',1100,SH,`translate3d(${V.SX0}px,${SYm}px,-5190px) rotateY(90deg)`));
-  salle.push(pane('pane-mouchara',440,640,`translate3d(1060px,-230px,${V.SZ1-88}px)`));
-  salle.push(pane('pane-mouchara',440,640,`translate3d(2060px,-230px,${V.SZ1-88}px)`));
+  salle.push(pane('pane-riad riad-screen',440,640,`translate3d(1060px,-230px,${V.SZ1-88}px)`,riadScreenSVG()));
+  salle.push(pane('pane-riad riad-screen',440,640,`translate3d(2060px,-230px,${V.SZ1-88}px)`,riadScreenSVG()));
   salle.push(pane('pane-strip',150,SL,`translate3d(${V.SX-110}px,${V.SCY+18}px,${SZc}px) rotateX(-90deg)`));
   salle.push(pane('pane-strip',150,SL,`translate3d(${V.SX0+180}px,${V.SCY+18}px,${SZc}px) rotateX(-90deg)`));
-  [-3500,-4300,-5100].forEach(lz=>salle.push(pane('pane-lampe',74,100,`translate3d(2340px,-640px,${lz}px) rotateY(-90deg)`)));
+  [-3500,-4300,-5100].forEach(lz=>salle.push(pane('pane-riad riad-lantern',140,327,`translate3d(2340px,-1055px,${lz}px) rotateY(-90deg)`,riadLanternSVG())));
   // claustras de cèdre sur le mur proche, et deux appliques au-dessus du banc
-  salle.push(pane('pane-mouchara',420,620,`translate3d(${V.SX0+8}px,-230px,-3700px) rotateY(90deg)`));
-  salle.push(pane('pane-mouchara',420,620,`translate3d(${V.SX0+8}px,-230px,-4900px) rotateY(90deg)`));
-  [-3900,-4700].forEach(lz=>salle.push(pane('pane-lampe',66,90,`translate3d(1700px,-690px,${lz}px)`)));
+  salle.push(pane('pane-riad riad-screen',420,620,`translate3d(${V.SX0+8}px,-230px,-3700px) rotateY(90deg)`,riadScreenSVG()));
+  salle.push(pane('pane-riad riad-screen',420,620,`translate3d(${V.SX0+8}px,-230px,-4900px) rotateY(90deg)`,riadScreenSVG()));
+  [-3900,-4700].forEach(lz=>salle.push(pane('pane-riad riad-lantern',120,280,`translate3d(1700px,-900px,${lz}px) rotateY(-90deg)`,riadLanternSVG())));
   // Flaques de lumière au sol, sous chaque lanterne du mur. Un seul plan
   // chacune, et la salle cesse d'être éclairée uniformément.
   [-3500,-4300,-5100].forEach(lz=>
@@ -467,13 +471,11 @@ function buildWorld(){
   // Vitrines au milieu de la salle : socle, boîte de verre, et la paire
   // dedans. Trois plans chacune — on circule autour, ce n'est plus seulement
   // un mur qu'on regarde.
-  const vz = PETIT ? [-3560,-5280] : [-3620,-5120];
+  const vz = PETIT ? [-3560] : [-3620];
   vz.forEach(z=>{
     salle.push(pane('pane-podium',240,300,`translate3d(1790px,${V.FY-150}px,${z}px) rotateY(-90deg)`));
     salle.push(pane('pane-podtop',240,240,`translate3d(1790px,${V.FY-300}px,${z}px) rotateX(90deg)`));
-    salle.push(pane('pane-boite',180,105,`translate3d(1790px,${V.FY-352}px,${z}px) rotateY(-90deg)`,'<i></i>'));
-    salle.push(pane('pane-verre',240,340,`translate3d(1790px,${V.FY-470}px,${z}px) rotateY(-90deg)`));
-    salle.push(pane('pane-led',190,12,`translate3d(1790px,${V.FY-645}px,${z}px) rotateY(-90deg)`));
+    salle.push(pane('pane-riad riad-lantern',120,280,`translate3d(1790px,${V.FY-440}px,${z}px) rotateY(-90deg)`,riadLanternSVG()));
   });
 
   // Deux clients qui longent le mur, lentement.
@@ -492,14 +494,9 @@ function buildWorld(){
   if(RICHE){
     salle.push(pane('pane-podium',2200,150,`translate3d(1950px,${V.FY-75}px,-4300px) rotateY(-90deg)`));
     salle.push(pane('pane-podtop',300,2200,`translate3d(2100px,${V.FY-150}px,-4300px) rotateX(90deg)`));
-    // Des boîtes de l'atelier, posées sur le banc. Deux hauteurs pour que la
-    // ligne ne soit pas plate, et aucune paire : les chaussures se regardent
-    // au mur, pas en six exemplaires identiques.
-    [[-3620,2],[-4180,1],[-4720,3],[-5180,1]].forEach(([pz,n])=>{
-      for(let j=0;j<n;j++)
-        salle.push(pane('pane-boite',210,118,
-          `translate3d(2100px,${V.FY-209-j*112}px,${pz}px) rotateY(-90deg)`,'<i></i>'));
-    });
+    // Console basse en cèdre : la vue reste dégagée vers les huit alcôves.
+    salle.push(pane('pane-riad riad-frieze',2200,120,`translate3d(1948px,${V.FY-80}px,-4300px) rotateY(-90deg)`,riadFriezeSVG()));
+    salle.push(pane('pane-riad riad-lantern',145,338,`translate3d(2100px,1px,-4900px) rotateY(-90deg)`,riadLanternSVG()));
   }
 
   /* La fête suit la visite : la médina s'illumine, la façade accueille les
@@ -534,11 +531,11 @@ function buildWorld(){
       allee.push(pane('pane-fete fete-plafond',1000,150,
         `translate3d(0px,-405px,${z}px)`,feteGuirlande(false))));
 
-    salle.push(pane('pane-fete fete-galerie',2600,390,
-      `translate3d(${V.SX-34}px,-840px,${SZc}px) rotateY(-90deg)`,feteGuirlande(true)));
+    salle.push(pane('pane-fete fete-galerie',2600,300,
+      `translate3d(${V.SX-34}px,-1020px,${SZc}px) rotateY(-90deg)`,feteGuirlande(true)));
     salle.push(pane('pane-fete fete-affiche',1100,297,
       `translate3d(${V.SX-26}px,-85px,${SZc}px) rotateY(-90deg)`,feteAffiche()));
-    [-3100,-5500].forEach(z=>
+    [-3100].forEach(z=>
       salle.push(pane('pane-fete fete-sapin',390,691.4,
         `translate3d(2410px,${V.FY-345.7}px,${z}px) rotateY(-90deg)`,feteSapin())));
   }
