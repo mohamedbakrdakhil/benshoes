@@ -5,17 +5,17 @@ function cartHTML(){
   if(S.step===3&&S.lastOrder){const o=S.lastOrder;
     body=`<div style="text-align:center;padding-top:18px">
       <div class="okmark"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12.5l5.2 5L20 6.5"/></svg></div>
-      <span class="eyebrow">Commande enregistrée</span><div class="ordref">${esc(o.ref)}</div>
+      <span class="eyebrow">${o.saved?'Commande reçue':'Récapitulatif à transmettre'}</span><div class="ordref">${esc(o.ref)}</div>
       <p class="note" style="max-width:34ch;margin:8px auto 0">${o.canal==='tableur'
         ? `Votre commande est arrivée à l'atelier. On vous rappelle au <b>${esc(o.customer.phone)}</b> pour confirmer la disponibilité et la livraison.`
         : o.saved
-        ? `Nous avons reçu votre commande. Un e-mail de confirmation part à <b>${esc(o.customer.email)}</b>.`
+        ? `Votre commande a bien été enregistrée. Conservez cette référence pour le suivi auprès de l’atelier.`
         : `Votre récapitulatif est prêt. Envoyez-le à l'atelier : il confirme la disponibilité et vous rappelle pour la livraison.`}</p>
       ${o.saved?'':`<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px">
         ${waLink(o)?`<a class="btn btn-pri btn-sm" href="${waLink(o)}" target="_blank" rel="noopener">Envoyer sur WhatsApp</a>`:''}
         <a class="btn btn-out btn-sm" href="${mailLink(o)}">Envoyer par e-mail</a></div>
         <p class="note" style="margin-top:10px">ou copiez le texte ci-dessous et envoyez-le à ${esc(SHOP.email)}</p>`}</div>
-      ${o.saved?'':`<div class="callout" style="margin-top:20px"><b>Pourquoi cette étape ?</b> Le paiement en ligne n'est pas encore branché sur cette boutique. L'atelier confirme la disponibilité, puis vous règlez à la livraison ou par virement.</div>
+      ${o.saved?'':`<div class="callout" style="margin-top:20px"><b>Pourquoi cette étape ?</b> Le paiement en ligne n'est pas encore branché sur cette boutique. L'atelier confirme la disponibilité, puis vous réglez à la livraison ou par virement.</div>
       <textarea id="summ" readonly style="width:100%;height:176px;margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:3px;background:var(--surface);font-size:.8rem;font-family:var(--fu);line-height:1.55">${esc(orderText(o))}</textarea>`}
       ${o.discount?`<p class="bf-cart-saved">Black Friday : ${fmt(o.discount)} économisés · prix remisés ci-dessous</p>`:''}<ul class="spec" style="margin-top:18px">${o.items.map(i=>`<li><span>${i.q} × ${esc(i.name)} · ${esc(i.color)} · ${i.size}</span><span class="num">${fmt(i.unit*i.q)}</span></li>`).join('')}
         <li><span>Livraison</span><span class="num">${o.ship?fmt(o.ship):'Offerte'}</span></li>
@@ -25,16 +25,20 @@ function cartHTML(){
   } else if(S.step===2){
     const f=S.form||{};
     body=`<div class="steps" style="margin-bottom:20px"><b>Panier</b><i></i><b data-on="1">Livraison</b><i></i><b>Confirmation</b></div>
+      <p class="checkout-intro">Vos coordonnées pour la livraison. Aucun paiement en ligne.</p>
+      <p class="checkout-error" role="alert" ${S.checkoutError?'':'hidden'}>${esc(S.checkoutError||'')}</p>
       <div class="form">
-      <label class="f full">Nom et prénom<input id="f_name" maxlength="80" value="${esc(f.name)}" autocomplete="name" placeholder="Amina Benali"></label>
-      <label class="f">Téléphone<input id="f_phone" type="tel" inputmode="tel" maxlength="20" value="${esc(f.phone)}" autocomplete="tel" placeholder="06 12 34 56 78"></label>
-      <label class="f">E-mail<input id="f_email" type="email" maxlength="120" value="${esc(f.email)}" autocomplete="email" placeholder="amina@exemple.fr"></label>
-      <label class="f full">Adresse<input id="f_addr" maxlength="200" value="${esc(f.addr)}" autocomplete="street-address" placeholder="12 rue Tahar Sebti"></label>
-      <label class="f full">Ville<input id="f_city" maxlength="80" value="${esc(f.city)}" autocomplete="address-level2" placeholder="Casablanca"></label>
-      <label class="f full">Pays<select id="f_country">${['Maroc','France','Belgique','Espagne','Algérie','Tunisie','Canada','Autre'].map(c=>`<option ${(f.country||'Maroc')===c?'selected':''}>${c}</option>`).join('')}</select></label>
+      <label class="f full">Nom et prénom<input id="f_name" required aria-required="true" maxlength="80" value="${esc(f.name)}" autocomplete="name" placeholder="Amina Benali"></label>
+      <label class="f">Téléphone<input id="f_phone" required aria-required="true" type="tel" inputmode="tel" maxlength="20" value="${esc(f.phone)}" autocomplete="tel" placeholder="06 12 34 56 78"></label>
+      <label class="f">E-mail<input id="f_email" required aria-required="true" type="email" maxlength="120" value="${esc(f.email)}" autocomplete="email" placeholder="amina@exemple.fr"></label>
+      <label class="f full">Adresse<input id="f_addr" required aria-required="true" maxlength="200" value="${esc(f.addr)}" autocomplete="street-address" placeholder="12 rue Tahar Sebti"></label>
+      <label class="f full">Ville<input id="f_city" required aria-required="true" maxlength="80" value="${esc(f.city)}" autocomplete="address-level2" placeholder="Casablanca"></label>
+      <label class="f full">Pays<select id="f_country"><option selected>Maroc</option></select></label>
+      <p class="full checkout-international">Livraison hors Maroc : <a href="mailto:${att(SHOP.email)}">demandez un devis à l’atelier</a>.</p>
       <label class="f full">Note pour l'atelier <span style="text-transform:none;letter-spacing:0;font-weight:400">(optionnel)</span><textarea id="f_note" maxlength="500" placeholder="Pied large, livrer après 18 h…">${esc(f.note)}</textarea></label>
       <input id="f_site" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
       </div>
+      <p class="checkout-privacy">Vos coordonnées servent à préparer votre commande et à vous contacter pour sa livraison.</p>
       <div class="callout" style="margin-top:18px"><b>Aucun paiement maintenant.</b> L'atelier vérifie la disponibilité, vous recevez la confirmation, puis vous réglez à la livraison ou par virement.</div>`;
     foot=`<div class="totals"><div><span>Sous-total</span><span class="num">${fmt(pricing.gross)}</span></div>${pricing.discount?`<div class="bf-discount"><span>Black Friday · Trio de 3 paires</span><span class="num">−${fmt(pricing.discount)}</span></div>`:''}
       <div><span>Livraison</span><span class="num">${ship?fmt(ship):'Offerte'}</span></div>
@@ -52,14 +56,14 @@ function cartHTML(){
         <div><h4>${p.name}</h4><div class="meta">${COLORS[it.c].n} · Pointure ${it.s}</div>
           <div class="qty"><button data-act="qty" data-n="${n}" data-d="-1" aria-label="Retirer un">−</button><span class="num">${it.q}</span><button data-act="qty" data-n="${n}" data-d="1" aria-label="Ajouter un">+</button></div></div>
         <div class="right"><b class="num">${fmt(priceOf(p)*it.q)}</b><button class="lnk" data-act="rm" data-n="${n}">Retirer</button></div></div>`;}).join('')
-      +`<p class="note" style="margin-top:16px">${SHIPFREE===0||SHIPCOST===0?'Livraison offerte, partout au Maroc.':(sub>=SHIPFREE?'Livraison offerte sur cette commande.':`Encore ${fmt(SHIPFREE-sub)} pour la livraison offerte.`)}</p>`;
+      +`<button class="continue-shopping" data-act="closep">Continuer à choisir mes paires <span aria-hidden="true">↗</span></button><p class="note" style="margin-top:16px">${SHIPFREE===0||SHIPCOST===0?'Livraison offerte, partout au Maroc.':(sub>=SHIPFREE?'Livraison offerte sur cette commande.':`Encore ${fmt(SHIPFREE-sub)} pour la livraison offerte.`)}</p>`;
     foot=`<div class="totals"><div><span>Sous-total</span><span class="num">${fmt(pricing.gross)}</span></div>${pricing.discount?`<div class="bf-discount"><span>Black Friday · Trio de 3 paires</span><span class="num">−${fmt(pricing.discount)}</span></div>`:''}
       <div><span>Livraison</span><span class="num">${ship?fmt(ship):'Offerte'}</span></div>
       <div class="grand"><span>Total</span><span class="num">${fmt(sub+ship)}</span></div></div>
       <button class="btn btn-pri" data-act="next" style="justify-content:center">Passer à la livraison</button>`;
   }
   return `<div class="panel left" role="dialog" aria-modal="true" aria-label="Panier">
-    <div class="panel-hd"><h3>${S.step===3?'Merci':S.step===2?'Livraison':'Votre panier'}</h3>
+    <div class="panel-hd"><h3>${S.step===3?(S.lastOrder?.saved?'Merci':'Votre récapitulatif'):S.step===2?'Livraison':'Votre panier'}</h3>
       <button class="close" data-act="closep" aria-label="Fermer">✕</button></div>
     <div class="panel-bd">${body}</div>${foot?`<div class="panel-ft">${foot}</div>`:''}</div>`;
 }
@@ -118,21 +122,40 @@ async function envoyerAuTableur(o,cle,leurre){
   const charge=JSON.stringify({cle,
     items:o.requestItems||o.items.map(i=>({id:i.id,colorKey:i.colorKey,size:i.size,q:i.q})),
     customer:o.customer,note:o.note,expectedTotal:o.total,pricingVersion:'bf-exact3-699-v2',site:leurre||''});
-  const envoi=m=>fetch(SHOP.tableur,{method:'POST',mode:m,
-    headers:{'Content-Type':'text/plain;charset=utf-8'},body:charge});
+  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),25000);
   try{
-    const r=await envoi('cors');
-    let d=null; try{d=await r.json();}catch(e){}
-    if(d&&d.ok)return {ok:true,ref:d.ref};
-    // L'atelier a répondu non : c'est un refus motivé, pas une panne.
-    if(d&&d.erreur)return {ok:false,refus:true,message:d.erreur};
-    return {ok:true,ref:null,aveugle:true};
-  }catch(e){
-    // Lecture refusée ou réseau coupé : on ne sait pas lequel. On rejoue avec
-    // la même clé — sans risque — et on considère la commande partie.
-    try{await envoi('no-cors');return {ok:true,ref:null,aveugle:true};}
-    catch(e2){return {ok:false,refus:false,message:'L\u2019envoi n\u2019a pas abouti. Voici votre récapitulatif à envoyer à l\u2019atelier.'};}
+    const r=await fetch(SHOP.tableur,{method:'POST',mode:'cors',signal:controller.signal,
+      headers:{'Content-Type':'text/plain;charset=utf-8'},body:charge});
+    let d=null;try{d=await r.json();}catch(e){}
+    if(r.ok&&d?.ok===true&&/^[A-Za-z0-9-]{1,24}$/.test(d.ref||''))return {ok:true,ref:d.ref};
+    if(d&&typeof d.erreur==='string')return {ok:false,refus:true,message:d.erreur};
+  }catch(e){/* Une réponse absente ne prouve ni le succès ni l'échec du dépôt. */}
+  finally{clearTimeout(timeout);}
+  return {ok:false,incertain:true,message:'La réception de votre commande n’a pas pu être confirmée. Votre panier est conservé. Réessayez ici : la même référence d’envoi sera utilisée.'};
+}
+function clePourCommande(o){
+  const signature=JSON.stringify([o.requestItems,o.customer,o.note,o.total]);
+  if(S.tentative?.signature===signature)return S.tentative.cle;
+  const cle=cleCommande();S.tentative={signature,cle};return cle;
+}
+function erreursLivraison(f){
+  const e={};
+  for(const k of ['name','phone','email','addr','city'])if(!f[k])e[k]='Ce champ est obligatoire.';
+  if(f.phone&&(!/^[0-9+().\s-]+$/.test(f.phone)||!/^\d{8,15}$/.test(f.phone.replace(/\D/g,''))))e.phone='Indiquez un numéro de téléphone valide.';
+  if(f.email&&!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(f.email))e.email='Indiquez une adresse e-mail valide.';
+  return e;
+}
+function afficherErreursLivraison(erreurs){
+  document.querySelectorAll('.field-error').forEach(el=>el.remove());
+  document.querySelectorAll('label.f').forEach(l=>l.classList.remove('bad'));
+  for(const k of ['name','phone','email','addr','city']){
+    const el=$('#f_'+k);if(!el)continue;
+    el.setAttribute('aria-invalid',String(!!erreurs[k]));el.removeAttribute('aria-describedby');
+    if(!erreurs[k])continue;
+    const note=document.createElement('span');note.className='field-error';note.id='error-'+k;note.textContent=erreurs[k];
+    el.closest('label')?.appendChild(note);el.closest('label')?.classList.add('bad');el.setAttribute('aria-describedby',note.id);
   }
+  const premier=Object.keys(erreurs)[0];if(premier)$('#f_'+premier)?.focus();
 }
 /* Appelée une seule fois, quand la commande est vraiment passée. */
 function mesurerAchat(o,id){
@@ -142,55 +165,36 @@ function mesurerAchat(o,id){
     value:o.total,currency:'MAD'},id);
 }
 async function placeOrder(){
-  if(S.envoi)return;   // le bouton a déjà été cliqué
+  if(S.envoi||!S.cart.length)return;
   const f=readForm();S.form=f;
-  const miss=['name','phone','email','addr','city'].filter(k=>!f[k]);
-  if(!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(f.email))miss.push('email');
-  // Un numéro mal saisi, c'est une commande qu'on ne peut pas confirmer.
-  if(f.phone && !/^[0-9+().\s-]{8,20}$/.test(f.phone))miss.push('phone');
-  if(miss.length){document.querySelectorAll('label.f').forEach(l=>l.classList.remove('bad'));
-    miss.forEach(k=>$('#f_'+k)?.closest('label')?.classList.add('bad'));
-    toast('Complétez les champs en rouge');$('#f_'+miss[0])?.focus();return;}
+  const erreurs=erreursLivraison(f);afficherErreursLivraison(erreurs);
+  if(Object.keys(erreurs).length){toast('Vérifiez les champs indiqués.');return;}
+  if(f.country!=='Maroc'){S.checkoutError='Pour une livraison hors Maroc, contactez l’atelier pour un devis.';draw();return;}
   const pricing=cartPricing(),sub=pricing.sub,ship=shipCost();
   const o={ref:newRef(),createdAt:new Date().toISOString(),status:'nouvelle',source:'boutique',
-    items:pricing.items,
-    requestItems:S.cart.map(i=>({id:i.id,colorKey:i.c,size:i.s,q:i.q})),
+    items:pricing.items,requestItems:S.cart.map(i=>({id:i.id,colorKey:i.c,size:i.s,q:i.q})),
     customer:{name:f.name,phone:f.phone,email:f.email,addr:f.addr,zip:f.zip,city:f.city,country:f.country},
     note:f.note,discount:pricing.discount,packs:pricing.packs,sub,ship,total:sub+ship,currency:'MAD'};
-  /* Un seul identifiant pour toute la commande, quel que soit le chemin
-     qu'elle prend. Il sert d'abord de clé d'idempotence vers le tableur, et
-     de dédoublonnage entre le pixel et l'API Conversions. */
-  const cle=cleCommande();
-  if(MODE==='api'){
-    try{const r=await api('orders',{method:'POST',body:{items:o.requestItems,customer:o.customer,note:o.note,expectedTotal:o.total}});
-      mesurerAchat(o,cle);S.lastOrder=Object.assign({},nettoyerCommande(r.order)||o,{saved:true});S.cart=[];syncCart();S.step=3;S.form=null;
-      await refreshCatalog();draw();return;}
-    catch(e){toast(e.message);return;}}
-  if(SHOP.tableur){
-    S.envoi=true;
-    const b=document.querySelector('[data-act="place"]');
-    if(b){b.disabled=true;b.textContent='Envoi en cours…';}
-    const r=await envoyerAuTableur(o,cle,f.site);
-    S.envoi=false;
-    if(r.ok){
-      if(r.ref)o.ref=r.ref;
-      mesurerAchat(o,cle);
-      S.lastOrder=Object.assign({},nettoyerCommande(o)||o,{saved:true,canal:'tableur'});
-      S.cart=[];syncCart();S.step=3;S.form=null;
-      if(MODE==='local'){S.orders=[S.lastOrder].concat(S.orders);saveLocal();}
-      draw();return;
+  const cle=clePourCommande(o);
+  S.envoi=true;S.checkoutError='';draw();
+  try{
+    if(MODE==='api'){
+      const r=await api('orders',{method:'POST',body:{items:o.requestItems,customer:o.customer,note:o.note,expectedTotal:o.total}});
+      S.lastOrder=Object.assign({},nettoyerCommande(r.order)||o,{saved:true});
+      await refreshCatalog();
+    }else if(SHOP.tableur){
+      const r=await envoyerAuTableur(o,cle,f.site);
+      if(!r.ok){S.checkoutError=r.message;toast(r.message);return;}
+      o.ref=r.ref;S.lastOrder=Object.assign({},nettoyerCommande(o),{saved:true,canal:'tableur'});
+    }else{
+      let saved=false;
+      if(S.db){await S.db.doc('orders/'+o.ref).set(o);saved=true;}
+      S.lastOrder=Object.assign({},nettoyerCommande(o),{saved});
     }
-    if(b){b.disabled=false;b.textContent='Valider la commande';}
-    toast(r.message);
-    // Refus motivé : on garde le client sur le formulaire, sa commande n'est
-    // pas passée et lui faire croire le contraire serait pire que tout.
-    if(r.refus)return;
-    // Panne de liaison : on ne le bloque pas, il repart avec son récapitulatif
-    // et de quoi nous l'envoyer.
-  }
-  let saved=false;
-  if(S.db){try{await S.db.doc('orders/'+o.ref).set(o);saved=true;}catch(e){saved=false;}}
-  mesurerAchat(o,cle);
-  S.lastOrder=Object.assign({},nettoyerCommande(o)||o,{saved:saved});S.cart=[];syncCart();S.step=3;S.form=null;draw();
+    if(S.lastOrder.saved)mesurerAchat(o,cle);
+    S.cart=[];syncCart();S.step=3;S.form=null;S.tentative=null;
+    if(MODE==='local'){S.orders=[S.lastOrder].concat(S.orders);saveLocal();}
+    if(!S.panel)toast(S.lastOrder.saved?'Commande reçue : '+S.lastOrder.ref:'Votre récapitulatif est disponible dans le panier.');
+  }catch(e){S.checkoutError='L’envoi n’a pas pu être confirmé. Votre panier et vos coordonnées sont conservés ; réessayez dans un moment.';toast(S.checkoutError);}
+  finally{S.envoi=false;draw();}
 }
-

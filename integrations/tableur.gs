@@ -583,6 +583,10 @@ function doPost(e) {
     verrou.waitLock(20000);
     var ref, f, refus = null;
     try {
+      // Une autre exécution a pu terminer pendant l'attente du verrou.
+      // Relire aussi la mémoire complète pour ne pas écraser ses clés.
+      memoire = refDejaVue(cle);
+      if (memoire.ref) return reponse({ ok: true, ref: memoire.ref, deja: true });
       /* Le stock d'abord, et sous le même verrou que l'écriture : entre le
          moment où l'on constate qu'il reste une paire et celui où on l'enlève,
          une seconde commande ne doit pas pouvoir se glisser. Si ça refuse,
@@ -923,6 +927,7 @@ function doGet() {
   }
   return reponse({ service: 'Benkashoes — réception des commandes', methode: 'POST',
                    alerte: ALERTE_EMAIL ? 'armée' : 'absente',
+                   revision: 'audit-2026-11-20',
                    promotion: {version:'bf-exact3-699-v2',modele:'opus',quantite:3,quantiteExacte:true,prix:699,livraison:0},
                    stock: stock });
 }

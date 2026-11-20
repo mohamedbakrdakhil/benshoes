@@ -12,10 +12,8 @@ function renderStatic(){
   // carte un autocollant posé sur le décor.
   poserLogo();
   $('#anatfig').innerHTML=anatomySVG();
-  $('#filters').innerHTML=FAMS.map(([k,l])=>`<button class="chip" data-act="fam" data-k="${k}" aria-pressed="${S.filter===k}">${l}</button>`).join('')
-    +`<span class="fsep"></span><span class="swatches">`
-    +Object.entries(COLORS).map(([k,c])=>`<button class="sw" data-act="col" data-k="${k}" aria-pressed="${S.colorFilter===k}" title="${c.n}" aria-label="${c.n}" style="background:linear-gradient(135deg,${c.c},${c.d})"></button>`).join('')
-    +`</span>`;
+  $('#filters').innerHTML=`<div class="color-filters" role="group" aria-label="Couleur"><button class="color-chip" data-act="filters-reset" aria-pressed="true">Tous les coloris</button>`
+    +Object.entries(COLORS).map(([k,c])=>`<button class="color-chip" data-act="col" data-k="${k}" aria-pressed="false"><i style="background:linear-gradient(135deg,${c.c},${c.d})" aria-hidden="true"></i>${c.n}</button>`).join('')+`</div>`;
   $('#ftrmodels').innerHTML=CATALOG.map(p=>`<li><a href="#modeles" data-act="open" data-id="${p.id}">${p.name} — ${fmt(priceOf(p))}</a></li>`).join('');
   $('#ftrcontact').innerHTML=`<h5>Nous écrire</h5>
     <div class="copybox"><code id="mailtxt">${esc(SHOP.email)}</code><button class="btn btn-sm btn-ghost" data-copy="mailtxt" style="margin-left:auto">Copier</button></div>
@@ -24,14 +22,14 @@ function renderStatic(){
     <p class="note" style="color:var(--band-soft);margin-top:9px">Atelier ouvert du lundi au vendredi, 9 h – 18 h.</p>`;
   $('#ftrcopy').textContent=`© ${new Date().getFullYear()} Benkashoes — ${SHOP.site}`;
   renderFAQ();
-  $('#sizebody').innerHTML=SIZES.map(s=>{const mm=MM[s];
-    return `<tr><td style="font-weight:700" class="num">${s}</td><td class="num">${mm} – ${mm+6}</td><td class="num">${mm+13} mm</td><td class="num">${Math.round(mm*.372)} mm</td><td class="num">${Math.round(mm*.405)} mm</td></tr>`;}).join('');
+  $('#sizebody').innerHTML=SIZES.map((s,i)=>{const mm=MM[s],fin=i<SIZES.length-1?MM[SIZES[i+1]]-1:mm+6;
+    return `<tr><td style="font-weight:700" class="num">${s}</td><td class="num">${mm} – ${fin}</td><td class="num">${mm+13} mm</td><td class="num">${Math.round(mm*.372)} mm</td><td class="num">${Math.round(mm*.405)} mm</td></tr>`;}).join('');
 }
 function renderFAQ(){
   const el=$('#faqlist'); if(!el)return;
   el.innerHTML=FAQ.map((q,i)=>`<div class="qa" data-open="0">
-    <button class="qa-q" data-act="qa" data-i="${i}" aria-expanded="false">${q[0]}<span class="pm" aria-hidden="true"></span></button>
-    <div class="qa-a"><div><p>${q[1]}</p></div></div></div>`).join('');
+    <button class="qa-q" data-act="qa" data-i="${i}" aria-expanded="false" aria-controls="faq-answer-${i}">${q[0]}<span class="pm" aria-hidden="true"></span></button>
+    <div class="qa-a" id="faq-answer-${i}" aria-hidden="true"><div><p>${q[1]}</p></div></div></div>`).join('');
 }
 /* La grille montre un coloris par carte, pas un modèle par carte.
 
@@ -43,15 +41,17 @@ let grilleRendue=null;
 function renderGrid(){
   const paires=[];
   CATALOG.filter(p=>S.filter==='tous'||p.fam===S.filter).forEach(p=>
-    p.colors.filter(c=>!S.colorFilter||c===S.colorFilter).forEach(c=>paires.push([p,c])));
+    p.colors.filter(c=>(!S.colorFilter||c===S.colorFilter)&&(!S.sizeFilter||stockCol(p,c,SIZES.indexOf(S.sizeFilter))>0)).forEach(c=>paires.push([p,c])));
   $('#filters').querySelectorAll('[data-act="fam"]').forEach(b=>b.setAttribute('aria-pressed',S.filter===b.dataset.k));
   $('#filters').querySelectorAll('[data-act="col"]').forEach(b=>b.setAttribute('aria-pressed',S.colorFilter===b.dataset.k));
+  $('#filters').querySelector('[data-act="filters-reset"]')?.setAttribute('aria-pressed',!S.colorFilter&&!S.sizeFilter);
+  if($('#size-filter'))$('#size-filter').value=S.sizeFilter||'';
   // Le compte des cuirs affichés, sous les pastilles. role="status" : un
   // lecteur d'écran annonce le nouveau total quand on filtre, sinon le
   // changement se produit en silence.
   const compte=$('#collection-count');
-  if(compte) compte.textContent=paires.length+' coloris'+(S.colorFilter?' · '+COLORS[S.colorFilter].n:'');
-  const html=!paires.length?`<div class="empty" style="grid-column:1/-1;background:var(--surface)"><h4>Aucun cuir dans cette combinaison</h4><p>Essayez une autre couleur ou revenez à tous les cuirs.</p></div>`:paires.map(([p,c],i)=>{
+  if(compte) compte.textContent=paires.length+' coloris'+(S.sizeFilter?' en pointure '+S.sizeFilter:'');
+  const html=!paires.length?`<div class="empty" style="grid-column:1/-1;background:var(--surface)"><h4>Aucune paire disponible avec ces filtres</h4><p>Essayez une autre pointure ou découvrez les autres coloris.</p><button class="btn btn-out" data-act="filters-reset">Réinitialiser les filtres</button></div>`:paires.map(([p,c],i)=>{
     const out=totStockCol(p,c)===0;
     // Le bandeau du modèle ne se répète pas sur chaque coloris.
     const ruban=out?`<span class="card-flag out">Épuisé</span>`
@@ -61,7 +61,7 @@ function renderGrid(){
     return `<button class="card" data-act="open" data-id="${p.id}" data-c="${c}">
       <div class="card-art">${ruban}${visuel(p,c)}${ticket}<span class="card-discover">Découvrir</span></div>
       <div><div class="card-name"><h3>${p.name} <span>${COLORS[c].n}</span></h3><span class="p num">${fmt(priceOf(p))}</span></div>
-      <div class="card-meta"><span>${p.sub}</span><span class="dots"><i style="background:linear-gradient(135deg,${COLORS[c].c},${COLORS[c].d})"></i></span></div></div>
+      <div class="card-meta"><span>${out?'Actuellement épuisé':SIZES.filter((s,i)=>stockCol(p,c,i)>0).join(' · ')+' EU'}</span><span class="dots"><i style="background:linear-gradient(135deg,${COLORS[c].c},${COLORS[c].d})"></i></span></div></div>
     </button>`;}).join('');
   // Une quantité du panier ou une pointure ne doit pas reconstruire la collection.
   if(html===grilleRendue)return false;
