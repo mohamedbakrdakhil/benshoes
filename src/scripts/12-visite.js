@@ -86,6 +86,63 @@ function pane(cls,w,ht,tf,inner){
   if(f!==1){w/=f;ht/=f;tf+=` scale(${f})`;}
   if(K!==1){w*=K;ht*=K;tf=tf.replace(/(-?[\d.]+)px/g,(m,v)=>(v*K).toFixed(1)+'px');}
   return `<div class="pane ${cls}"${f!==1?` style="--f:${f};`:' style="'}width:${w}px;height:${ht}px;margin-left:${-w/2}px;margin-top:${-ht/2}px;transform:${tf}">${inner||''}</div>`;}
+
+/* Les accessoires de fêtes sont dessinés sur des plans uniques. Les branches,
+   rubans et ampoules ne créent donc pas de nouveaux murs 3D, et les zones
+   continuent de retirer tout ce décor lorsqu'il est derrière la caméra. */
+function feteSVG(w,h,body){
+  return `<svg class="fete-svg" data-bf-motion viewBox="0 0 ${w} ${h}" width="100%" height="100%" style="display:block" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${body}</svg>`;
+}
+function feteGuirlande(feuillage){
+  const courbe=x=>28+56*Math.abs(Math.sin(x/1000*Math.PI*3));
+  let s='<path d="M0 28Q167 140 333 28Q500 140 667 28Q834 140 1000 28" fill="none" stroke="'+(feuillage?'#123e32':'#92704a')+'" stroke-width="'+(feuillage?24:3)+'"/>';
+  if(feuillage){
+    for(let i=0;i<42;i++){
+      const x=12+i*23.3,y=courbe(x),a=i%2?22:-22;
+      s+=`<path d="M${x-20} ${y-17}q25 2 36 30q-26-2-36-30M${x+20} ${y-14}q-25 2-36 30q26-2 36-30" fill="${i%3?'#20523c':'#316348'}" transform="rotate(${a} ${x} ${y})"/>`;
+    }
+    s+='<path d="M0 26Q167 126 333 26Q500 126 667 26Q834 126 1000 26" fill="none" stroke="#cda96c" stroke-width="3"/>';
+  }
+  for(let i=0;i<20;i++){
+    const x=24+i*50,y=courbe(x)+8;
+    s+=`<path d="M${x} ${y-10}v16" stroke="#b89a65" stroke-width="2"/><g class="fete-bulb"><circle cx="${x}" cy="${y+12}" r="14" fill="#f4ce8c" opacity=".13"/><circle cx="${x}" cy="${y+12}" r="6" fill="#ffedbc"/></g>`;
+  }
+  if(feuillage) [167,500,834].forEach(x=>{
+    s+=`<path d="M${x} 65q-56-43-48-9q5 24 48 9q56-43 48-9q-5 24-48 9l-17 42l17-9l16 9z" fill="#9e2942" stroke="#c8676e" stroke-width="2"/><circle cx="${x}" cy="65" r="8" fill="#eed0a3"/>`;
+  });
+  return feteSVG(1000,150,s);
+}
+function feteCadeau(x,y,w,h,couleur){
+  const r=w*.12;
+  return `<g transform="translate(${x} ${y})"><rect x="0" y="0" width="${w}" height="${h}" rx="3" fill="${couleur}"/><path d="M0 ${h*.15}H${w}" stroke="#ffffff" stroke-opacity=".12" stroke-width="${h*.3}"/><path d="M${w/2} 0V${h}" stroke="#eed0a3" stroke-width="${r}"/><path d="M0 ${h*.48}H${w}" stroke="#d4ae72" stroke-width="${r*.65}"/><rect x="-4" y="-5" width="${w+8}" height="${h*.16}" rx="2" fill="${couleur}" stroke="#eed0a3" stroke-opacity=".4"/><path d="M${w/2} 0c-${w*.35}-${w*.35}-${w*.46} 3 0 0c${w*.35}-${w*.35} ${w*.46} 3 0 0" fill="none" stroke="#eed0a3" stroke-width="${r*.38}"/><path d="M${w/2} 0v${h*.11}" stroke="#eed0a3" stroke-width="${r}"/></g>`;
+}
+function feteSapin(){
+  let s='<ellipse cx="220" cy="748" rx="190" ry="20" fill="#080b08" opacity=".4"/><rect x="198" y="600" width="43" height="138" fill="#795134"/><path d="M220 95L113 280h57L78 428h65L30 622h380L297 428h65L270 280h57z" fill="#123e32" stroke="#386c4b" stroke-width="4"/><path d="M220 95v527H30l113-194H78l92-148h-57z" fill="#1b5139"/><path d="M156 254q70 44 132 9M115 402q107 68 204 8M70 559q156 78 297 9" fill="none" stroke="#d0ae71" stroke-width="7"/>';
+  [[197,236],[255,285],[174,344],[276,381],[120,440],[229,460],[326,513],[157,543],[257,581]].forEach(([x,y],i)=>{
+    s+=`<circle cx="${x}" cy="${y}" r="${i%3?14:18}" fill="${i%2?'#eed0a3':'#aa3049'}"/><circle cx="${x-4}" cy="${y-4}" r="4" fill="#fff2cd" opacity=".65"/>`;
+  });
+  [[173,257],[269,282],[142,416],[244,441],[301,424],[96,573],[194,600],[326,590]].forEach(([x,y])=>{
+    s+=`<g class="fete-bulb"><circle cx="${x}" cy="${y}" r="15" fill="#eed0a3" opacity=".12"/><circle cx="${x}" cy="${y}" r="5" fill="#fff1c6"/></g>`;
+  });
+  s+='<path d="M220 20l15 43l46 1l-37 27l13 45l-37-27l-38 27l14-45l-37-27l46-1z" fill="#eed0a3" stroke="#fff2d5" stroke-width="3"/>';
+  s+=feteCadeau(25,661,139,91,'#8c223b')+feteCadeau(263,640,147,112,'#b58952')+feteCadeau(160,690,104,64,'#235840');
+  return feteSVG(440,780,s);
+}
+function fetePaquets(){
+  return feteSVG(500,280,feteCadeau(32,121,174,131,'#8c223b')+feteCadeau(231,78,225,174,'#b58952')+feteCadeau(103,39,143,94,'#235840'));
+}
+function feteAffiche(){
+  return feteSVG(1000,270,'<rect x="5" y="5" width="990" height="260" rx="4" fill="#1b1016" stroke="#eed0a3" stroke-width="5"/><rect x="20" y="20" width="960" height="230" fill="none" stroke="#ad8656" stroke-width="2"/><g text-anchor="middle" font-family="Arial,sans-serif" fill="#eed0a3"><text x="500" y="66" font-size="29" letter-spacing="8">NOËL CHEZ BENKA</text><text x="500" y="147" font-size="70" font-weight="800" letter-spacing="2">BLACK FRIDAY</text><text x="500" y="211" font-size="34" letter-spacing="5">3 PAIRES · 699 DH</text></g><path d="M66 122l8 17l19 5l-19 7l-8 18l-7-18l-19-7l19-5zM934 122l8 17l19 5l-19 7l-8 18l-7-18l-19-7l19-5z" fill="#eed0a3"/>');
+}
+function feteCouronne(){
+  let s='<circle cx="150" cy="150" r="95" fill="none" stroke="#123e32" stroke-width="42"/><circle cx="150" cy="150" r="94" fill="none" stroke="#416d47" stroke-width="20" stroke-dasharray="3 12"/>';
+  for(let i=0;i<12;i++){
+    const a=i*Math.PI/6,x=150+Math.cos(a)*95,y=150+Math.sin(a)*95;
+    s+=`<circle cx="${x}" cy="${y}" r="9" fill="${i%2?'#eed0a3':'#a62c43'}"/>`;
+  }
+  s+='<path d="M150 235q-77-52-70-7q12 31 70 7q77-52 70-7q-12 31-70 7l-23 56l23-13l23 13z" fill="#a62c43" stroke="#d4757d" stroke-width="3"/><circle cx="150" cy="235" r="12" fill="#eed0a3"/>';
+  return feteSVG(300,300,s);
+}
 /* Une silhouette humaine, en un seul SVG. Les jambes et les bras sont dans
    leurs propres groupes pour que la CSS leur donne le pas. */
 /* Quatre silhouettes, pas une. Une foule faite du même gabarit répété se
@@ -445,6 +502,47 @@ function buildWorld(){
     });
   }
 
+  /* La fête suit la visite : la médina s'illumine, la façade accueille les
+     cadeaux, puis la salle garde ses paires dégagées au centre. Seize plans
+     au total, également disponibles sur téléphone ; aucun objet sur le
+     trajet de la caméra ni devant les niches de la collection. */
+  if($('#shopview')?.classList.contains('black-friday')){
+    fes.push(pane('pane-fete fete-entree',3000,450,
+      `translate3d(0px,-790px,${F.ZP+36}px)`,feteGuirlande(true)));
+
+    seuil.push(pane('pane-fete fete-facade',2400,360,
+      `translate3d(0px,-850px,${V.FZ+32}px)`,feteGuirlande(true)));
+    seuil.push(pane('pane-fete fete-affiche',650,175.5,
+      `translate3d(-1000px,-100px,${V.FZ+24}px)`,feteAffiche()));
+    seuil.push(pane('pane-fete fete-sapin',350,620.5,
+      `translate3d(1000px,${V.FY-310.25}px,${V.FZ+34}px)`,feteSapin()));
+    seuil.push(pane('pane-fete fete-paquets',400,224,
+      `translate3d(-1000px,${V.FY-112}px,${V.FZ+40}px)`,fetePaquets()));
+    seuil.push(pane('pane-fete fete-couronne',190,190,
+      `translate3d(0px,-335px,${V.FZ+30}px)`,feteCouronne()));
+    // La derb masque les vitrines latérales depuis l'axe de la porte.
+    // Trois accessoires près des jambages restent donc visibles en entrant,
+    // sans occuper le passage central (de -140 à +150 unités).
+    seuil.push(pane('pane-fete fete-sapin fete-porte',180,319.1,
+      `translate3d(-230px,${V.FY-159.55}px,${V.FZ+70}px)`,feteSapin()));
+    seuil.push(pane('pane-fete fete-paquets fete-porte',170,95.2,
+      `translate3d(235px,${V.FY-47.6}px,${V.FZ+76}px)`,fetePaquets()));
+    seuil.push(pane('pane-fete fete-linteau',600,90,
+      `translate3d(0px,-185px,${V.FZ+74}px)`,feteGuirlande(false)));
+
+    [-1500,-2300,-3100].forEach(z=>
+      allee.push(pane('pane-fete fete-plafond',1000,150,
+        `translate3d(0px,-405px,${z}px)`,feteGuirlande(false))));
+
+    salle.push(pane('pane-fete fete-galerie',2600,390,
+      `translate3d(${V.SX-34}px,-840px,${SZc}px) rotateY(-90deg)`,feteGuirlande(true)));
+    salle.push(pane('pane-fete fete-affiche',1100,297,
+      `translate3d(${V.SX-26}px,-85px,${SZc}px) rotateY(-90deg)`,feteAffiche()));
+    [-3100,-5500].forEach(z=>
+      salle.push(pane('pane-fete fete-sapin',390,691.4,
+        `translate3d(2410px,${V.FY-345.7}px,${z}px) rotateY(-90deg)`,feteSapin())));
+  }
+
   w.innerHTML=[['fes',fes],['seuil',seuil],['allee',allee],['salle',salle]]
     .map(([n,a])=>`<div class="zone" data-z="${n}">${a.join('')}</div>`).join('');
 }
@@ -499,7 +597,9 @@ function initVisite(){
   const bar2=bar;
   if(MODE2D){
     const plans=[...world.querySelectorAll('.mv')];
-    const bornes=caps.map(c=>[c.a,c.b]);
+    // Les cinq photos couvrent toute la visite, indépendamment de ses neuf
+    // légendes : les cinq premières bornes laissaient la fin sans image.
+    const bornes=plans.map((_,i)=>[i/plans.length,(i+1)/plans.length]);
     let capPrec=-1;
     avancer((dt,sy)=>{
       const p=borne((sy-GEO.vTop)/GEO.vSpan,0,1);
