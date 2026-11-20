@@ -13,7 +13,9 @@
     const offset=parseFloat(getComputedStyle(stage).top)||0;
     const start=section.getBoundingClientRect().top+scrollY-offset;
     const span=Math.max(1,section.offsetHeight-stage.offsetHeight);
+    section.dispatchEvent(new Event('benka:visitejump'));
     window.scrollTo({top:Math.max(0,start+Number(select.value)*span),behavior:'instant'});
+    reveiller();
   });
   // La boucle existante synchronise le menu ; aucun minuteur supplémentaire.
   let previous=-1;

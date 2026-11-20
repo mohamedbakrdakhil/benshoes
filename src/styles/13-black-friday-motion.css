@@ -101,6 +101,25 @@
 [data-bf-scene][data-bf-visible="false"] [data-bf-motion]::after,
 [data-bf-scene][data-bf-visible="false"] [data-bf-motion] *::before,
 [data-bf-scene][data-bf-visible="false"] [data-bf-motion] *::after{animation-play-state:paused!important}
+/* Le bandeau historique partage la pause et la visibilité de la campagne.
+   Les panneaux de commande gèlent le décor qui se trouve derrière eux. */
+.bf-paused .mq-track,
+.marquee[data-bf-visible="false"] .mq-track,
+.bf-paused .world .sil g.jb,.bf-paused .world .sil g.br,
+body:has(#overlays .panel) #shopview [data-bf-motion],
+body:has(#overlays .panel) #shopview [data-bf-motion] *,
+body:has(#overlays .panel) #shopview .mq-track,
+body:has(#overlays .panel) #shopview .sil g.jb,
+body:has(#overlays .panel) #shopview .sil g.br{animation-play-state:paused!important}
+/* Les halos couvrent une grande partie de l'écran : sur petit écran,
+   leur lumière reste présente sans déplacer continuellement ces surfaces. */
+@media(max-width:860px){
+  .bf-orbit,.bf-spotlight{animation:none}
+  .bf-spotlight{transform:rotate(-14deg)}
+}
+@media(hover:none){
+  .bf-collection .card:hover .card-art .pv{transform:none}
+}
 @media(min-width:861px) and (max-width:1100px){.bf-burst{width:88px;height:88px;right:0;top:5px;padding:13px 8px}.bf-burst b{font-size:1rem}.bf-burst small{font-size:.46rem}.bf-hero .hero-in{column-gap:36px}}
 @media(max-width:860px){
   .bf-hero .hero-in{padding:36px 20px 22px;gap:28px}

@@ -20,6 +20,7 @@
       if(label)label.textContent=text;
       else button.textContent=text;
       if(icon){icon.textContent=paused?'▶':'Ⅱ';icon.setAttribute('aria-hidden','true');}
+      document.dispatchEvent(new Event('benka:motionchange'));
     }
     button.addEventListener('click',()=>{
       paused=!paused;
@@ -29,7 +30,7 @@
     reduced.addEventListener('change',updateControl);
     updateControl();
 
-    const scenes=[...root.querySelectorAll('[data-bf-scene]')];
+    const scenes=[...root.querySelectorAll('[data-bf-scene],.marquee')];
     const visible=new Map(scenes.map(scene=>[scene,false]));
     const updateScene=scene=>{
       scene.dataset.bfVisible=String(!document.hidden&&visible.get(scene)===true);

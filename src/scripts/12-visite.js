@@ -249,7 +249,7 @@ function photoNiche(col,nom){
     // fond de niche, la LED et les étiquettes s'affichaient — ce sont du CSS
     // et du texte — et la chaussure manquait. Les huit font 51 Ko en 190 px,
     // c'est le prix de la seule chose qu'on vient voir.
-    +` loading="${PETIT?'eager':'lazy'}" decoding="async">`;
+    +` loading="eager" decoding="async">`;
 }
 function niche(p,left,w,ht,top,plate,col){
   if(K!==1){left*=K;w*=K;ht*=K;top*=K;}
@@ -550,29 +550,40 @@ function buildWorld(){
    rend la main et le moteur s'endort. */
 function animerPassants(world){
   const gens=[...world.querySelectorAll('.passant')].map(el=>({
-    el, x:+el.dataset.x, y:+el.dataset.y, z0:+el.dataset.z0, z1:+el.dataset.z1,
+    el, zone:el.closest('.zone'), x:+el.dataset.x, y:+el.dataset.y, z0:+el.dataset.z0, z1:+el.dataset.z1,
     v:+el.dataset.v, t:+el.dataset.t, ry:+el.dataset.ry }));
   if(!gens.length)return;
-  // Un observateur suffit : il ne coûte rien tant que rien ne traverse le
-  // bord de l'écran, là où un sondage à chaque image coûterait tout le temps.
   const sec=world.closest('.visite')||world.parentElement;
+  const boutique=world.closest('#shopview');
+  let visible=!self.IntersectionObserver,horloge=0,attente=0;
+  const cadence=PETIT?50:1000/30;
   if(self.IntersectionObserver&&sec){
-    new IntersectionObserver(e=>world.classList.toggle('vit',e[0].isIntersecting),
-      {rootMargin:'25% 0px'}).observe(sec);
+    new IntersectionObserver(entries=>{
+      visible=entries[0].isIntersecting;
+      world.classList.toggle('vit',visible);
+      if(visible)reveiller();
+    }).observe(sec);
   }else world.classList.add('vit');
-  let horloge=0;
   avancer((dt,sy)=>{
-    if(sy<GEO.vTop-GEO.vh || sy>GEO.vTop+GEO.vSpan+GEO.vh*0.6) return false;
-    horloge+=dt;
+    if(!visible||boutique?.classList.contains('bf-paused')
+      ||(typeof S!=='undefined'&&S.panel)
+      ||sy<GEO.vTop-GEO.vh||sy>GEO.vTop+GEO.vSpan+GEO.vh*.6)return false;
+    attente+=dt*1000;
+    if(attente<cadence)return cadence-attente;
+    horloge+=attente/1000;attente=0;
+    let anime=false;
     for(let i=0;i<gens.length;i++){
       const g=gens[i];
-      const u=(horloge*g.v+g.t)%1;                    // 0 → 1, puis on repart
-      const z=g.z0+(g.z1-g.z0)*u;
-      const bob=Math.sin(horloge*5.7+g.t*6.3)*2.5;     // le pas fait monter le corps
+      // Les personnages des quartiers retirés ne demandent aucune écriture.
+      if(g.zone?.style.display==='none')continue;
+      anime=true;
+      const u=(horloge*g.v+g.t)%1,z=g.z0+(g.z1-g.z0)*u;
+      const bob=Math.sin(horloge*5.7+g.t*6.3)*2.5;
       g.el.style.transform='translate3d('+(g.x*K).toFixed(1)+'px,'
         +((g.y+bob)*K).toFixed(1)+'px,'+(z*K).toFixed(1)+'px) rotateY('+g.ry+'deg)';
     }
-    return true;
+    // Le décor de fond n'a pas besoin de la cadence de la caméra au scroll.
+    return anime?cadence:false;
   });
 }
 
@@ -586,9 +597,26 @@ function echantillon(p){
           yaw:cr(P[3],A[3],B[3],N[3],t), pit:cr(P[4],A[4],B[4],N[4],t)};
 }
 function initVisite(){
-  const sec=$('#visite'),world=$('#world'); if(!sec||!world)return;
-  buildWorld();
-  if(!MOTION)return;
+  const sec=$('#visite'),world=$('#world'); if(!sec||!world||!MOTION)return;
+  let construit=false;
+  function preparer(){
+    if(construit)return;
+    construit=true;
+    try{
+      buildWorld();mesurer();installerVisite(sec,world);reveiller();
+    }catch(err){degrader(err&&err.message||err);}
+  }
+  // Le premier écran et les commandes ne paient pas la construction du riad.
+  // Une entrée directe par #visite est également couverte par l'observateur.
+  if(self.IntersectionObserver){
+    const io=new IntersectionObserver(entries=>{
+      if(!entries.some(e=>e.isIntersecting))return;
+      io.disconnect();preparer();
+    },{rootMargin:'350px 0px'});
+    io.observe(sec);
+  }else preparer();
+}
+function installerVisite(sec,world){
   const caps=[...sec.querySelectorAll('.vcap')].map(el=>({el,a:+el.dataset.a,b:+el.dataset.b}));
   const bar=$('#vprogbar'),hint=$('#vhint');
   const bar2=bar;
@@ -597,10 +625,11 @@ function initVisite(){
     // Les cinq photos couvrent toute la visite, indépendamment de ses neuf
     // légendes : les cinq premières bornes laissaient la fin sans image.
     const bornes=plans.map((_,i)=>[i/plans.length,(i+1)/plans.length]);
-    let capPrec=-1;
+    let capPrec=-1,progression=-1;
     avancer((dt,sy)=>{
       const p=borne((sy-GEO.vTop)/GEO.vSpan,0,1);
-      const proche=sy>GEO.vTop-GEO.vh*1.2 && sy<GEO.vTop+GEO.vSpan+GEO.vh*0.5;
+      if(p===progression)return false;
+      progression=p;
       for(let i=0;i<plans.length;i++){
         const [a,b]=bornes[i]||[0,1];
         const dedans=p>=a-0.05&&p<b+0.05;
@@ -612,7 +641,7 @@ function initVisite(){
       if(vu!==capPrec){capPrec=vu; for(let i=0;i<caps.length;i++) caps[i].el.style.opacity=i===vu?'1':'0';}
       if(bar2)bar2.style.width=(p*100).toFixed(1)+'%';
       if(hint){hint.style.opacity=p>.03?'0':'1';hint.style.visibility=p>.12?'hidden':'visible';}
-      return proche;
+      return false;
     });
     return;
   }
@@ -628,20 +657,32 @@ function initVisite(){
     masque=m;
     for(let i=0;i<zel.length;i++) if(zel[i]) zel[i].style.display=(m>>i&1)?'':'none';
   }
-  majZones(0);
+  const debut=borne((scrollY-GEO.vTop)/GEO.vSpan,0,1);
+  majZones(debut);
   animerPassants(world);
-  const cam=echantillon(0); let roll=0, prevYaw=cam.yaw, capPrec=-1, hintPrec=-1;
+  const cam=echantillon(debut);
+  let roll=0,prevYaw=cam.yaw,capPrec=-1,hintPrec=-1,progression=-1,saut=false;
   cam.pit=cam.pit||0;
+  sec.addEventListener('benka:visitejump',()=>{saut=true;});
   avancer((dt,sy)=>{
     const p=borne((sy-GEO.vTop)/GEO.vSpan,0,1);
     const proche=sy>GEO.vTop-GEO.vh*1.4 && sy<GEO.vTop+GEO.vSpan+GEO.vh*0.6;
-    majZones(p);
+    majZones(proche?p:-1);
     const c=echantillon(p);
-    const k=1-Math.pow(.0012,dt);
-    cam.x+=(c.x-cam.x)*k; cam.z+=(c.z-cam.z)*k; cam.yaw+=(c.yaw-cam.yaw)*k;
-    cam.pit+=(c.pit-cam.pit)*k;
-    const d=cam.yaw-prevYaw; prevYaw=cam.yaw;
-    roll+=(borne(-d*2.6,-6,6)-roll)*Math.min(1,dt*7);
+    const erreur=()=>Math.abs(c.x-cam.x)+Math.abs(c.z-cam.z)+Math.abs(c.yaw-cam.yaw)+Math.abs(c.pit-cam.pit);
+    const arrive=erreur()<.15&&Math.abs(roll)<.02;
+    if(p===progression&&arrive&&!saut)return false;
+    progression=p;
+    if(saut||!proche||arrive){
+      cam.x=c.x;cam.z=c.z;cam.yaw=c.yaw;cam.pit=c.pit;roll=0;saut=false;
+    }else{
+      const k=1-Math.pow(.0012,dt);
+      cam.x+=(c.x-cam.x)*k;cam.z+=(c.z-cam.z)*k;cam.yaw+=(c.yaw-cam.yaw)*k;
+      cam.pit+=(c.pit-cam.pit)*k;
+      const d=cam.yaw-prevYaw;
+      roll+=(borne(-d*2.6,-6,6)-roll)*Math.min(1,dt*7);
+    }
+    prevYaw=cam.yaw;
     const bob=Math.sin(p*46)*7;
     world.style.transform=`rotateZ(${roll.toFixed(2)}deg) rotateX(${cam.pit.toFixed(2)}deg) `
       +`rotateY(${cam.yaw.toFixed(2)}deg) `
@@ -651,8 +692,7 @@ function initVisite(){
     if(bar)bar.style.width=(p*100).toFixed(1)+'%';
     const hv=p>.03?0:1;
     if(hint&&hv!==hintPrec){hintPrec=hv;hint.style.opacity=hv;hint.style.visibility=p>.12?'hidden':'visible';}
-    return proche || Math.abs(c.x-cam.x)+Math.abs(c.z-cam.z)+Math.abs(c.yaw-cam.yaw)
-      +Math.abs(c.pit-cam.pit)>.4 || Math.abs(roll)>.05;
+    return proche&&(erreur()>=.15||Math.abs(roll)>=.02);
   });
 }
 

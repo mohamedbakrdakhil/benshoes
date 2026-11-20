@@ -146,3 +146,8 @@ label.f.bad input{border-color:var(--bad)}
 /* Une fois qu'on a compris, l'invite n'a plus rien à dire. */
 .rotor.touche .rotor-aide{opacity:0}
 .rotor:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+/* Un voile opaque est moins coûteux qu'un flou plein écran sur téléphone. */
+@media(max-width:860px){
+  .scrim{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(10,12,14,.58)}
+}

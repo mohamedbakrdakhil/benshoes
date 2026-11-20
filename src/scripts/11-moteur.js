@@ -2,7 +2,7 @@
    Une seule boucle pour toute la page. La géométrie est mesurée une fois
    et remesurée au redimensionnement : plus aucune lecture forcée du
    rendu pendant l'animation, qui est la première cause de saccade. */
-const MOTEUR={taches:[],actif:false,t:0};
+const MOTEUR={taches:[],actif:false,t:0,raf:0,timer:0};
 const GEO={};
 function mesurerEcranMobile(){
   if(!matchMedia('(max-width:860px)').matches)return;
@@ -13,8 +13,18 @@ function mesurerEcranMobile(){
   if(!v||v.scale===1){root.style.setProperty('--mobile-screen',(v?.height||innerHeight)+'px');
     root.style.setProperty('--mobile-screen-top',(v?.offsetTop||0)+'px');}
 }
-window.visualViewport?.addEventListener('resize',mesurerEcranMobile,{passive:true});
-window.visualViewport?.addEventListener('scroll',mesurerEcranMobile,{passive:true});
+// Les barres du navigateur mobile émettent plusieurs événements par image.
+// Une seule mesure suffit, et un défilement visuel ne relit pas l'en-tête.
+let mesureMobileRaf=0;
+function planifierMesureMobile(){
+  if(mesureMobileRaf)return;
+  mesureMobileRaf=requestAnimationFrame(()=>{mesureMobileRaf=0;mesurerEcranMobile();});
+}
+window.visualViewport?.addEventListener('resize',planifierMesureMobile,{passive:true});
+window.visualViewport?.addEventListener('scroll',()=>{
+  const v=window.visualViewport;
+  if(v&&v.scale===1)document.documentElement.style.setProperty('--mobile-screen-top',v.offsetTop+'px');
+},{passive:true});
 function mesurer(){
   mesurerEcranMobile();
   GEO.vw=innerWidth; GEO.vh=innerHeight;
@@ -27,15 +37,43 @@ function mesurer(){
       .filter(o=>o.im);}
 }
 function avancer(fn){MOTEUR.taches.push(fn);}
+/* Une tâche retourne true pendant une interpolation, false au repos, ou
+   un délai en millisecondes pour un décor autonome à cadence limitée. */
 function tourner(ts){
-  const dt=Math.min(.05,(ts-MOTEUR.t)/1000||.016); MOTEUR.t=ts;
-  let encore=false;
-  for(let i=0;i<MOTEUR.taches.length;i++) if(MOTEUR.taches[i](dt,scrollY)) encore=true;
-  if(encore&&!document.hidden) requestAnimationFrame(tourner); else MOTEUR.actif=false;
+  MOTEUR.raf=0;
+  if(document.hidden){MOTEUR.actif=false;return;}
+  const dt=Math.min(.1,(ts-MOTEUR.t)/1000||.016); MOTEUR.t=ts;
+  const sy=scrollY;
+  let delai=Infinity;
+  for(let i=0;i<MOTEUR.taches.length;i++){
+    const suite=MOTEUR.taches[i](dt,sy);
+    if(suite===true)delai=0;
+    else if(typeof suite==='number'&&suite>0)delai=Math.min(delai,suite);
+  }
+  if(delai===0)MOTEUR.raf=requestAnimationFrame(tourner);
+  else if(Number.isFinite(delai)){
+    // Le navigateur garde le dernier pas de synchronisation avec l'écran.
+    MOTEUR.timer=setTimeout(()=>{
+      MOTEUR.timer=0;
+      if(document.hidden){MOTEUR.actif=false;return;}
+      MOTEUR.raf=requestAnimationFrame(tourner);
+    },Math.max(0,delai-16));
+  }else MOTEUR.actif=false;
 }
 function reveiller(){
-  if(MOTEUR.actif||document.hidden||!MOTEUR.taches.length)return;
-  MOTEUR.actif=true; MOTEUR.t=performance.now(); requestAnimationFrame(tourner);
+  if(document.hidden||!MOTEUR.taches.length)return;
+  // Un vrai geste interrompt l'attente du décor : le scroll reste immédiat.
+  if(MOTEUR.timer){clearTimeout(MOTEUR.timer);MOTEUR.timer=0;}
+  if(MOTEUR.raf)return;
+  if(!MOTEUR.actif)MOTEUR.t=performance.now();
+  MOTEUR.actif=true;MOTEUR.raf=requestAnimationFrame(tourner);
 }
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden)return;
+  if(MOTEUR.raf)cancelAnimationFrame(MOTEUR.raf);
+  if(MOTEUR.timer)clearTimeout(MOTEUR.timer);
+  MOTEUR.raf=0;MOTEUR.timer=0;MOTEUR.actif=false;
+});
+document.addEventListener('benka:motionchange',reveiller);
 const borne=(v,a,b)=>v<a?a:v>b?b:v;
 

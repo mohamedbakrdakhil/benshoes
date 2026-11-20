@@ -15,7 +15,7 @@ function initMotion(){
     avancer((dt,sy)=>{const y=Math.min(sy,900);
       if(Math.abs(y-yPrec)>.5){yPrec=y;
         topo.style.transform=`translate3d(0,${(y*.22).toFixed(1)}px,0) scale(${(1+y*.00022).toFixed(4)})`;}
-      return sy<1400;});}
+      return false;});}
   // boutons magnétiques
   document.addEventListener('pointermove',e=>{
     if(e.pointerType==='touch')return;
@@ -99,7 +99,7 @@ function tacheRevelations(dt,sy){
       RV.splice(i,1);
     }
   }
-  return RV.length>0;
+  return false;
 }
 function bumpCart(){const b=$('#cartbtn');if(!b||!MOTION)return;b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump');}
 

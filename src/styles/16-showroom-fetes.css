@@ -5,6 +5,9 @@
 .visite-fetes .pane-fete{pointer-events:none}
 .fete-svg{overflow:visible}
 .fete-bulb{animation:fete-light 4s ease-in-out infinite alternate}
+/* Les ampoules intégrées aux grands plans 3D restent éclairées sans repeindre
+   chaque guirlande à chaque image. Le cadre garde ses petites lumières animées. */
+.visite-fetes .world .fete-bulb{animation:none}
 .fete-bulb:nth-of-type(3n){animation-delay:-2.5s}
 .visite-fetes .pane-sign{background:linear-gradient(140deg,#183e31,#102219);border-color:#bd955b;box-shadow:0 0 65px #d7b16b45,inset 0 0 40px #0005}
 .visite-fetes .pane-sign i{color:#eed0a3}
@@ -13,7 +16,7 @@
 .visite-fetes .niche::before{background:#fff0bd;box-shadow:0 0 16px 5px #ebc58066}
 .visite-fetes .bf-showroom-label{max-width:none;border-color:#b99560;background:#132b25ed;color:#fff0d2;box-shadow:3px 3px 0 #a5764240}
 .visite-fetes .bf-showroom-label small{display:block;margin-top:5px;font-family:var(--fb);font-weight:400;font-size:.8rem;letter-spacing:.03em;text-transform:none;color:#eed0a3}
-.visite-fetes .vskip{color:#f5dcb8;border-color:#b9956070;background:#14241de8;min-height:42px}
+.visite-fetes .vskip{-webkit-backdrop-filter:none;backdrop-filter:none;color:#f5dcb8;border-color:#b9956070;background:#14241de8;min-height:42px}
 .visite-fetes .vcap .k{color:#f1d5a7}
 .visite-fetes .vcap p{color:#f1dfd1;text-shadow:0 2px 9px #000}
 .visite-fetes .vprog i{background:linear-gradient(90deg,#245a44,#e5bd7e)}

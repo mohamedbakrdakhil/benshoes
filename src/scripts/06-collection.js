@@ -39,6 +39,7 @@ function renderFAQ(){
    montrerait qu'un septième de ce qu'on vend, et les six autres resteraient
    cachés derrière un clic. Chaque carte ouvre la fiche directement sur son
    coloris. */
+let grilleRendue=null;
 function renderGrid(){
   const paires=[];
   CATALOG.filter(p=>S.filter==='tous'||p.fam===S.filter).forEach(p=>
@@ -50,8 +51,7 @@ function renderGrid(){
   // changement se produit en silence.
   const compte=$('#collection-count');
   if(compte) compte.textContent=paires.length+' coloris'+(S.colorFilter?' · '+COLORS[S.colorFilter].n:'');
-  if(!paires.length){$('#grid').innerHTML=`<div class="empty" style="grid-column:1/-1;background:var(--surface)"><h4>Aucun cuir dans cette combinaison</h4><p>Essayez une autre couleur ou revenez à tous les cuirs.</p></div>`;return;}
-  $('#grid').innerHTML=paires.map(([p,c],i)=>{
+  const html=!paires.length?`<div class="empty" style="grid-column:1/-1;background:var(--surface)"><h4>Aucun cuir dans cette combinaison</h4><p>Essayez une autre couleur ou revenez à tous les cuirs.</p></div>`:paires.map(([p,c],i)=>{
     const out=totStockCol(p,c)===0;
     // Le bandeau du modèle ne se répète pas sur chaque coloris.
     const ruban=out?`<span class="card-flag out">Épuisé</span>`
@@ -63,6 +63,9 @@ function renderGrid(){
       <div><div class="card-name"><h3>${p.name} <span>${COLORS[c].n}</span></h3><span class="p num">${fmt(priceOf(p))}</span></div>
       <div class="card-meta"><span>${p.sub}</span><span class="dots"><i style="background:linear-gradient(135deg,${COLORS[c].c},${COLORS[c].d})"></i></span></div></div>
     </button>`;}).join('');
+  // Une quantité du panier ou une pointure ne doit pas reconstruire la collection.
+  if(html===grilleRendue)return false;
+  $('#grid').innerHTML=html;grilleRendue=html;return true;
 }
 function cartCount(){return S.cart.reduce((a,i)=>a+i.q,0);}
 function cartPricing(){
