@@ -69,11 +69,11 @@ function blackFridayCartNote(pricing){
     ? `Offre appliquée : vous économisez ${fmt(pricing.discount)}.`
     : pricing.quantity<3 && pricing.count===pricing.quantity
       ? `Encore ${missing} paire${missing>1?'s':''} pour votre trio à 699 DH.`
-      : 'Tarif normal appliqué : cette offre est réservée à un panier de exactement 3 paires Opus.';
+      : 'Tarif normal appliqué : cette offre est réservée à un panier d’exactement 3 paires Opus.';
   return `<div class="bf-cart-offer"><b>BLACK FRIDAY · 3 PAIRES = 699 DH</b>
     <p>${message}</p>
     <small>Couleurs et pointures au choix · Livraison offerte au Maroc</small>
-    <small>Uniquement pour un panier de exactement 3 paires Opus. Offre non cumulable.</small></div>`;
+    <small>Uniquement pour un panier d’exactement 3 paires Opus. Offre non cumulable.</small></div>`;
 }
 function waLink(o){return SHOP.whatsapp?`https://wa.me/${SHOP.whatsapp}?text=${encodeURIComponent(orderText(o))}`:'';}
 function mailLink(o){return `mailto:${SHOP.email}?subject=${encodeURIComponent('Commande '+o.ref)}&body=${encodeURIComponent(orderText(o))}`;}

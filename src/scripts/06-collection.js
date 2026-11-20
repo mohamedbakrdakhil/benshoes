@@ -57,8 +57,9 @@ function renderGrid(){
     const ruban=out?`<span class="card-flag out">Épuisé</span>`
                    :((p.vedette?c===p.vedette:i===0)&&p.flag
                        ?`<span class="card-flag">${p.flag}</span>`:'');
+    const ticket=!out&&p.id==='opus'&&priceOf(p)===279?'<span class="bf-card-ticket" aria-hidden="true"><span>BLACK FRIDAY</span><b>TRIO · 699 DH</b></span>':'';
     return `<button class="card" data-act="open" data-id="${p.id}" data-c="${c}">
-      <div class="card-art">${ruban}${visuel(p,c)}<span class="card-discover">Découvrir</span></div>
+      <div class="card-art">${ruban}${visuel(p,c)}${ticket}<span class="card-discover">Découvrir</span></div>
       <div><div class="card-name"><h3>${p.name} <span>${COLORS[c].n}</span></h3><span class="p num">${fmt(priceOf(p))}</span></div>
       <div class="card-meta"><span>${p.sub}</span><span class="dots"><i style="background:linear-gradient(135deg,${COLORS[c].c},${COLORS[c].d})"></i></span></div></div>
     </button>`;}).join('');
