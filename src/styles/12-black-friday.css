@@ -1,4 +1,4 @@
-/* Habillage saisonnier. Les prix et le parcours de commande restent ceux du catalogue. */
+/* Habillage saisonnier. Offre et décors de la campagne Benka. */
 .black-friday{--bf-black:#111112;--bf-red:#b12639;--bf-pink:#ee9aa6;--bf-white:#faf7f5}
 .black-friday .hdr{background:var(--bf-black);color:var(--bf-white);border-bottom-color:#343034}
 .black-friday .hdr .nav a{color:#ded8d9}

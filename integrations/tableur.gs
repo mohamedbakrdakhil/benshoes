@@ -464,6 +464,20 @@ function nouvelleReference(f) {
   return 'BS-' + aa + '-' + Date.now().toString(36).toUpperCase();
 }
 
+/* Offre réservée à un panier de exactement trois Opus, couleurs et pointures
+   au choix. Les prix nets restent cohérents dans les reçus et les exports.
+   Les serveurs appellent cette fonction APRÈS avoir validé le catalogue. */
+function prixBlackFriday(items, active = true) {
+  const eligible = i => i.id === 'opus' && i.unit === 279;
+  const count = items.reduce((n, i) => n + (eligible(i) ? i.q : 0), 0);
+  const quantity = items.reduce((n, i) => n + i.q, 0);
+  const packs = active && count === 3 && quantity === 3 ? 1 : 0;
+  const net = items.map(item => ({...item, unit: packs ? 233 : item.unit}));
+  const gross = items.reduce((n, i) => n + i.unit * i.q, 0);
+  const sub = net.reduce((n, i) => n + i.unit * i.q, 0);
+  return {items: net, count, quantity, packs, gross, sub, discount: gross - sub};
+}
+
 /* ───────── validation de la commande ───────── */
 
 function construireCommande(entree) {
@@ -508,7 +522,18 @@ function construireCommande(entree) {
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(client.email))
     return { erreur: 'Adresse e-mail invalide.' };
 
-  var livraison = sousTotal >= LIVR_OFFERTE ? 0 : LIVR_PRIX;
+  var pricing = prixBlackFriday(lignes.map(function(l) {
+    return Object.assign({}, l, {unit:l.prix});
+  }));
+  lignes = pricing.items.map(function(l) {
+    l.prix = l.unit;
+    delete l.unit;
+    return l;
+  });
+  sousTotal = pricing.sub;
+  var livraison = pricing.packs || sousTotal >= LIVR_OFFERTE ? 0 : LIVR_PRIX;
+  if (entree.expectedTotal !== undefined && Number(entree.expectedTotal) !== sousTotal + livraison)
+    return {erreur:'Le montant a changé. Actualisez votre panier avant de commander.'};
   return {
     commande: {
       articles: articles.join(' | '),
@@ -517,6 +542,8 @@ function construireCommande(entree) {
       client: client,
       note: texte(entree.note, 500),
       sousTotal: sousTotal,
+      remise: pricing.discount,
+      packs: pricing.packs,
       livraison: livraison,
       total: sousTotal + livraison
     }
@@ -896,5 +923,6 @@ function doGet() {
   }
   return reponse({ service: 'Benkashoes — réception des commandes', methode: 'POST',
                    alerte: ALERTE_EMAIL ? 'armée' : 'absente',
+                   promotion: {version:'bf-exact3-699-v2',modele:'opus',quantite:3,quantiteExacte:true,prix:699,livraison:0},
                    stock: stock });
 }
