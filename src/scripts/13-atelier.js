@@ -1,7 +1,7 @@
 /* ======================= l'atelier : panoramique horizontal ======================= */
 function initAtelier(){
   const sec=$('#atelier'), track=$('#attrack'), bar=$('#atbar');
-  if(!sec||!track||!MOTION)return;
+  if(!sec||!track||!$('.at-stage')||!MOTION)return;
   let x=0,progression=-1,pose=false;
   avancer((dt,sy)=>{
     const p=borne((sy-GEO.aTop)/GEO.aSpan,0,1);

@@ -244,6 +244,10 @@ function serveStatic(req, res, pathname) {
   // « public-sauvegarde » : on exige le séparateur.
   if (file !== PUBLIC_DIR && !file.startsWith(PUBLIC_DIR + path.sep)) { res.writeHead(403).end('Interdit'); return; }
   fs.stat(file, (err, st) => {
+    if (!err && st.isDirectory() && !pathname.endsWith('/')) {
+      const query=new URL(req.url,'http://local').search;
+      res.writeHead(308, {location:pathname+'/'+query}).end();return;
+    }
     if (err || !st.isFile()) {
       // Un fichier manquant répond 404 ; seule une adresse sans extension
       // retombe sur la page, sinon les moteurs indexeraient des pages fantômes.

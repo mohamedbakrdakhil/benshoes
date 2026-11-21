@@ -155,7 +155,7 @@ def graphe(produits, faq, tailles, liv, email, tel, reseaux, desc):
     for p in produits:
         offre = {
             '@type': 'Offer', '@id': URL + '#offre-' + p['id'],
-            'url': URL + ('#as-by-benka' if p['id'] == 'as' else '#modeles'),
+            'url': URL + 'collection/' + ('#as-by-benka' if p['id'] == 'as' else '#modeles'),
             'priceCurrency': 'MAD', 'price': p['prix'],
             'priceValidUntil': fin,
             'itemCondition': 'https://schema.org/NewCondition',

@@ -63,7 +63,7 @@ for m in produits:
             'availability':   'in stock' if reste else 'out of stock',
             'condition':      'new',
             'price':          '%d.00 MAD' % prix,
-            'link':           '%s#%s-%s' % (SITE, pid, c),
+            'link':           '%scollection/#%s-%s' % (SITE, pid, c),
             'image_link':     visuel(pid, c),
             'brand':          'Benkashoes',
             'color':          couleurs.get(c, c),

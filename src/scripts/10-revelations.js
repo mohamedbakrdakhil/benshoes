@@ -20,22 +20,33 @@ function initMotion(){
 
 }
 function initNav(){
-  const nav=$('#nav'),ink=$('#navink'); if(!nav||!ink)return;
+  const nav=$('#nav'),ink=$('#navink');if(!nav||!ink)return;
   const links=[...nav.querySelectorAll('a')];
   const place=a=>{if(!a){ink.classList.remove('on');return;}
     ink.style.width=a.offsetWidth+'px';ink.style.transform=`translateX(${a.offsetLeft}px)`;ink.classList.add('on');};
-  const secs=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
-  if('IntersectionObserver' in window){
+  const current=new URL(location.href),normalise=p=>p.replace(/index\.html$/,'').replace(/\/+$/,'')||'/';
+  const entries=links.map(link=>{try{return {link,url:new URL(link.getAttribute('href'),current.href)};}catch(e){return null;}})
+    .filter(entry=>entry&&entry.url.origin===current.origin&&normalise(entry.url.pathname)===normalise(current.pathname));
+  const page=entries.find(entry=>!entry.url.hash)?.link||null;
+  const mark=anchor=>{
+    links.forEach(link=>link.removeAttribute('aria-current'));
+    const chosen=anchor||page;if(chosen)chosen.setAttribute('aria-current',anchor?'location':'page');place(chosen);
+  };
+  mark(null);
+  // Seules les ancres de la page courante sont des sélecteurs de section.
+  // Un chemin tel que /collection/ n'est jamais transmis à querySelector.
+  const sections=entries.filter(entry=>entry.url.hash).map(entry=>{
+    let id;try{id=decodeURIComponent(entry.url.hash.slice(1));}catch(e){return null;}
+    const section=document.getElementById(id);return section?{...entry,section}:null;
+  }).filter(Boolean);
+  if('IntersectionObserver' in window&&sections.length){
     const vus=new Map();
     const io=new IntersectionObserver(es=>{
       es.forEach(e=>vus.set(e.target.id,e.intersectionRatio));
-      let best=null,r=0; vus.forEach((v,k)=>{if(v>r){r=v;best=k;}});
-      links.forEach(a=>a.removeAttribute('aria-current'));
-      if(best&&r>0.04){const a=links.find(x=>x.getAttribute('href')==='#'+best);
-        if(a){a.setAttribute('aria-current','true');place(a);}}
-      else place(null);
+      let best=null,r=0;vus.forEach((v,k)=>{if(v>r){r=v;best=k;}});
+      mark(r>.04?sections.find(entry=>entry.section.id===best)?.link:null);
     },{threshold:[0,.05,.25,.5,.75,1],rootMargin:'-80px 0px -45% 0px'});
-    secs.forEach(s=>io.observe(s));
+    sections.forEach(entry=>io.observe(entry.section));
   }
   addEventListener('resize',()=>place(links.find(x=>x.hasAttribute('aria-current'))),{passive:true});
 }
@@ -142,7 +153,7 @@ function fondVideo(){
     sec.classList.add('a-fond');
     if(getComputedStyle(sec).position==='static') sec.style.position='relative';
 
-    if(etroit||lente||!MOTION) return;   // l'affiche suffira
+    if(etroit||lente||!MOTION||!('IntersectionObserver' in window)) return;   // l'affiche suffira
 
     // La vidéo n'est demandée qu'à l'approche de la section.
     const io=new IntersectionObserver(e=>{

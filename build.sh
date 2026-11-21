@@ -141,61 +141,9 @@ printf '</body>\n</html>\n'
 # ---------- 4. le catalogue du tableur doit suivre celui du site ----------
 if command -v python3 >/dev/null 2>&1; then python3 verif-catalogue.py; fi
 
-# ---------- 5. allègement du fichier livré (les sources restent lisibles) ----------
-# Doit passer avant le scellage : il modifie le texte des scripts, donc leurs
-# empreintes.
-if command -v python3 >/dev/null 2>&1; then python3 minifier.py index.html; fi
-
-# ---------- 6. politique de sécurité : chaque script scellé par son empreinte ----------
-# Deux échecs très différents dormaient sous la même branche : python3
-# réellement absent, et csp.py qui plante. Le second repliait la politique sur
-# 'unsafe-inline' en annonçant « python3 absent » — un mensonge qui annulait la
-# protection contre l'injection de script sans que personne le remarque. Un
-# outil qui plante arrête désormais la livraison.
-if command -v python3 >/dev/null 2>&1; then
-  if ! python3 csp.py index.html; then
-    echo "ERREUR : csp.py a échoué. Rien n'est livré."
-    echo "         Replier ici autoriserait 'unsafe-inline' et rouvrirait la"
-    echo "         porte à l'injection de script. Corrigez csp.py d'abord."
-    exit 1
-  fi
-else
-  echo "  python3 absent : politique de repli (scripts en ligne autorisés)"
-  POLITIQUE="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; media-src 'none'; worker-src 'none'; upgrade-insecure-requests"
-  sed -i '' "s|@@CSP@@|$POLITIQUE|" index.html
-fi
-grep -q '@@CSP@@' index.html && { echo "ERREUR : la politique de sécurité n'a pas été posée"; exit 1; }
-
-# ---------- 7. la version servie par server.js porte le repère d'API ----------
-# Sans ce repère, la page ne sonde pas /api/catalog : inutile sur GitHub Pages,
-# où il n'y a pas de serveur et où le sondage coûtait un 404 à chaque visite.
-python3 - <<'PY' || cp index.html public/index.html
-import io
-h=io.open('index.html',encoding='utf-8').read()
-io.open('public/index.html','w',encoding='utf-8').write(
-  h.replace('<meta name="referrer"','<meta name="benka-api" content="oui">\n<meta name="referrer"',1))
-PY
-
-# ---------- 8. le plan du site, daté du jour ----------
-# Une seule adresse — le site tient sur une page — mais l'image de marque y est
-# déclarée : c'est ce qui la rend éligible à Google Images.
-cat > sitemap.xml <<SITEMAP
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-  <url>
-    <loc>$URL</loc>
-    <lastmod>$(date -u +%Y-%m-%d)</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-    <image:image>
-      <image:loc>${URL}${PARTAGE}</image:loc>
-      <image:title>Benkashoes — mocassins-mules en daim</image:title>
-      <image:caption>Une tige en daim benka montée sur forme, à l'atelier.</image:caption>
-    </image:image>
-  </url>
-</urlset>
-SITEMAP
+# ---------- 5. pages autonomes, liens, métadonnées et CSP ----------
+# Chaque page est minifiée et scellée après son assemblage final.
+python3 tools/preparer-pages.py "$URL"
 
 # ---------- 8b. le flux catalogue, pour les publicités dynamiques ----------
 # Meta relit ce fichier tous les jours à son adresse publique : il doit donc
