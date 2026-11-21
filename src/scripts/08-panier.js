@@ -56,7 +56,7 @@ function cartHTML(){
         <div><h4>${p.name}</h4><div class="meta">${COLORS[it.c].n} · Pointure ${it.s}</div>
           <div class="qty"><button data-act="qty" data-n="${n}" data-d="-1" aria-label="Retirer un">−</button><span class="num">${it.q}</span><button data-act="qty" data-n="${n}" data-d="1" aria-label="Ajouter un">+</button></div></div>
         <div class="right"><b class="num">${fmt(priceOf(p)*it.q)}</b><button class="lnk" data-act="rm" data-n="${n}">Retirer</button></div></div>`;}).join('')
-      +`<button class="continue-shopping" data-act="closep">Continuer à choisir mes paires <span aria-hidden="true">↗</span></button><p class="note" style="margin-top:16px">${SHIPFREE===0||SHIPCOST===0?'Livraison offerte, partout au Maroc.':(sub>=SHIPFREE?'Livraison offerte sur cette commande.':`Encore ${fmt(SHIPFREE-sub)} pour la livraison offerte.`)}</p>`;
+      +`<button class="continue-shopping" data-act="${S.packMode?'pack-continue':'closep'}">Continuer à choisir mes paires <span aria-hidden="true">↗</span></button><p class="note" style="margin-top:16px">${SHIPFREE===0||SHIPCOST===0?'Livraison offerte, partout au Maroc.':(sub>=SHIPFREE?'Livraison offerte sur cette commande.':`Encore ${fmt(SHIPFREE-sub)} pour la livraison offerte.`)}</p>`;
     foot=`<div class="totals"><div><span>Sous-total</span><span class="num">${fmt(pricing.gross)}</span></div>${pricing.discount?`<div class="bf-discount"><span>Black Friday · ${blackFridayPackLabel(pricing.pack)}</span><span class="num">−${fmt(pricing.discount)}</span></div>`:''}
       <div><span>Livraison</span><span class="num">${ship?fmt(ship):'Offerte'}</span></div>
       <div class="grand"><span>Total</span><span class="num">${fmt(sub+ship)}</span></div></div>
@@ -78,8 +78,8 @@ function blackFridayCartNote(pricing){
   const title=pricing.packs ? `${blackFridayPackLabel(pricing.pack)} · ${fmt(pricing.sub)}` : 'BLACK FRIDAY · VOTRE PACK DE 3';
   return `<div class="bf-cart-offer"><b>${title}</b>
     <p>${message}</p>
-    <small>3 Opus : 699 DH · Mixte Opus + AS : 749 DH · 3 AS : 799 DH</small>
-    <small>Couleurs et pointures au choix · Exactement 3 paires · Non cumulable</small></div>`;
+    ${pricing.packs?'':`<small>3 Opus : 699 DH · Mixte Opus + AS : 749 DH · 3 AS : 799 DH</small>`}
+    <small>Exactement 3 paires · Couleurs et pointures au choix</small></div>`;
 }
 function waLink(o){return SHOP.whatsapp?`https://wa.me/${SHOP.whatsapp}?text=${encodeURIComponent(orderText(o))}`:'';}
 function mailLink(o){return `mailto:${SHOP.email}?subject=${encodeURIComponent('Commande '+o.ref)}&body=${encodeURIComponent(orderText(o))}`;}
@@ -194,7 +194,7 @@ async function placeOrder(){
       S.lastOrder=Object.assign({},nettoyerCommande(o),{saved});
     }
     if(S.lastOrder.saved)mesurerAchat(o,cle);
-    S.cart=[];syncCart();S.step=3;S.form=null;S.tentative=null;
+    S.cart=[];S.packMode=null;syncCart();S.step=3;S.form=null;S.tentative=null;
     if(MODE==='local'){S.orders=[S.lastOrder].concat(S.orders);saveLocal();}
     if(!S.panel)toast(S.lastOrder.saved?'Commande reçue : '+S.lastOrder.ref:'Votre récapitulatif est disponible dans le panier.');
   }catch(e){S.checkoutError='L’envoi n’a pas pu être confirmé. Votre panier et vos coordonnées sont conservés ; réessayez dans un moment.';toast(S.checkoutError);}

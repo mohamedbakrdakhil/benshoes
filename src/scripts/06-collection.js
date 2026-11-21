@@ -68,12 +68,15 @@ function productCard(p,c,i){
     return `<button class="card" data-act="open" data-id="${p.id}" data-c="${c}">
       <div class="card-art">${ruban}${visuel(p,c)}${ticket}<span class="card-discover">Découvrir</span></div>
       <div><div class="card-name"><h3>${p.name} <span>${COLORS[c].n}</span></h3><span class="p num">${fmt(priceOf(p))}</span></div>
-      <div class="card-meta"><span>${out?'Actuellement épuisé':SIZES.filter((s,i)=>stockCol(p,c,i)>0).join(' · ')+' EU'}</span><span class="dots"><i style="background:linear-gradient(135deg,${COLORS[c].c},${COLORS[c].d})"></i></span></div></div>
+      <div class="card-meta"><span>${out?'Actuellement épuisé':SIZES.filter((s,i)=>stockCol(p,c,i)>0).join(' · ')+' EU'}</span><span class="dots"><i style="background:linear-gradient(135deg,${COLORS[c].c},${COLORS[c].d})"></i></span></div><span class="card-choose">${out?'Voir les autres coloris':'Choisir ma pointure'} <b aria-hidden="true">↗</b></span></div>
     </button>`;}
 let asGrilleRendue=null;
 function renderASGrid(){
   const el=$('#as-grid'),p=prod('as');if(!el||!p)return false;
-  const html=p.colors.map((c,i)=>productCard(p,c,i)).join('');
+  const colors=p.colors.filter(c=>!S.sizeFilter||stockCol(p,c,SIZES.indexOf(S.sizeFilter))>0);
+  if($('#as-size-filter'))$('#as-size-filter').value=S.sizeFilter||'';
+  if($('#as-collection-count'))$('#as-collection-count').textContent=colors.length+' coloris'+(S.sizeFilter?' en pointure '+S.sizeFilter:'');
+  const html=colors.length?colors.map((c,i)=>productCard(p,c,i)).join(''):`<div class="empty" style="grid-column:1/-1"><h4>Aucun coloris disponible dans cette pointure</h4><button class="btn btn-out" data-act="filters-reset">Voir toutes les pointures</button></div>`;
   if(html===asGrilleRendue)return false;
   el.innerHTML=html;asGrilleRendue=html;return true;
 }

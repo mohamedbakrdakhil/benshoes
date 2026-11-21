@@ -49,6 +49,7 @@ function draw(){
   majRotor();
   document.body.style.overflow=S.panel?'hidden':'';
   $('#cartcount').textContent=cartCount();
+  renderPackGuide();
   reveiller();
 }
 
@@ -120,10 +121,14 @@ document.addEventListener('click',async e=>{
   if(e.target.closest('#cartbtn')){S.panel='cart';S.step=!S.cart.length&&S.lastOrder?3:1;draw();return;}
   const t=e.target.closest('[data-act]');if(!t)return;const a=t.dataset.act,d=t.dataset;
   if(S.envoi&&['add','qty','rm','next','place'].includes(a)){toast('Votre commande est en cours d’envoi.');return;}
-  if(a==='skipvisite'){
+  if(a==='pack-start'){e.preventDefault();startPack(d.pack);}
+  else if(a==='pack-stop'){S.packMode=null;renderPackGuide();$('#cartbtn')?.focus({preventScroll:true});}
+  else if(a==='pack-cart'){S.panel='cart';S.step=1;draw();}
+  else if(a==='pack-continue'){goPackCollection();}
+  else if(a==='skipvisite'){
     e.preventDefault();
     document.getElementById('visite')?.dispatchEvent(new Event('benka:showroomclose'));
-    const m=$('#modeles');
+    const m=$('#as-by-benka');
     if(m){
       // La collection possède désormais son propre cadre positionné :
       // offsetTop serait relatif à ce cadre, et ramènerait en haut du site.
@@ -153,11 +158,15 @@ document.addEventListener('click',async e=>{
     // le bouton est désactivé sans pointure, mais une ligne sans pointure
     // fausserait le panier et la commande : on refuse aussi ici.
     if(!prod(id)||!COLORS[c]||!SIZES.includes(s)){toast('Choisissez une pointure');return;}
+    if(S.packMode&&packProgress(S.cart).count>=3){S.panel='cart';S.step=1;draw();toast('Votre trio est complet. Ajustez votre sélection dans le panier.');return;}
     const ex=S.cart.find(i=>i.id===id&&i.c===c&&i.s===s);
     const max=Math.min(10,stockCol(prod(id),c,SIZES.indexOf(s)));
     if(max<1){toast('Cette pointure est épuisée. Choisissez-en une autre.');draw();return;}
     if(ex){if(ex.q>=max){toast('Stock atteint pour cette pointure');return;}ex.q++;}else S.cart.push({id,c,s,q:1});
-    syncCart();S.panel='cart';S.step=1;draw();bumpCart();toast('Ajouté au panier');
+    syncCart();S.step=1;
+    if(S.packMode&&packProgress(S.cart).missing>0){fermerPanneau();toast('Paire ajoutée · encore '+packProgress(S.cart).missing+' pour votre trio');}
+    else{S.panel='cart';draw();toast(S.packMode?'Votre trio est prêt':'Ajouté au panier');}
+    bumpCart();
     const pr=prod(id);
     mesure('AddToCart',{content_type:'product',content_ids:[refMeta(id,c)],
       content_name:pr.name+' '+(COLORS[c]||{}).n,value:priceOf(pr),currency:'MAD'});}
@@ -233,7 +242,7 @@ async function saveManual(){readManual();const m=S.manual;
   S.panel=null;S.manual=null;S.openRow=o.ref;draw();toast('Commande '+o.ref+' enregistrée');
 }
 document.addEventListener('change',e=>{
-  if(e.target.id==='size-filter'){S.sizeFilter=SIZES.includes(+e.target.value)?+e.target.value:null;draw();return;}
+  if(e.target.id==='size-filter'||e.target.id==='as-size-filter'){S.sizeFilter=SIZES.includes(+e.target.value)?+e.target.value:null;draw();return;}
   const c=e.target.closest('[data-ch]');
   if(c){const v=Math.max(0,Math.round(+e.target.value||0));
     if(c.dataset.ch==='price'){S.ov.prices[c.dataset.id]=v;}
