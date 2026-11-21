@@ -1,0 +1,179 @@
+/* Sur ordinateur, la vitrine éditoriale demeure. Sur téléphone, on entre
+   directement dans les produits : modèle, couleur, prix, puis pointure. */
+.store-title-mobile,.shop-mobile-nav,.shop-mobile-pack{display:none}
+@media(max-width:700px){
+  [data-page="collection"] .store-intro{padding-block:22px 18px}
+  [data-page="collection"] .store-intro .page-breadcrumb,
+  [data-page="collection"] .store-title-row .eyebrow,
+  [data-page="collection"] .store-title-desktop,
+  [data-page="collection"] .store-title-row>p,
+  [data-page="collection"] .store-models,
+  [data-page="collection"] .store-trio-link,
+  [data-page="collection"] .store-reassurance{display:none}
+  [data-page="collection"] .store-title-row{margin:0}
+  [data-page="collection"] .store-title-row h1{font:400 36px/1.1 var(--fb);letter-spacing:-.035em;margin:0}
+  [data-page="collection"] .store-title-mobile{display:inline}
+
+  .shop-mobile-nav{
+    display:grid;grid-template-columns:1.25fr .85fr 1fr;position:sticky;
+    top:var(--mobile-header,64px);z-index:45;padding:0 16px;
+    background:var(--bg);border-block:1px solid var(--line);
+    box-shadow:0 5px 16px #1c0d0906;
+  }
+  .shop-mobile-nav a{
+    display:flex;flex-direction:column;justify-content:center;align-items:center;
+    min-width:0;min-height:54px;padding:9px 6px;text-decoration:none;
+    color:var(--fg);font-size:14px;font-weight:600;line-height:1.25;
+  }
+  .shop-mobile-nav a+a{border-left:1px solid var(--line)}
+  .shop-mobile-nav a:last-child{color:var(--accent-text)}
+  .shop-mobile-nav a span{font-size:12px;font-weight:400;margin-top:3px}
+  .shop-mobile-nav a[aria-current="location"]{color:var(--accent-text);background:var(--accent-wash);box-shadow:inset 0 -3px 0 var(--accent-text)}
+  .shop-mobile-nav a:focus-visible{outline-offset:-4px}
+  [data-page="collection"] #as-by-benka,
+  [data-page="collection"] #modeles,
+  [data-page="collection"] #packs{scroll-margin-top:calc(var(--mobile-header,64px) - 80px + 68px)}
+
+  /* Un seul en-tête court et une seule barre de filtre avant les photos. */
+  [data-page="collection"] .as-collection{border:0;background:var(--bg)}
+  [data-page="collection"] .as-collection>.sec,
+  [data-page="collection"] .bf-collection #modeles{padding-block:24px 32px}
+  [data-page="collection"] .as-heading,
+  [data-page="collection"] #modeles .sec-head{display:block;margin:0 0 16px}
+  [data-page="collection"] .as-heading{position:absolute;width:1px;height:1px;padding:0;margin:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+  [data-page="collection"] .as-heading .eyebrow,
+  [data-page="collection"] #modeles .sec-head .eyebrow,
+  [data-page="collection"] .as-intro,
+  [data-page="collection"] #modeles .sec-head>p,
+  [data-page="collection"] .opus-heading-desktop,
+  [data-page="collection"] .as-collection .bf-pack-banner,
+  [data-page="collection"] #modeles .bf-pack-banner,
+  [data-page="collection"] .as-contact,
+  [data-page="collection"] .bf-collection-end{display:none}
+  [data-page="collection"] .as-heading h2,
+  [data-page="collection"] #modeles .sec-head h2{font:400 30px/1.1 var(--fb);letter-spacing:-.025em;margin:0!important}
+  [data-page="collection"] .as-heading h2 span{font:500 13px/1.3 var(--fu);letter-spacing:.06em;margin-left:6px}
+  [data-page="collection"] .collection-toolbar,
+  [data-page="collection"] .bf-collection .collection-toolbar{
+    display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;
+    gap:12px;padding:0;margin:0 0 18px;border:0;
+  }
+  [data-page="collection"] .collection-toolbar .size-filter{grid-column:1;grid-row:1;margin:0;font-size:14px;gap:8px}
+  [data-page="collection"] .collection-toolbar .size-filter select{
+    min-width:92px;min-height:44px;font-size:16px;line-height:1.4;
+    border-radius:4px;background:var(--surface);color:var(--fg);border:1px solid var(--line-2);
+  }
+  [data-page="collection"] .collection-toolbar .collection-count{
+    grid-column:2;grid-row:1;order:0;justify-self:end;margin:0;max-width:100px;
+    font-size:13px!important;line-height:1.4;letter-spacing:0;white-space:normal;text-align:right;
+  }
+  [data-page="collection"] .as-toolbar .collection-help{display:none}
+  [data-page="collection"] .collection-toolbar .filters{grid-column:1/-1;grid-row:2;width:100%;min-width:0;margin:0}
+  [data-page="collection"] .color-filters{
+    width:100%;max-width:100%;display:flex;flex-wrap:nowrap;gap:8px;
+    padding:2px 2px 6px;overflow-x:auto;scrollbar-width:thin;
+    overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;
+  }
+  [data-page="collection"] .color-chip{flex:none;min-height:44px;font-size:14px;line-height:1.3;padding:10px 12px}
+
+  /* La photo occupe toute la carte ; rien ne masque la paire. */
+  [data-page="collection"] .grid,
+  [data-page="collection"] .as-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 12px}
+  [data-page="collection"] .grid .card{gap:0;min-width:0;align-items:stretch}
+  [data-page="collection"] .grid .card-art{
+    width:100%;aspect-ratio:3/4;background:#e9e6df;
+    border:0;border-radius:0;box-shadow:none;
+  }
+  [data-page="collection"] .grid .card-art .pv{
+    display:block;width:100%;height:100%;min-height:0;
+    object-fit:cover;object-position:center;transform:none;
+  }
+  [data-page="collection"] .grid .card-flag:not(.out),
+  [data-page="collection"] .grid .bf-card-ticket,
+  [data-page="collection"] .grid .card-discover{display:none}
+  [data-page="collection"] .grid .card-flag.out{font-size:12px;line-height:1.3;padding:6px 8px;top:8px;left:8px}
+  [data-page="collection"] .grid .card-name{display:flex;flex-direction:column;align-items:start;gap:8px;padding-top:12px}
+  [data-page="collection"] .grid .card-name h3{font:500 15px/1.35 var(--fu);letter-spacing:0;overflow-wrap:normal}
+  [data-page="collection"] .grid .card-name h3 span{font:400 14px/1.4 var(--fu);margin-top:3px;color:var(--fg-soft)}
+  [data-page="collection"] .grid .card-name .p{font:600 16px/1.3 var(--fu);margin:0;white-space:nowrap;color:var(--fg)}
+  [data-page="collection"] .grid .card-meta{display:none}
+  [data-page="collection"] .grid .card-choose{
+    display:flex;align-items:center;justify-content:space-between;gap:6px;
+    min-height:44px;margin-top:12px;padding:9px 10px;
+    background:var(--surface);border:1px solid var(--line-2);
+    color:var(--fg);font-size:13px;line-height:1.35;font-weight:500;
+  }
+  [data-page="collection"] .grid .card-choose b{flex:none;font-size:18px}
+  [data-page="collection"] .grid .card:focus-visible .card-choose{background:var(--accent-wash);border-color:var(--accent-text)}
+  .shop-mobile-pack{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    margin-top:26px;padding:17px 16px;text-decoration:none;
+    background:#651e2b;color:#fff5e9;border:1px solid #8d5260;
+  }
+  .shop-mobile-pack b{display:block;font-size:16px;line-height:1.4;font-weight:600}
+  .shop-mobile-pack small{display:block;font-size:13px;line-height:1.5;margin-top:4px;color:#f2dcd8}
+  .shop-mobile-pack>span:last-child{font-size:22px;flex:none}
+  [data-page="collection"] .bf-collection{border-top:1px solid var(--line)}
+
+  /* Les trois offres sont regroupées ici, avec les compositions exactes. */
+  [data-page="collection"] .bf-packs{padding-block:32px;background:#21191a}
+  [data-page="collection"] .bf-packs-heading{gap:14px;margin-bottom:22px}
+  [data-page="collection"] .bf-packs-heading .eyebrow{font-size:12px;line-height:1.5;letter-spacing:.05em}
+  [data-page="collection"] .bf-packs-heading h2{font-size:32px;line-height:1.1;margin-top:8px}
+  [data-page="collection"] .bf-packs-heading>p{font-size:14px;line-height:1.6}
+  [data-page="collection"] .bf-trio{padding:18px;grid-template-columns:minmax(0,1fr) 78px;gap:6px 14px;background:#2c2224;border-color:#6e5158}
+  [data-page="collection"] .bf-trio-mixte{background:#46232e;border-color:#bb8b96}
+  [data-page="collection"] .bf-trio-number{display:none}
+  [data-page="collection"] .bf-trio .trio-composition{grid-column:2;grid-row:1/5;height:118px;margin:4px 0 0}
+  [data-page="collection"] .bf-trio .trio-composition img{width:52px;height:70px;border-radius:0;object-fit:cover}
+  [data-page="collection"] .bf-trio .trio-composition img:nth-child(2){left:20px;top:22px}
+  [data-page="collection"] .bf-trio .trio-composition img:nth-child(3){left:6px;top:46px}
+  [data-page="collection"] .bf-trio h3{grid-column:1;grid-row:1;margin:0;font-size:26px;line-height:1.2}
+  [data-page="collection"] .bf-trio>p:not(.bf-trio-detail){grid-column:1;grid-row:2;font-size:14px;line-height:1.4}
+  [data-page="collection"] .bf-trio-price{grid-column:1;grid-row:3;margin:8px 0 0;gap:8px}
+  [data-page="collection"] .bf-trio-price strong{font:500 36px/1 var(--fu);letter-spacing:-.04em}
+  [data-page="collection"] .bf-trio-price>span{font-size:14px;line-height:1.4}
+  [data-page="collection"] .bf-trio-price s{font-size:13px}
+  [data-page="collection"] .bf-trio-saving{grid-column:1;grid-row:4;font-size:13px;line-height:1.4}
+  [data-page="collection"] .bf-trio:not(.bf-trio-mixte) .bf-trio-detail{display:none}
+  [data-page="collection"] .bf-trio .bf-trio-detail{grid-column:1/-1;grid-row:5;font-size:14px;line-height:1.5;margin:8px 0 0}
+  [data-page="collection"] .bf-trio .btn{grid-column:1/-1;grid-row:6;min-height:48px;margin-top:12px;font-size:14px;line-height:1.4;padding:12px;white-space:normal}
+  [data-page="collection"] .bf-packs-terms{font-size:13px;line-height:1.65;margin-top:20px}
+  [data-page="collection"] .launch-help{padding-block:30px;gap:0}
+  [data-page="collection"] .launch-help>div{display:none}
+  [data-page="collection"] .launch-help>a{min-height:72px;padding:18px 24px 18px 0}
+  [data-page="collection"] .launch-help>a>span{display:none}
+  [data-page="collection"] .launch-help h3{font-size:21px;margin:0 0 6px}
+  [data-page="collection"] .launch-help p{font-size:14px;line-height:1.5}
+
+  /* La fiche reprend la même hiérarchie : titre, photographie, choix,
+     puis détails. Les wrappers restent dans le DOM pour leurs contrôles. */
+  #overlays .panel.plein .panel-bd{display:flex;flex-direction:column;align-items:stretch;gap:0}
+  #overlays .panel.plein .sheet-media,
+  #overlays .panel.plein .sheet-details{display:contents}
+  #overlays .panel.plein .sheet-details>.eyebrow{order:0;flex:none;margin:0 0 7px;font-size:13px;letter-spacing:0}
+  #overlays .panel.plein .sheet-top{order:1;flex:none;margin:0 0 16px;gap:8px}
+  #overlays .panel.plein .sheet-top h2{font-size:29px}
+  #overlays .panel.plein .sheet-media>.galerie{order:2;flex:none;width:100%;min-width:0;margin:0;border-radius:0;background:#e9e6df}
+  #overlays .panel.plein .sheet-media .galerie .sheet-art,
+  #overlays .panel.plein .sheet-media .galerie .sheet-art:only-child{height:clamp(210px,32svh,280px)}
+  #overlays .panel.plein .gallery-controls{order:3;flex:none;min-height:52px;padding:4px 0}
+  #overlays .panel.plein .sheet-details>.fld{order:4;flex:none;margin-top:16px}
+  #overlays .panel.plein .sheet-details>.serif{order:5;flex:none;margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
+  #overlays .panel.plein .sheet-details>.sheet-offer{order:6;flex:none}
+  #overlays .panel.plein .sheet-details>.tabs{order:7;flex:none}
+  #overlays .panel.plein .sheet-details>.tabpane{order:8;flex:none}
+  #overlays .panel.plein .sheet-media>.product-360{order:3;flex:none;margin-top:0}
+}
+
+@media (max-width: 480px) and (min-height: 480px) {
+  #overlays .panel.plein[data-product="as"] .sheet-media .galerie .sheet-art .pv {
+    object-fit: cover !important;
+    object-position: center 57%;
+  }
+}
+@media (max-width: 700px) {
+  #overlays .panel.plein .galerie:has(.sheet-art:only-child) + .gallery-controls {
+    display: none;
+  }
+}

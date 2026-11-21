@@ -278,17 +278,81 @@ document.addEventListener('change',e=>{
   }catch(err){toast('Fichier de sauvegarde illisible');}};
   fr.readAsText(e.target.files[0]);e.target.value='';
 });
-/* menu de téléphone : ouverture, fermeture au choix d'une section,
-   à l'échappement, et dès qu'on clique ailleurs. */
-(function(){
-  const b=$('#menubtn'), m=$('#navmob'); if(!b||!m)return;
-  const poser=ouvert=>{m.hidden=!ouvert;b.setAttribute('aria-expanded',String(ouvert));
-    b.setAttribute('aria-label',ouvert?'Fermer le menu':'Ouvrir le menu');};
-  b.addEventListener('click',e=>{e.stopPropagation();poser(m.hidden);});
-  m.addEventListener('click',e=>{if(e.target.closest('a'))poser(false);});
-  document.addEventListener('click',e=>{if(!m.hidden&&!m.contains(e.target)&&e.target!==b)poser(false);});
-  addEventListener('keydown',e=>{if(e.key==='Escape'&&!m.hidden){poser(false);b.focus();}});
-  addEventListener('resize',()=>{if(innerWidth>860&&!m.hidden)poser(false);},{passive:true});
+/* Navigation mobile et recherche locale dans les variantes du catalogue. */
+(function initMobileMenu(){
+  const menu=$('#navmob'), toggle=$('#menubtn'), search=$('#searchbtn');
+  if (!menu || !toggle || !search) return;
+  const query=$('#menu-query'), destinations=$('#menu-destinations');
+  const results=$('#menu-results'), status=$('#menu-search-status');
+  let opener=toggle;
+
+  function updateResults(){
+    const normalise=value=>value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+    const phrase=normalise(query.value);
+    results.replaceChildren();
+    status.textContent='';
+    destinations.hidden=Boolean(phrase);
+    results.hidden=!phrase;
+    if (!phrase) return;
+
+    const words=phrase.split(/\s+/);
+    let matches=0;
+    for (const product of CATALOG) {
+      for (const color of product.colors) {
+        const name=product.name+' · '+COLORS[color].n;
+        const terms=normalise(name);
+        if (!words.every(word=>terms.includes(word))) continue;
+        const link=document.createElement('a');
+        link.href='/collection/#'+product.id+'-'+color;
+        const thumbnail=document.createElement('span');
+        thumbnail.className='menu-thumbnail';
+        thumbnail.setAttribute('aria-hidden','true');
+        thumbnail.innerHTML=visuel(product,color,true,0,'48px');
+        link.append(thumbnail,document.createTextNode(name));
+        const price=document.createElement('small');
+        price.textContent=fmt(priceOf(product));
+        link.append(price);
+        results.append(link);
+        matches++;
+      }
+    }
+    status.textContent=matches ? matches+(matches===1?' paire trouvée':' paires trouvées') : 'Aucune paire trouvée. Essayez « Opus », « AS » ou un coloris.';
+  }
+
+  function setOpen(open){
+    menu.hidden=!open;
+    toggle.setAttribute('aria-expanded',String(open));
+    search.setAttribute('aria-expanded',String(open));
+    toggle.setAttribute('aria-label',open?'Fermer le menu':'Ouvrir le menu');
+    if (!open) {query.value='';updateResults();}
+  }
+  toggle.addEventListener('click',()=>{
+    opener=toggle;
+    setOpen(menu.hidden);
+    if (!menu.hidden) menu.querySelector('.nav-feature').focus({preventScroll:true});
+  });
+  search.addEventListener('click',()=>{
+    opener=search;
+    setOpen(true);
+    query.focus();
+  });
+  query.addEventListener('input',updateResults);
+  query.addEventListener('keydown',event=>{
+    if (event.key!=='Enter' || !results.firstElementChild) return;
+    event.preventDefault();
+    if (results.childElementCount===1) results.firstElementChild.click();
+    else results.firstElementChild.focus();
+  });
+  menu.addEventListener('click',e=>{if(e.target.closest('a'))setOpen(false);});
+  function closeOutside(e){
+    if (!menu.hidden && !menu.contains(e.target) && !toggle.contains(e.target) && !search.contains(e.target)) setOpen(false);
+  }
+  document.addEventListener('click',closeOutside);
+  document.addEventListener('focusin',closeOutside);
+  addEventListener('keydown',e=>{
+    if(e.key==='Escape'&&!menu.hidden){setOpen(false);opener.focus();}
+  });
+  addEventListener('resize',()=>{if(innerWidth>860&&!menu.hidden)setOpen(false);},{passive:true});
 })();
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&e.target.id==='pw'){e.preventDefault();document.querySelector('[data-act="login"]')?.click();return;}

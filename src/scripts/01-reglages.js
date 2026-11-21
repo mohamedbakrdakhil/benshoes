@@ -59,26 +59,21 @@ const jeuSrc=(base,larg,ext)=>larg.map(w=>`${base}-${w}.${ext} ${w}w`).join(',')
    opus-beige-640.webp, qui n'existe pas, et la vignette restait vide. */
 const basePhoto=(ph,i)=>ph.n&&ph.n.length?`${ph.b}-${ph.n[Math.min(i||0,ph.n.length-1)]}`:ph.b;
 function nbPhotos(id,c){const ph=photoDe(id,c);return ph&&ph.n?ph.n.length:(ph?1:0);}
-function visuel(p,c,lite,i){
+function visuel(p,c,lite,i,sizes){
   const ph=photoDe(p.id,c);
   if(!ph) return sandal(p.style,c,p.platform,lite);
   const alt=att(`${p.name} — ${(COLORS[c]||{}).n||''}`);
   if(ph.brut){
-    const responsive=p.id==='as'?` srcset="${jeuSrc(ph.brut.replace(/\.jpg$/,''),[480,640,960],'webp')}" sizes="(max-width:700px) 46vw, ${lite?'300px':'480px'}"`:'';
+    const responsive=p.id==='as'?` srcset="${jeuSrc(ph.brut.replace(/\.jpg$/,''),[480,640,960],'webp')}" sizes="${att(sizes||`(max-width:700px) 46vw, ${lite?'300px':'480px'}`)}"`:'';
     return `<img class="pv" width="960" height="1280" src="${ph.brut}"${responsive} alt="${alt}" loading="lazy" decoding="async">`;
   }
   const B=basePhoto(ph,i);
   // « sizes » dit au navigateur la place réelle de l'image AVANT de la
   // choisir : sans lui il prend la plus large et télécharge pour rien.
-  /* Mesuré, pas supposé : sur téléphone la grille est à une colonne et la
-     vignette occupe 293 px sur 375, soit 78 % — pas les 42 % que j'avais
-     écrits en imaginant deux colonnes. Un « sizes » faux fait choisir au
-     navigateur une image trop lourde ou trop floue. */
-  // La grille et la galerie de fiche passent à deux colonnes sous 700 px :
-    // sans ce palier, le navigateur y chargeait une image prévue pour 92 % de
-    // la largeur, soit quatre fois les pixels nécessaires.
-    const places=lite?'(max-width:700px) 46vw, (max-width:860px) 80vw, 300px'
-                     :'(max-width:700px) 46vw, (max-width:860px) 92vw, 480px';
+  // Les cartes restent en deux colonnes. La galerie fournit sa largeur
+  // propre pour conserver des photos nettes lorsqu'elle occupe tout l'écran.
+  const places=sizes||(lite?'(max-width:700px) 46vw, (max-width:860px) 80vw, 300px'
+                          :'(max-width:700px) 46vw, (max-width:860px) 92vw, 480px');
   /* Un <img> seul, jamais un <picture>.
 
      Le <picture> servait à offrir le WebP avec un repli JPEG. Il créait des
@@ -98,7 +93,7 @@ function visuel(p,c,lite,i){
   const dim=ph.w&&ph.h?` width="${ph.w}" height="${ph.h}"`:'';
   const repli=ph.j[ph.j.length-1];
   const jeu=ph.p.length?jeuSrc(B,ph.p,'webp'):jeuSrc(B,ph.j,'jpg');
-  return `<img class="pv"${dim} src="${B}-${repli}.jpg" srcset="${jeu}" sizes="${places}"`
+  return `<img class="pv"${dim} src="${B}-${repli}.jpg" srcset="${jeu}" sizes="${att(places)}"`
     +` alt="${alt}" loading="lazy" decoding="async">`;
 }
 // Le logo benka, redessiné : mot rond et gras, empreinte de pied en appui.
