@@ -14,7 +14,8 @@ function renderStatic(){
   $('#anatfig').innerHTML=anatomySVG();
   $('#filters').innerHTML=`<div class="color-filters" role="group" aria-label="Couleur"><button class="color-chip" data-act="filters-reset" aria-pressed="true">Tous les coloris</button>`
     +Object.entries(COLORS).map(([k,c])=>`<button class="color-chip" data-act="col" data-k="${k}" aria-pressed="false"><i style="background:linear-gradient(135deg,${c.c},${c.d})" aria-hidden="true"></i>${c.n}</button>`).join('')+`</div>`;
-  $('#ftrmodels').innerHTML=CATALOG.map(p=>`<li><a href="#modeles" data-act="open" data-id="${p.id}">${p.name} — ${fmt(priceOf(p))}</a></li>`).join('');
+  $('#ftrmodels').innerHTML=CATALOG.map(p=>`<li><a href="#modeles" data-act="open" data-id="${p.id}">${p.name} — ${fmt(priceOf(p))}</a></li>`).join('')
+    +'<li><a href="#as-by-benka">AS by BENKA</a></li>';
   $('#ftrcontact').innerHTML=`<h5>Nous écrire</h5>
     <div class="copybox"><code id="mailtxt">${esc(SHOP.email)}</code><button class="btn btn-sm btn-ghost" data-copy="mailtxt" style="margin-left:auto">Copier</button></div>
     ${SHOP.phone?`<div class="copybox"><code id="teltxt">${esc(SHOP.phone)}</code><button class="btn btn-sm btn-ghost" data-copy="teltxt" style="margin-left:auto">Copier</button></div>`:''}
