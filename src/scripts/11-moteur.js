@@ -36,7 +36,10 @@ function mesurer(){
     GEO.figs=[...t.children].map(el=>({im:el.querySelector('img'),x:el.offsetLeft,w:el.offsetWidth}))
       .filter(o=>o.im);}
 }
-function avancer(fn){MOTEUR.taches.push(fn);}
+function avancer(fn){
+  MOTEUR.taches.push(fn);
+  return ()=>{const i=MOTEUR.taches.indexOf(fn);if(i>=0)MOTEUR.taches.splice(i,1);};
+}
 /* Une tâche retourne true pendant une interpolation, false au repos, ou
    un délai en millisecondes pour un décor autonome à cadence limitée. */
 function tourner(ts){

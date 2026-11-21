@@ -1,0 +1,24 @@
+/* L'aperçu garde le riad accessible sans réserver neuf écrans de défilement. */
+.visite.visite-preview{height:auto!important;min-height:0!important;scroll-margin-top:85px}
+.showroom-cover{display:grid;grid-template-columns:minmax(160px,300px) minmax(0,540px);justify-content:center;align-items:center;gap:clamp(24px,6vw,88px);padding:48px 28px;background:radial-gradient(ellipse at 20% 40%,#224f3c,#0d2821 75%);color:#f8eed5;border-block:1px solid #b89b61}
+.showroom-cover-art{display:flex;justify-content:center}
+.showroom-cover-art .riad-svg{width:220px;height:264px;max-width:100%;object-fit:contain}
+.showroom-cover .k{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#d6be89}
+.showroom-cover h2{font-family:var(--fd);font-size:clamp(32px,4vw,52px);line-height:1.08;margin:14px 0}
+.showroom-cover-copy>p{font-size:15px;line-height:1.7;max-width:470px;color:#dfddce}
+.showroom-cover-actions{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin-top:22px}
+.showroom-cover .btn{background:#f8eed5;color:#193b2b;border:1px solid #d6be89;cursor:pointer}
+.showroom-cover .btn:disabled{opacity:.65;cursor:wait}
+.showroom-collection{font-size:13px;color:#f8eed5;text-decoration:underline;text-underline-offset:5px}
+#showroom-status:empty{display:none}
+.showroom-close{position:absolute;right:22px;top:82px;z-index:25;padding:10px 14px;background:#152b24e8;color:#f8eed5;border:1px solid #b89b61;cursor:pointer;font:inherit;font-size:12px}
+@media(max-width:700px){
+ .visite.visite-preview{scroll-margin-top:var(--mobile-header,70px)}
+ .showroom-cover{grid-template-columns:85px minmax(0,1fr);gap:18px;padding:32px 20px}
+ .showroom-cover-art .riad-svg{width:85px;height:140px}
+ .showroom-cover h2{font-size:30px}
+ .showroom-cover-copy>p{font-size:13px}
+ .showroom-cover-actions{gap:18px}
+ .showroom-cover .btn{font-size:11px;padding:12px 14px}
+ .showroom-close{top:68px;right:12px;font-size:11px;padding:8px 10px}
+}

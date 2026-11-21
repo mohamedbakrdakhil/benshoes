@@ -5,8 +5,8 @@
   const select=document.getElementById('fete-chapter');
   const nav=section?.querySelector('.fete-tour-nav');
   if(!section||!stage||!select||!nav)return;
-  const art=section.querySelector('.fete-static-art');
-  if(art&&typeof riadPortalSVG==='function')art.innerHTML=riadPortalSVG()+'<div class="riad-static-lantern">'+riadLanternSVG()+'</div>';
+  const art=section.querySelector('.showroom-cover-art');
+  if(art&&typeof riadPortalSVG==='function')art.innerHTML=riadPortalSVG().replace('decoding="async"','decoding="async" loading="lazy"');
   nav.hidden=false;
   const caps=[...section.querySelectorAll('.vcap')];
   select.addEventListener('change',()=>{
@@ -20,7 +20,7 @@
   // La boucle existante synchronise le menu ; aucun minuteur supplémentaire.
   let previous=-1;
   avancer((dt,sy)=>{
-    if(!MOTION||document.documentElement.classList.contains('degrade'))return false;
+    if(section.dataset.showroomActive!=='true'||!MOTION||document.documentElement.classList.contains('degrade'))return false;
     const progress=borne((sy-GEO.vTop)/GEO.vSpan,0,1);
     const index=caps.findIndex(cap=>progress>=Number(cap.dataset.a)&&progress<Number(cap.dataset.b));
     if(index!==previous&&index>=0){select.selectedIndex=index;previous=index;}

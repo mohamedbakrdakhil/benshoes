@@ -10,7 +10,7 @@
     const reduced=matchMedia('(prefers-reduced-motion: reduce)');
     const label=button.querySelector('[data-bf-motion-label]');
     const icon=button.querySelector('[data-bf-motion-icon]');
-    let paused=lsGet(key)===true;
+    let paused=lsGet(key)!==false;
 
     function updateControl(){
       root.classList.toggle('bf-paused',paused);
