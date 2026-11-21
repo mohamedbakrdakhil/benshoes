@@ -141,6 +141,7 @@ function sheetHTML(){
   return `<div class="panel plein" data-product="${p.id}" role="dialog" aria-modal="true" aria-label="${p.name}">
     <div class="panel-hd"><span class="eyebrow">${p.id==='as'?'AS by BENKA · LA COLLECTION':'BENKA · LA COLLECTION OPUS'}</span>
       <button class="close" data-act="closep" style="margin-left:auto" aria-label="Fermer">✕</button></div>
+    ${S.packMode?`<div class="sheet-pack-step">Votre trio · Paire ${Math.min(3,cartCount()+1)} sur 3 <span>— choisissez le coloris et la pointure</span></div>`:''}
     <div class="panel-bd">
       <div class="sheet-media">
         ${galerie(p,c)}
@@ -163,7 +164,7 @@ function sheetHTML(){
       <div class="tabpane" role="tabpanel" id="product-tab" aria-labelledby="tab-${S.tab||'fiche'}">${sheetTab(p)}</div></div>
     </div>
     <div class="panel-ft">
-      <button class="btn btn-pri" data-act="add" ${si&&st>0?'':'disabled'} style="justify-content:center">${si?(st>0?`Ajouter au panier — ${fmt(priceOf(p))}`:'Pointure épuisée — choisissez-en une autre'):'Choisissez une pointure'}</button>
+      <button class="btn btn-pri" data-act="add" ${si&&st>0?'':'disabled'} style="justify-content:center">${si?(st>0?(S.packMode?`Ajouter à mon trio · paire ${Math.min(3,cartCount()+1)}/3`:`Ajouter au panier — ${fmt(priceOf(p))}`):'Pointure épuisée — choisissez-en une autre'):'Choisissez une pointure'}</button>
       <p class="note" style="text-align:center">Expédition 48 h · ${LIVR_PHRASE()}</p>
     </div></div>`;
 }

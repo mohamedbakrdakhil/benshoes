@@ -39,7 +39,7 @@ function initShowroomDemande(){
       $('#showroom-close')?.focus({preventScroll:true});
       status.textContent='';
     }catch(err){
-      fermer();status.textContent='La visite est indisponible. La collection reste accessible via « Voir les modèles ».';
+      fermer();status.textContent='La visite est indisponible. La collection reste accessible via « Aller à la collection ».';
       console.warn('[benka] showroom :',err);
     }finally{button.disabled=false;}
   });
