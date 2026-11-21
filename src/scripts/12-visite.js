@@ -132,7 +132,7 @@ function fetePaquets(){
   return feteSVG(500,280,feteCadeau(32,121,174,131,'#8c223b')+feteCadeau(231,78,225,174,'#b58952')+feteCadeau(103,39,143,94,'#235840'));
 }
 function feteAffiche(){
-  return feteSVG(1000,270,'<rect x="5" y="5" width="990" height="260" rx="4" fill="#1b1016" stroke="#eed0a3" stroke-width="5"/><rect x="20" y="20" width="960" height="230" fill="none" stroke="#ad8656" stroke-width="2"/><g text-anchor="middle" font-family="Arial,sans-serif" fill="#eed0a3"><text x="500" y="66" font-size="29" letter-spacing="8">NOËL CHEZ BENKA</text><text x="500" y="147" font-size="70" font-weight="800" letter-spacing="2">BLACK FRIDAY</text><text x="500" y="211" font-size="34" letter-spacing="5">3 PAIRES · 699 DH</text></g><path d="M66 122l8 17l19 5l-19 7l-8 18l-7-18l-19-7l19-5zM934 122l8 17l19 5l-19 7l-8 18l-7-18l-19-7l19-5z" fill="#eed0a3"/>');
+  return feteSVG(1000,270,'<rect x="5" y="5" width="990" height="260" rx="4" fill="#1b1016" stroke="#eed0a3" stroke-width="5"/><rect x="20" y="20" width="960" height="230" fill="none" stroke="#ad8656" stroke-width="2"/><g text-anchor="middle" font-family="Arial,sans-serif" fill="#eed0a3"><text x="500" y="66" font-size="29" letter-spacing="8">NOËL CHEZ BENKA</text><text x="500" y="147" font-size="70" font-weight="800" letter-spacing="2">BLACK FRIDAY</text><text x="500" y="211" font-size="34" letter-spacing="5">TRIOS · 699 / 749 / 799 DH</text></g><path d="M66 122l8 17l19 5l-19 7l-8 18l-7-18l-19-7l19-5zM934 122l8 17l19 5l-19 7l-8 18l-7-18l-19-7l19-5z" fill="#eed0a3"/>');
 }
 function feteCouronne(){
   let s='<circle cx="150" cy="150" r="95" fill="none" stroke="#123e32" stroke-width="42"/><circle cx="150" cy="150" r="94" fill="none" stroke="#416d47" stroke-width="20" stroke-dasharray="3 12"/>';

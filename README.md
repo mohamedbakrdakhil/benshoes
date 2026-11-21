@@ -6,7 +6,7 @@ Boutique publique : [benkashoes.ma](https://www.benkashoes.ma/). Le site est ass
 
 - AS by BENKA : quatre coloris (Camel, Cognac, Noir, Chocolat), pointures 37 à 41, 299 DH la paire. Le PDF contient deux lignes de 5 paires en 37 ; elles sont additionnées : 10 / 7 / 5 / 5 / 3 par coloris, soit 120 paires au départ.
 - Opus : huit coloris, pointures 37 à 41, 279 DH la paire.
-- Black Friday : un panier d’exactement trois paires Opus coûte 699 DH, livraison offerte au Maroc. Quatre, cinq ou six paires restent au tarif unitaire ; aucun pack multiple automatique.
+- Black Friday : un panier d’exactement trois paires coûte 699 DH pour trois Opus, 799 DH pour trois AS by BENKA, ou 749 DH pour un mélange des deux modèles (1 + 2 ou 2 + 1), livraison offerte au Maroc. Quatre, cinq ou six paires restent au tarif unitaire ; aucun pack multiple automatique.
 - Le stock reçu d’Apps Script remplace le stock de repli du catalogue. Le service recalcule les prix et vérifie la disponibilité avant réception.
 - Les livraisons internationales nécessitent un devis auprès de l’atelier.
 

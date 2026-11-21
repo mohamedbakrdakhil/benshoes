@@ -63,7 +63,8 @@ function productCard(p,c,i){
     const ruban=out?`<span class="card-flag out">Épuisé</span>`
                    :((p.vedette?c===p.vedette:i===0)&&p.flag
                        ?`<span class="card-flag">${p.flag}</span>`:'');
-    const ticket=!out&&p.id==='opus'&&priceOf(p)===279?'<span class="bf-card-ticket" aria-hidden="true"><span>BLACK FRIDAY</span><b>TRIO · 699 DH</b></span>':'';
+    const packPrice=p.id==='opus'&&priceOf(p)===279?699:p.id==='as'&&priceOf(p)===299?799:0;
+    const ticket=!out&&packPrice?`<span class="bf-card-ticket" aria-hidden="true"><span>BLACK FRIDAY</span><b>TRIO · ${packPrice} DH</b></span>`:'';
     return `<button class="card" data-act="open" data-id="${p.id}" data-c="${c}">
       <div class="card-art">${ruban}${visuel(p,c)}${ticket}<span class="card-discover">Découvrir</span></div>
       <div><div class="card-name"><h3>${p.name} <span>${COLORS[c].n}</span></h3><span class="p num">${fmt(priceOf(p))}</span></div>
