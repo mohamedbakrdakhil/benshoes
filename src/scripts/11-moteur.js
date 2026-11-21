@@ -29,9 +29,11 @@ function mesurer(){
   mesurerEcranMobile();
   GEO.vw=innerWidth; GEO.vh=innerHeight;
   if(typeof RV!=='undefined'&&RV.length)mesurerRV();
-  const v=$('#visite'); if(v){const stage=$('.visite-stage'),decalage=parseFloat(getComputedStyle(stage).top)||0;GEO.vTop=v.offsetTop-decalage; GEO.vSpan=Math.max(1,v.offsetHeight-stage.offsetHeight);}
+  const v=$('#visite'),vStage=$('.visite-stage');
+  if(v&&vStage){const decalage=parseFloat(getComputedStyle(vStage).top)||0;GEO.vTop=v.offsetTop-decalage;GEO.vSpan=Math.max(1,v.offsetHeight-vStage.offsetHeight);}
   const a=$('#atelier'),t=$('#attrack');
-  if(a){const stage=$('.at-stage'),decalage=parseFloat(getComputedStyle(stage).top)||0;GEO.aTop=a.offsetTop-decalage; GEO.aSpan=Math.max(1,a.offsetHeight-stage.offsetHeight);}
+  const aStage=$('.at-stage');
+  if(a&&aStage){const decalage=parseFloat(getComputedStyle(aStage).top)||0;GEO.aTop=a.offsetTop-decalage;GEO.aSpan=Math.max(1,a.offsetHeight-aStage.offsetHeight);}
   if(t){GEO.tW=t.scrollWidth;
     GEO.figs=[...t.children].map(el=>({im:el.querySelector('img'),x:el.offsetLeft,w:el.offsetWidth}))
       .filter(o=>o.im);}

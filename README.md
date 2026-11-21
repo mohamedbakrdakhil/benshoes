@@ -32,7 +32,7 @@ Ouvrir `http://127.0.0.1:8766/`. Le serveur local sert la version statique ; ses
 - `integrations/tableur.gs` : réception Apps Script, prix, stock, dédoublonnage, export et mise en forme du classeur.
 - `tests/` : règles de prix, sécurité de réception, intégrité du panier, animations et chargement différé.
 
-`build.sh` produit `index.html` et `public/index.html`, les images dérivées, le flux catalogue et les données structurées. Il vérifie la cohérence des catalogues et calcule les empreintes de la politique de sécurité. Modifier les sources, puis reconstruire ; ne pas modifier uniquement les fichiers générés.
+`build.sh` produit les cinq pages (accueil `/`, `/collection/`, `/showroom/`, `/maison/`, `/aide/`) à la racine pour GitHub Pages et dans `public/` pour le serveur Node, ainsi que les images dérivées, le flux catalogue et les données structurées. Le cadre commun se trouve dans `src/page.html` et le contenu de chaque page dans `src/pages/`. `tools/preparer-pages.py` génère les titres, canoniques, ressources absolues et empreintes CSP de chaque page. Les anciennes ancres produit sont redirigées vers la Collection en conservant les paramètres de campagne ; le panier reste partagé entre les pages. Modifier les sources, puis reconstruire ; ne pas modifier uniquement les fichiers générés.
 
 ## Publication
 

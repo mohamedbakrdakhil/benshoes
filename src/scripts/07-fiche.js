@@ -156,7 +156,7 @@ function sheetHTML(){
       <div class="fld"><div class="fld-lab"><span class="t">Pointure EU</span><span class="v">${si?`${si} · ${st>0?st+' en stock':'épuisé'}`:'Choisissez votre pointure'}</span></div>
         <div class="sizegrid">${SIZES.map((s,i)=>{const k=stockCol(p,c,i);
           return `<button class="sizebtn" data-act="setsize" data-s="${s}" aria-pressed="${si===s}" ${k?'':'disabled'}>${s}${k&&k<=3?`<small>${k} rest.</small>`:''}</button>`;}).join('')}</div>
-        <p class="note" style="margin-top:9px">Entre deux pointures, prenez la plus petite : <a href="#tailles" data-act="closep" style="color:var(--accent-text)">voir le guide</a>.</p></div>
+        <p class="note" style="margin-top:9px">Entre deux pointures, prenez la plus petite : <a href="/aide/#tailles" data-act="closep" style="color:var(--accent-text)">voir le guide</a>.</p></div>
       <div class="tabs" role="tablist">
         ${[['fiche','Fiche technique'],['entretien','Entretien'],['livraison','Livraison']].map(([k,l])=>
           `<button role="tab" id="tab-${k}" aria-controls="product-tab" tabindex="${(S.tab||'fiche')===k?0:-1}" data-act="tab" data-k="${k}" aria-selected="${(S.tab||'fiche')===k}">${l}</button>`).join('')}

@@ -34,9 +34,9 @@ test('mouvement réduit : le showroom reste un aperçu léger',()=>{
  const h=boutique(false);assert.equal(h.scripts.length,0);assert.equal(h.button.hidden,true);assert.equal(h.stage.hidden,true);
 });
 test('la page livrée sépare le code 3D du JavaScript du panier et sert un module existant',()=>{
- const html=fs.readFileSync('index.html','utf8');
+ const html=fs.readFileSync('showroom/index.html','utf8');
  assert.doesNotMatch(html,/function buildWorld\(/);
- const source=html.match(/const SHOWROOM_SOURCE='([^']+)'/)[1];assert.ok(fs.existsSync(source));
+ const source=html.match(/const SHOWROOM_SOURCE='([^']+)'/)[1].replace(/^\/+/, '');assert.ok(fs.existsSync(source));
  assert.match(fs.readFileSync(source,'utf8'),/function buildWorld\(/);
  assert.match(html,/function initShowroomDemande\(/);assert.match(html,/function nettoyerPanier\(/);
 });

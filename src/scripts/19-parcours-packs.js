@@ -13,6 +13,7 @@ function goPackCollection(){
   const target=packDestination(S.packMode,S.cart);
   if(S.panel)fermerPanneau();
   const section=document.querySelector(target);
+  if(!section){location.assign('/collection/'+target);return;}
   section?.scrollIntoView({behavior:MOTION?'smooth':'auto',block:'start'});
   if(section){section.setAttribute('tabindex','-1');section.focus({preventScroll:true});}
 }

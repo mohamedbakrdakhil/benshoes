@@ -125,10 +125,16 @@ document.addEventListener('click',async e=>{
   else if(a==='pack-stop'){S.packMode=null;renderPackGuide();$('#cartbtn')?.focus({preventScroll:true});}
   else if(a==='pack-cart'){S.panel='cart';S.step=1;draw();}
   else if(a==='pack-continue'){goPackCollection();}
+  else if(a==='continue-shopping'){
+    if(S.packMode)goPackCollection();
+    else if(!document.getElementById('grid'))location.assign('/collection/');
+    else fermerPanneau();
+  }
   else if(a==='skipvisite'){
     e.preventDefault();
     document.getElementById('visite')?.dispatchEvent(new Event('benka:showroomclose'));
     const m=$('#as-by-benka');
+    if(!m){location.assign('/collection/');return;}
     if(m){
       // La collection possède désormais son propre cadre positionné :
       // offsetTop serait relatif à ce cadre, et ramènerait en haut du site.
@@ -328,6 +334,7 @@ function poserLien(h){
 let ancienAdmin=location.hash==='#admin';
 addEventListener('hashchange',()=>{
   if(lienInterne)return;
+  if(redirigerAncienneAncre())return;
   if(S.panel==='cart'&&S.step===2&&$('#f_name'))S.form=readForm();
   const admin=location.hash==='#admin';
   const fiche=depuisLien();

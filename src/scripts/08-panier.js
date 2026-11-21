@@ -47,7 +47,7 @@ function cartHTML(){
       <button class="btn btn-out btn-sm" data-act="back" style="justify-content:center">Retour au panier</button>`;
   } else if(!S.cart.length){
     body=`<div class="empty"><h4>Votre panier est vide</h4><p>Opus ou AS by BENKA : choisissez votre modèle, votre couleur et votre pointure.</p>
-      <a class="btn btn-out btn-sm" href="#modeles" data-act="closep" style="margin-top:18px">Voir la collection</a></div>`;
+      <a class="btn btn-out btn-sm" href="/collection/" data-act="closep" style="margin-top:18px">Voir la collection</a></div>`;
     foot='';
   } else {
     body=(S.cart.some(i=>i.id==='opus'||i.id==='as')?blackFridayCartNote(pricing):'')+`<div class="steps" style="margin-bottom:16px"><b data-on="1">Panier</b><i></i><b>Livraison</b><i></i><b>Confirmation</b></div>`
@@ -56,7 +56,7 @@ function cartHTML(){
         <div><h4>${p.name}</h4><div class="meta">${COLORS[it.c].n} · Pointure ${it.s}</div>
           <div class="qty"><button data-act="qty" data-n="${n}" data-d="-1" aria-label="Retirer un">−</button><span class="num">${it.q}</span><button data-act="qty" data-n="${n}" data-d="1" aria-label="Ajouter un">+</button></div></div>
         <div class="right"><b class="num">${fmt(priceOf(p)*it.q)}</b><button class="lnk" data-act="rm" data-n="${n}">Retirer</button></div></div>`;}).join('')
-      +`<button class="continue-shopping" data-act="${S.packMode?'pack-continue':'closep'}">Continuer à choisir mes paires <span aria-hidden="true">↗</span></button><p class="note" style="margin-top:16px">${SHIPFREE===0||SHIPCOST===0?'Livraison offerte, partout au Maroc.':(sub>=SHIPFREE?'Livraison offerte sur cette commande.':`Encore ${fmt(SHIPFREE-sub)} pour la livraison offerte.`)}</p>`;
+      +`<button class="continue-shopping" data-act="continue-shopping">Continuer à choisir mes paires <span aria-hidden="true">↗</span></button><p class="note" style="margin-top:16px">${SHIPFREE===0||SHIPCOST===0?'Livraison offerte, partout au Maroc.':(sub>=SHIPFREE?'Livraison offerte sur cette commande.':`Encore ${fmt(SHIPFREE-sub)} pour la livraison offerte.`)}</p>`;
     foot=`<div class="totals"><div><span>Sous-total</span><span class="num">${fmt(pricing.gross)}</span></div>${pricing.discount?`<div class="bf-discount"><span>Black Friday · ${blackFridayPackLabel(pricing.pack)}</span><span class="num">−${fmt(pricing.discount)}</span></div>`:''}
       <div><span>Livraison</span><span class="num">${ship?fmt(ship):'Offerte'}</span></div>
       <div class="grand"><span>Total</span><span class="num">${fmt(sub+ship)}</span></div></div>

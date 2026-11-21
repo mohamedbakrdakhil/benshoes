@@ -1,11 +1,12 @@
 /* ======================= démarrage ======================= */
 function degrader(raison){
-  if(typeof construirePlans==='function'){MODE2D=true;construirePlans();}
+  if($('#visite')&&typeof construirePlans==='function'){MODE2D=true;construirePlans();}
   document.documentElement.classList.add('degrade');
   MOTEUR.taches.length=0;
   document.querySelectorAll('[data-rv]').forEach(el=>{el.style.opacity='';el.style.transform='';});
   console.warn('[benka] affichage simplifié :',raison);
 }
+preparerPanierLocal();
 try{
   renderStatic();
   initMotion();initShowroomDemande();initAtelier();initNav();initCounters();initProgress();
@@ -27,7 +28,6 @@ addEventListener('resize',()=>{mesurer();reveiller();},{passive:true});
 document.addEventListener('visibilitychange',reveiller);
 addEventListener('load',()=>{mesurer();reveiller();});
 reveiller();
-S.cart=nettoyerPanier(lsGet('benkashoes.cart'));syncCart();
 draw();
 // Une adresse qui désigne un coloris ouvre sa fiche tout de suite.
 (function(){const f=depuisLien();
@@ -38,7 +38,6 @@ draw();
 if(!HASCLAUDE){
   TOKEN=lsGet('benkashoes.token')||'';
   S.canAdmin=true;loadLocal();
-  S.ov=nettoyerCatalogue(lsGet('benkashoes.catalog'));
   draw();
   (async function(){
     // Sur l'hébergement statique il n'y a pas de serveur : sonder /api/catalog
@@ -77,11 +76,6 @@ if(!HASCLAUDE){
       if(Object.keys(n).length===p.colors.length)net[p.id]=n;});
     return Object.keys(net).length?net:null;
   };
-  // Le dernier stock connu s'affiche tout de suite : au rechargement suivant,
-  // les pointures fermées le restent sans attendre l'aller-retour.
-  const garde=lsGet('benkashoes.stock');
-  const tot=valider(garde);
-  if(tot){S.ov.stock=Object.assign({},S.ov.stock,tot);draw();}
   try{
     const r=await fetch(SHOP.tableur,{method:'GET'});
     const frais=valider(await r.json());
@@ -105,3 +99,51 @@ if(!HASCLAUDE){
   }
   draw();
 })();
+
+/* Reprendre une sélection n'est pas la valider pour la vente. Un stock
+   embarqué ou en cache peut dater d'avant un réassort ; il ne doit jamais
+   effacer des paires lors du passage d'une page à l'autre. L'ajout contrôle
+   toujours le stock affiché et le serveur vérifie la commande finale. */
+function lireSelectionPanier(value){
+  const cart=[];
+  (Array.isArray(value)?value:[]).slice(0,40).forEach(item=>{
+    const product=item&&prod(item.id),quantity=Number(item?.q);
+    if(!product||!product.colors.includes(item.c)||!SIZES.includes(item.s)||!Number.isFinite(quantity)||quantity<1)return;
+    const q=Math.min(10,Math.floor(quantity));
+    const existing=cart.find(line=>line.id===item.id&&line.c===item.c&&line.s===item.s);
+    if(existing)existing.q=Math.min(10,existing.q+q);
+    else cart.push({id:product.id,c:item.c,s:item.s,q});
+  });
+  return cart;
+}
+function chargerStockCache(){
+  const cache=nettoyerCatalogue(lsGet('benkashoes.stock'));
+  const signature=JSON.stringify(cache.stock);
+  if(signature===S.stockCacheSignature)return false;
+  S.stockCacheSignature=signature;
+  if(!Object.keys(cache.stock).length)return false;
+  S.ov.stock=Object.assign({},S.ov.stock,cache.stock);return true;
+}
+function preparerPanierLocal(){
+  if(!HASCLAUDE)S.ov=nettoyerCatalogue(lsGet('benkashoes.catalog'));
+  chargerStockCache();
+  S.cart=lireSelectionPanier(lsGet('benkashoes.cart'));
+  syncCart();
+}
+/* Le retour navigateur peut restaurer une ancienne page depuis son cache.
+   Le panier partagé reprend alors la sélection réelle, même si la grille
+   de stock de cette page est encore ancienne. */
+function restaurerPanierPartage(){
+  if(S.envoi)return;
+  const stockChange=chargerStockCache();
+  const cart=lireSelectionPanier(lsGet('benkashoes.cart'));
+  const cartChange=JSON.stringify(cart)!==JSON.stringify(S.cart);
+  if(!cartChange&&!stockChange)return;
+  if(S.panel==='cart'&&S.step===2&&$('#f_name'))S.form=readForm();
+  if(!cartChange){draw();return;}
+  S.cart=cart;
+  if(!cart.length&&S.step===2)S.step=1;
+  syncCart();draw();
+}
+addEventListener('pageshow',event=>{if(event.persisted)restaurerPanierPartage();});
+addEventListener('storage',event=>{if(event.key==='benkashoes.cart'||event.key==='benkashoes.stock'||event.key===null)restaurerPanierPartage();});

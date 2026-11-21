@@ -1,5 +1,6 @@
 """Sépare le moteur 3D du parcours d'achat et prépare ses images responsive."""
 import hashlib
+import re
 from pathlib import Path
 import sys
 
@@ -8,7 +9,7 @@ from minifier import js
 
 
 def preparer():
-    code = js(Path('src/scripts/12-visite.js').read_text())
+    code = re.sub(r'(?<![/\w-])assets/', '/assets/', js(Path('src/scripts/12-visite.js').read_text()))
     empreinte = hashlib.sha256(code.encode()).hexdigest()[:12]
     dossier = Path('assets/js')
     dossier.mkdir(parents=True, exist_ok=True)

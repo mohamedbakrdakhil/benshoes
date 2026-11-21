@@ -3,26 +3,19 @@ function renderStatic(){
   const topo=$('#herotopo');
   if(topo)topo.innerHTML=[1.6,1.3,1.05,.82,.6,.4,.22].map((k,i)=>
     `<g transform="translate(600,310) scale(${k*2.1},${k*1.25}) translate(-100,-230)"><path d="${SOLE}" fill="none" stroke="rgba(207,149,73,${(.3-i*.03).toFixed(2)})" stroke-width="${(1.6/k).toFixed(2)}"/></g>`).join('');
-  // Le héros garde l'illustration : les photos de l'atelier portent leur
-  // décor (canapé, parquet, marbre), qui ferait une boîte claire au milieu du
-  // bordeaux. Pour y mettre la vraie chaussure il faudrait un détourage.
-  // Le héros ne porte plus de vignette : la chaussure est derrière, dans la
-  // boucle de collection, et la montrer deux fois au même instant — une fois
-  // nette dans une carte blanche, une fois sombre en fond — faisait de la
-  // carte un autocollant posé sur le décor.
   poserLogo();
-  $('#anatfig').innerHTML=anatomySVG();
-  $('#filters').innerHTML=`<div class="color-filters" role="group" aria-label="Couleur"><button class="color-chip" data-act="filters-reset" aria-pressed="true">Tous les coloris</button>`
+  const anatomy=$('#anatfig');if(anatomy)anatomy.innerHTML=anatomySVG();
+  const filters=$('#filters');if(filters)filters.innerHTML=`<div class="color-filters" role="group" aria-label="Couleur"><button class="color-chip" data-act="filters-reset" aria-pressed="true">Tous les coloris</button>`
     +Object.entries(COLORS).filter(([k])=>prod('opus').colors.includes(k)).map(([k,c])=>`<button class="color-chip" data-act="col" data-k="${k}" aria-pressed="false"><i style="background:linear-gradient(135deg,${c.c},${c.d})" aria-hidden="true"></i>${c.n}</button>`).join('')+`</div>`;
-  $('#ftrmodels').innerHTML=CATALOG.map(p=>`<li><a href="#modeles" data-act="open" data-id="${p.id}">${p.name} — ${fmt(priceOf(p))}</a></li>`).join('');
-  $('#ftrcontact').innerHTML=`<h5>Nous écrire</h5>
+  const footerModels=$('#ftrmodels');if(footerModels)footerModels.innerHTML=CATALOG.map(p=>`<li><a href="/collection/#${p.id}-${p.colors[0]}">${p.name} — ${fmt(priceOf(p))}</a></li>`).join('');
+  const contact=$('#ftrcontact');if(contact)contact.innerHTML=`<h5>Nous écrire</h5>
     <div class="copybox"><code id="mailtxt">${esc(SHOP.email)}</code><button class="btn btn-sm btn-ghost" data-copy="mailtxt" style="margin-left:auto">Copier</button></div>
     ${SHOP.phone?`<div class="copybox"><code id="teltxt">${esc(SHOP.phone)}</code><button class="btn btn-sm btn-ghost" data-copy="teltxt" style="margin-left:auto">Copier</button></div>`:''}
     ${SHOP.whatsapp?`<a class="btn btn-ghost btn-sm" href="https://wa.me/${esc(SHOP.whatsapp)}" target="_blank" rel="noopener" style="width:100%;justify-content:center">Écrire sur WhatsApp</a>`:''}
     <p class="note" style="color:var(--band-soft);margin-top:9px">Atelier ouvert du lundi au vendredi, 9 h – 18 h.</p>`;
-  $('#ftrcopy').textContent=`© ${new Date().getFullYear()} Benkashoes — ${SHOP.site}`;
+  const copyright=$('#ftrcopy');if(copyright)copyright.textContent=`© ${new Date().getFullYear()} Benkashoes — ${SHOP.site}`;
   renderFAQ();
-  $('#sizebody').innerHTML=SIZES.map((s,i)=>{const mm=MM[s],fin=i<SIZES.length-1?MM[SIZES[i+1]]-1:mm+6;
+  const sizes=$('#sizebody');if(sizes)sizes.innerHTML=SIZES.map((s,i)=>{const mm=MM[s],fin=i<SIZES.length-1?MM[SIZES[i+1]]-1:mm+6;
     return `<tr><td style="font-weight:700" class="num">${s}</td><td class="num">${mm} – ${fin}</td><td class="num">${mm+13} mm</td><td class="num">${Math.round(mm*.372)} mm</td><td class="num">${Math.round(mm*.405)} mm</td></tr>`;}).join('');
 }
 function renderFAQ(){
@@ -39,13 +32,15 @@ function renderFAQ(){
    coloris. */
 let grilleRendue=null;
 function renderGrid(){
-  const asChange=renderASGrid();
+  const asChange=renderASGrid(),grid=$('#grid');
+  // Les pages de marque et de visite partagent le panier, pas les grilles.
+  if(!grid)return asChange;
   const paires=[];
   CATALOG.filter(p=>p.id!=='as'&&(S.filter==='tous'||p.fam===S.filter)).forEach(p=>
     p.colors.filter(c=>(!S.colorFilter||c===S.colorFilter)&&(!S.sizeFilter||stockCol(p,c,SIZES.indexOf(S.sizeFilter))>0)).forEach(c=>paires.push([p,c])));
-  $('#filters').querySelectorAll('[data-act="fam"]').forEach(b=>b.setAttribute('aria-pressed',S.filter===b.dataset.k));
-  $('#filters').querySelectorAll('[data-act="col"]').forEach(b=>b.setAttribute('aria-pressed',S.colorFilter===b.dataset.k));
-  $('#filters').querySelector('[data-act="filters-reset"]')?.setAttribute('aria-pressed',!S.colorFilter&&!S.sizeFilter);
+  $('#filters')?.querySelectorAll('[data-act="fam"]').forEach(b=>b.setAttribute('aria-pressed',S.filter===b.dataset.k));
+  $('#filters')?.querySelectorAll('[data-act="col"]').forEach(b=>b.setAttribute('aria-pressed',S.colorFilter===b.dataset.k));
+  $('#filters')?.querySelector('[data-act="filters-reset"]')?.setAttribute('aria-pressed',!S.colorFilter&&!S.sizeFilter);
   if($('#size-filter'))$('#size-filter').value=S.sizeFilter||'';
   // Le compte des cuirs affichés, sous les pastilles. role="status" : un
   // lecteur d'écran annonce le nouveau total quand on filtre, sinon le
@@ -55,7 +50,7 @@ function renderGrid(){
   const html=!paires.length?`<div class="empty" style="grid-column:1/-1;background:var(--surface)"><h4>Aucune paire disponible avec ces filtres</h4><p>Essayez une autre pointure ou découvrez les autres coloris.</p><button class="btn btn-out" data-act="filters-reset">Réinitialiser les filtres</button></div>`:paires.map(([p,c],i)=>productCard(p,c,i)).join('');
   // Une quantité du panier ou une pointure ne doit pas reconstruire la collection.
   if(html===grilleRendue)return asChange;
-  $('#grid').innerHTML=html;grilleRendue=html;return true;
+  grid.innerHTML=html;grilleRendue=html;return true;
 }
 function productCard(p,c,i){
     const out=totStockCol(p,c)===0;
@@ -88,7 +83,7 @@ function cartPricing(){
 }
 function cartSub(){return cartPricing().sub;}
 function shipCost(){return S.cart.length===0?0:(cartSub()>=SHIPFREE?0:SHIPCOST);}
-function syncCart(){$('#cartcount').textContent=cartCount();
+function syncCart(){const count=$('#cartcount');if(count)count.textContent=cartCount();
   // Le compteur seul ne dit rien à qui n'a pas l'écran.
   $('#cartbtn')?.setAttribute('aria-label','Panier, '+cartCount()+' article(s)');
   lsSet('benkashoes.cart',S.cart);}
