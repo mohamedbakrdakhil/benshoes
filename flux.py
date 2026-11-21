@@ -24,23 +24,16 @@ couleurs = dict(re.findall(r"(\w+):\{n:'([^']*)'", s))
 tailles  = re.search(r'const SIZES=\[([\d,\s]*)\]', s)
 tailles  = [t.strip() for t in tailles.group(1).split(',') if t.strip()] if tailles else []
 
-m = re.search(r"\{id:'(\w+)'.*?name:'([^']*)',sub:'([^']*)'.*?price:(\d+),\s*\n?\s*"
-              r"colors:\[([^\]]*)\],.*?stock:\{(.*?)\}.*?blurb:\"(.*?)\",", s, re.S)
-if not m:
+pattern = re.compile(r"\{id:'(\w+)'.*?name:'([^']*)',sub:'([^']*)'.*?price:(\d+),\s*\n?\s*"
+                     r"colors:\[([^\]]*)\],.*?stock:\{(.*?)\}.*?blurb:\"(.*?)\",", re.S)
+produits = list(pattern.finditer(s))
+if not produits:
     sys.exit('flux.py : catalogue illisible')
 
-pid, nom, sous, prix = m.group(1), m.group(2), m.group(3), int(m.group(4))
-coloris = re.findall(r"'(\w+)'", m.group(5))
-texte   = re.sub(r'\\u2019', '’', m.group(7)).replace('\\"', '"')
-texte   = re.sub(r'\s+', ' ', texte).strip()
-
-# Le stock, cuir par cuir : un coloris dont les cinq pointures sont à zéro
-# part en « out of stock » plutôt que d'attirer des clics qu'on ne peut pas honorer.
-grille = {c: [int(x) for x in re.findall(r'\d+', l)]
-          for c, l in re.findall(r'(\w+)\s*:\s*\[([\d,\s]*)\]', m.group(6))}
-
 # La photo principale d'un coloris, telle que images.py l'a nommée.
-def visuel(c):
+def visuel(pid, c):
+    if pid == 'as':
+        return SITE + 'assets/as-by-benka/%s.jpg' % c
     for n in ('1', ''):
         base = 'assets/produits/%s-%s%s' % (pid, c, ('-' + n) if n else '')
         for larg in (960, 640, 480):
@@ -54,26 +47,33 @@ COLONNES = ['id', 'title', 'description', 'availability', 'condition', 'price',
             'product_type', 'custom_label_0']
 
 lignes = []
-for c in coloris:
-    reste = sum(grille.get(c, []))
-    lignes.append({
-        'id':             '%s-%s' % (pid, c),
-        'title':          '%s — %s' % (nom, couleurs.get(c, c)),
-        'description':    texte[:5000],
-        'availability':   'in stock' if reste else 'out of stock',
-        'condition':      'new',
-        'price':          '%d.00 MAD' % prix,
-        'link':           '%s#%s-%s' % (SITE, pid, c),
-        'image_link':     visuel(c),
-        'brand':          'Benkashoes',
-        'color':          couleurs.get(c, c),
-        'item_group_id':  pid,
-        'product_type':   sous,
-        'custom_label_0': 'pointures ' + '-'.join(tailles[:1] + tailles[-1:]),
-    })
+for m in produits:
+    pid, nom, sous, prix = m.group(1), m.group(2), m.group(3), int(m.group(4))
+    coloris = re.findall(r"'(\w+)'", m.group(5))
+    texte = re.sub(r'\\u2019', '’', m.group(7)).replace('\\"', '"')
+    texte = re.sub(r'\s+', ' ', texte).strip()
+    grille = {c: [int(x) for x in re.findall(r'\d+', l)]
+              for c, l in re.findall(r'(\w+)\s*:\s*\[([\d,\s]*)\]', m.group(6))}
+    for c in coloris:
+        reste = sum(grille.get(c, []))
+        lignes.append({
+            'id':             '%s-%s' % (pid, c),
+            'title':          '%s — %s' % (nom, couleurs.get(c, c)),
+            'description':    texte[:5000],
+            'availability':   'in stock' if reste else 'out of stock',
+            'condition':      'new',
+            'price':          '%d.00 MAD' % prix,
+            'link':           '%s#%s-%s' % (SITE, pid, c),
+            'image_link':     visuel(pid, c),
+            'brand':          'Benkashoes',
+            'color':          couleurs.get(c, c),
+            'item_group_id':  pid,
+            'product_type':   sous,
+            'custom_label_0': 'pointures ' + '-'.join(tailles[:1] + tailles[-1:]),
+        })
 
 with io.open(SORTIE, 'w', encoding='utf-8', newline='') as f:
-    w = csv.DictWriter(f, fieldnames=COLONNES)
+    w = csv.DictWriter(f, fieldnames=COLONNES, lineterminator='\n')
     w.writeheader()
     w.writerows(lignes)
 

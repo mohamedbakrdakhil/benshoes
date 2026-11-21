@@ -42,7 +42,7 @@ const VIDEOS={};
 
 /* Surcharge manuelle, pour une photo isolée qui ne suit pas la convention de
    nommage. Le cas normal passe par assets/produits/ et images.py. */
-const PHOTOS={/* 'opus':{_:'assets/produits/opus.jpg'} */};
+const PHOTOS={as:{camel:'assets/as-by-benka/camel.jpg',cognac:'assets/as-by-benka/cognac.jpg',noir:'assets/as-by-benka/noir.jpg',chocolat:'assets/as-by-benka/chocolat.jpg'}};
 
 /* PHOTOS_AUTO est écrit au build par images.py en lisant assets/produits/.
    Déposer une photo, lancer images.py, et elle est servie : rien à tenir à
@@ -63,7 +63,7 @@ function visuel(p,c,lite,i){
   const ph=photoDe(p.id,c);
   if(!ph) return sandal(p.style,c,p.platform,lite);
   const alt=att(`${p.name} — ${(COLORS[c]||{}).n||''}`);
-  if(ph.brut) return `<img class="pv" src="${ph.brut}" alt="${alt}" loading="lazy" decoding="async">`;
+  if(ph.brut) return `<img class="pv" width="960" height="1280" src="${ph.brut}" alt="${alt}" loading="lazy" decoding="async">`;
   const B=basePhoto(ph,i);
   // « sizes » dit au navigateur la place réelle de l'image AVANT de la
   // choisir : sans lui il prend la plus large et télécharge pour rien.

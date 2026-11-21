@@ -74,7 +74,8 @@ var STOCK_DEPART = {
           burgundy: [5,5,5,5,2],
           taupe:    [5,5,5,5,2],
           beige:    [5,0,5,6,2],   // 38 déclaré épuisé par l'atelier
-          tabac:    [5,5,6,5,2] }
+          tabac:    [5,5,6,5,2] },
+  as: {camel:[10,7,5,5,3],cognac:[10,7,5,5,3],noir:[10,7,5,5,3],chocolat:[10,7,5,5,3]}
 };
 
 
@@ -83,9 +84,10 @@ var STOCK_DEPART = {
    TOUJOURS celui d'ici, jamais celui annoncé par le navigateur. */
 
 var CATALOGUE = {
-  opus:    { nom: 'Opus',    prix: 279, coloris: ['beige','taupe','marron','tabac','burgundy','gris','marine','noir'] }
+  opus:    { nom: 'Opus',    prix: 279, coloris: ['beige','taupe','marron','tabac','burgundy','gris','marine','noir'] },
+  as: {nom:'AS by BENKA',prix:299,coloris:['camel','cognac','noir','chocolat']}
 };
-var COLORIS = { noir:'Noir', beige:'Beige', marron:'Marron', taupe:'Marron taupe',
+var COLORIS = { camel:'Camel',cognac:'Cognac',chocolat:'Chocolat', noir:'Noir', beige:'Beige', marron:'Marron', taupe:'Marron taupe',
                 tabac:'Tabac', burgundy:'Burgundy', gris:'Gris', marine:'Marine',
                 taupe:'Marron taupe' };
 var POINTURES   = [37,38,39,40,41];
@@ -232,6 +234,26 @@ function feuilleStock() {
   }
   habillerStock(f);
   return f;
+}
+
+/** Ajoute seulement les lignes AS absentes ; ne réinitialise jamais le stock existant. */
+function installerCollectionAS() {
+  var verrou=LockService.getScriptLock();verrou.waitLock(30000);
+  try {
+    var f=feuilleStock(),n=f.getLastRow(),rows=n>1?f.getRange(2,1,n-1,3).getValues():[];
+    var p=CATALOGUE.as,ajoutees=0;
+    p.coloris.forEach(function(c){
+      if(rows.some(function(r){return String(r[0]).trim()===p.nom&&String(r[2]).trim()===c;}))return;
+      var row=[p.nom,COLORIS[c],c].concat(STOCK_DEPART.as[c]).concat(['']);
+      var index=f.getLastRow()+1;
+      f.getRange(index,1,1,COL_STOCK.length).setValues([row]);
+      f.getRange(index,COL_STOCK.length).setFormula('=SUM('+f.getRange(index,4,1,POINTURES.length).getA1Notation()+')');
+      ajoutees++;
+    });
+    habillerStock(f);CacheService.getScriptCache().remove('stock');
+    console.log('Collection AS : '+ajoutees+' ligne(s) ajoutée(s). Les lignes existantes sont conservées.');
+    return ajoutees;
+  } finally {verrou.releaseLock();}
 }
 
 /** Mise en forme, rejouable. */
@@ -927,7 +949,8 @@ function doGet() {
   }
   return reponse({ service: 'Benkashoes — réception des commandes', methode: 'POST',
                    alerte: ALERTE_EMAIL ? 'armée' : 'absente',
-                   revision: 'audit-2026-11-20',
+                   revision: 'as-2026-11-21',
+                   catalogue: {as:{prix:299,coloris:CATALOGUE.as.coloris}},
                    promotion: {version:'bf-exact3-699-v2',modele:'opus',quantite:3,quantiteExacte:true,prix:699,livraison:0},
                    stock: stock });
 }

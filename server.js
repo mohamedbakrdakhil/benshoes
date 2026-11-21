@@ -26,8 +26,9 @@ const SESSION_DAYS = 14;
 
 /* ---------- catalogue de référence : le serveur fait foi sur les prix ---------- */
 const SIZES = [37, 38, 39, 40, 41];
-const COLORS = ['noir','beige','marron','taupe','tabac','burgundy','gris','marine'];
+const COLORS = ['camel','cognac','chocolat','noir','beige','marron','taupe','tabac','burgundy','gris','marine'];
 const SEED = {
+  as: {price:299,colors:['camel','cognac','noir','chocolat'],stock:[10,7,5,5,3]},
   opus:    { price: 279, colors: ['burgundy','noir','beige','marron','taupe','tabac','gris','marine'], stock: [9,16,21,18,11] },
   stepy:   { price: 259, colors: ['beige','noir','marron','gris','marine'],                            stock: [7,13,17,14,8] },
   western: { price: 359, colors: ['noir'],                                                             stock: [4,7,9,8,5] },

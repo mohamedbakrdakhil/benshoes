@@ -46,11 +46,11 @@ function cartHTML(){
       <button class="btn btn-pri" data-act="place" style="justify-content:center">Valider la commande</button>
       <button class="btn btn-out btn-sm" data-act="back" style="justify-content:center">Retour au panier</button>`;
   } else if(!S.cart.length){
-    body=`<div class="empty"><h4>Votre panier est vide</h4><p>Huit daims, une seule coupe — choisissez la couleur, la pointure vient après.</p>
+    body=`<div class="empty"><h4>Votre panier est vide</h4><p>Opus ou AS by BENKA : choisissez votre modèle, votre couleur et votre pointure.</p>
       <a class="btn btn-out btn-sm" href="#modeles" data-act="closep" style="margin-top:18px">Voir la collection</a></div>`;
     foot='';
   } else {
-    body=blackFridayCartNote(pricing)+`<div class="steps" style="margin-bottom:16px"><b data-on="1">Panier</b><i></i><b>Livraison</b><i></i><b>Confirmation</b></div>`
+    body=(S.cart.some(i=>i.id==='opus')?blackFridayCartNote(pricing):'')+`<div class="steps" style="margin-bottom:16px"><b data-on="1">Panier</b><i></i><b>Livraison</b><i></i><b>Confirmation</b></div>`
       +S.cart.map((it,n)=>{const p=prod(it.id);return `<div class="citem">
         <div class="cthumb">${visuel(p,it.c)}</div>
         <div><h4>${p.name}</h4><div class="meta">${COLORS[it.c].n} · Pointure ${it.s}</div>
