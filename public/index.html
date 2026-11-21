@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; script-src 'self' 'sha256-D+SUBdIr7b4eOSfgxqvSuGj1bD5yI6pJJdctngReXYs=' https://connect.facebook.net; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://www.facebook.com; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://www.facebook.com https://connect.facebook.net; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; script-src 'self' 'sha256-tdy98tyVvsATm2XRHcIystBT5WoLMZa6YZvdfPNJEuI=' https://connect.facebook.net; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://www.facebook.com; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://www.facebook.com https://connect.facebook.net; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
 <meta name="benka-api" content="oui">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Black Friday — Benka Shoes | Mocassins en daim</title>
@@ -1703,18 +1703,23 @@ function passant(cls,w,ht,x,y,z0,z1,vitesse,phase,ry,type){
     +`transform:translate3d(${(x*K).toFixed(1)}px,${(y*K).toFixed(1)}px,${(z0*K).toFixed(1)}px) rotateY(${ry||0}deg)">`
     +silhouetteSVG(type)+'</div>';
 }
-function photoNiche(col,nom){
-  const b='assets/visite/niche-'+col;
-  return `<img class="pv pv-decoupe" src="${b}-380.png"`
-    +` srcset="${b}-190.png 190w, ${b}-380.png 380w"`
-    +` sizes="(max-width:700px) 95px, 230px" width="380" height="258"`
-    +` alt="${att(nom+' — '+((COLORS[col]||{}).n||col))}"`
+function photoNiche(p,col){
+  const jeux={opus:{base:'assets/visite/niche-',largeurs:[190,380]},
+              as:{base:'assets/visite/niche-as-',largeurs:[960]}};
+  const jeu=jeux[p.id];
+  if(!jeu)return visuel(p,col,true).replace('loading="lazy"','loading="eager"');
+  const b=jeu.base+col,largeur=jeu.largeurs[jeu.largeurs.length-1];
+  const hauteur=p.id==='opus'?258:640;
+  return `<img class="pv pv-decoupe" src="${b}-${largeur}.png"`
+    +` srcset="${jeu.largeurs.map(w=>b+'-'+w+'.png '+w+'w').join(', ')}"`
+    +` sizes="(max-width:700px) 95px, 230px" width="${largeur}" height="${hauteur}"`
+    +` alt="${att(p.name+' — '+((COLORS[col]||{}).n||col))}"`
     +` loading="eager" decoding="async">`;
 }
 function niche(p,left,w,ht,top,plate,col){
   if(K!==1){left*=K;w*=K;ht*=K;top*=K;}
   const c=col||p.colors[0];
-  const corps=`<div class="riad-niche-art" aria-hidden="true">${riadNicheSVG()}</div>${photoNiche(c,p.name)}<b>${p.name}</b><span>${(COLORS[c]||{}).n||''}</span>`;
+  const corps=`<div class="riad-niche-art" aria-hidden="true">${riadNicheSVG()}</div>${photoNiche(p,c)}<b>${p.name}</b><span>${(COLORS[c]||{}).n||''}</span>`;
   if(!RICHE) return `<div class="niche" style="left:${left}px;top:${top}px;width:${w}px;height:${ht}px">${corps}</div>`;
   return `<div class="n3${plate?' plate':''}" style="left:${left}px;top:${top}px;width:${w}px;height:${ht}px">
       <div class="nb">${corps}</div><div class="ns nl"></div><div class="ns nr"></div>

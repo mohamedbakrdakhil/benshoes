@@ -234,12 +234,19 @@ function passant(cls,w,ht,x,y,z0,z1,vitesse,phase,ry,type){
    Plus léger, aussi : 147 Ko pour les huit contre 512 Ko de packshots.
    Les largeurs suivent celle de la niche (230 px, 95 sur téléphone), pas
    celle de l'écran : une image de 960 px n'y servait à rien. */
-function photoNiche(col,nom){
-  const b='assets/visite/niche-'+col;
-  return `<img class="pv pv-decoupe" src="${b}-380.png"`
-    +` srcset="${b}-190.png 190w, ${b}-380.png 380w"`
-    +` sizes="(max-width:700px) 95px, 230px" width="380" height="258"`
-    +` alt="${att(nom+' — '+((COLORS[col]||{}).n||col))}"`
+function photoNiche(p,col){
+  // Les découpes Opus ne conviennent ni aux couleurs ni à la forme des autres modèles.
+  const jeux={opus:{base:'assets/visite/niche-',largeurs:[190,380]},
+              as:{base:'assets/visite/niche-as-',largeurs:[960]}};
+  const jeu=jeux[p.id];
+  // Un nouveau modèle sans découpe dédiée garde sa vraie photo produit.
+  if(!jeu)return visuel(p,col,true).replace('loading="lazy"','loading="eager"');
+  const b=jeu.base+col,largeur=jeu.largeurs[jeu.largeurs.length-1];
+  const hauteur=p.id==='opus'?258:640;
+  return `<img class="pv pv-decoupe" src="${b}-${largeur}.png"`
+    +` srcset="${jeu.largeurs.map(w=>b+'-'+w+'.png '+w+'w').join(', ')}"`
+    +` sizes="(max-width:700px) 95px, 230px" width="${largeur}" height="${hauteur}"`
+    +` alt="${att(p.name+' — '+((COLORS[col]||{}).n||col))}"`
     // Chargement immédiat sur téléphone, et c'est la correction du défaut
     // le plus tenace de cette scène : les niches vivent dans des zones mises
     // en display:none tant que la caméra n'en approche pas, et une image
@@ -254,7 +261,7 @@ function photoNiche(col,nom){
 function niche(p,left,w,ht,top,plate,col){
   if(K!==1){left*=K;w*=K;ht*=K;top*=K;}
   const c=col||p.colors[0];
-  const corps=`<div class="riad-niche-art" aria-hidden="true">${riadNicheSVG()}</div>${photoNiche(c,p.name)}<b>${p.name}</b><span>${(COLORS[c]||{}).n||''}</span>`;
+  const corps=`<div class="riad-niche-art" aria-hidden="true">${riadNicheSVG()}</div>${photoNiche(p,c)}<b>${p.name}</b><span>${(COLORS[c]||{}).n||''}</span>`;
   if(!RICHE) return `<div class="niche" style="left:${left}px;top:${top}px;width:${w}px;height:${ht}px">${corps}</div>`;
   return `<div class="n3${plate?' plate':''}" style="left:${left}px;top:${top}px;width:${w}px;height:${ht}px">
       <div class="nb">${corps}</div><div class="ns nl"></div><div class="ns nr"></div>
