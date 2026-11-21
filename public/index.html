@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; script-src 'self' 'sha256-6sP/f/4RI/iz9J1am5NsRcl4hXht5IGlDWWwrdXVtK8=' https://connect.facebook.net; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://www.facebook.com; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://www.facebook.com https://connect.facebook.net; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; script-src 'self' 'sha256-QoBSOPcmnSK91YA4UySEfqTy6vJlmt+huUSbaSUTz84=' https://connect.facebook.net; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://www.facebook.com; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://www.facebook.com https://connect.facebook.net; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
 <meta name="benka-api" content="oui">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Black Friday — Benka Shoes | Mocassins en daim</title>
@@ -2540,11 +2540,13 @@ if(!HASCLAUDE){
     return false;
   });
 })();
-addEventListener('load',async()=>{
+addEventListener('pageshow',async()=>{
   if(location.hash!=='#as-by-benka')return;
   if(document.fonts)await document.fonts.ready;
-  if(location.hash==='#as-by-benka'&&!S.panel)
-    document.getElementById('as-by-benka')?.scrollIntoView({behavior:'instant',block:'start'});
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    if(location.hash==='#as-by-benka'&&!S.panel)
+      document.getElementById('as-by-benka')?.scrollIntoView({behavior:'instant',block:'start'});
+  }));
 });</script>
 </body>
 </html>

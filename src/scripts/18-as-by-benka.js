@@ -1,7 +1,9 @@
 // Le lien direct doit rester sur AS après le chargement des polices et du showroom.
-addEventListener('load',async()=>{
+addEventListener('pageshow',async()=>{
   if(location.hash!=='#as-by-benka')return;
   if(document.fonts)await document.fonts.ready;
-  if(location.hash==='#as-by-benka'&&!S.panel)
-    document.getElementById('as-by-benka')?.scrollIntoView({behavior:'instant',block:'start'});
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    if(location.hash==='#as-by-benka'&&!S.panel)
+      document.getElementById('as-by-benka')?.scrollIntoView({behavior:'instant',block:'start'});
+  }));
 });
