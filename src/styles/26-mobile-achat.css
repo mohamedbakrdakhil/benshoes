@@ -1,0 +1,156 @@
+/* Achat sur téléphone : une zone de lecture qui défile, une action toujours
+   séparée en bas. La hauteur suit déjà le clavier via visualViewport. */
+@media(max-width:700px){
+  #overlays .panel{
+    top:var(--mobile-screen-top,0px);bottom:auto;
+    width:100%;max-width:100%;height:var(--mobile-screen,100dvh);
+    max-height:var(--mobile-screen,100dvh);min-height:0;
+    overflow:hidden;border:0;font-size:16px;
+    container-name:benka-achat;container-type:size;
+  }
+  #overlays .panel-hd{
+    flex:0 0 auto;min-height:64px;gap:12px;
+    padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));
+    padding-top:calc(10px + env(safe-area-inset-top,0px));
+  }
+  #overlays .panel-hd h3{font-size:26px;line-height:1.2}
+  #overlays .panel-hd .eyebrow{font-size:14px;line-height:1.4;letter-spacing:.04em}
+  #overlays .panel .close{flex:0 0 44px;width:44px;height:44px;min-width:44px;min-height:44px}
+  #overlays .panel-bd{
+    flex:1 1 0;min-height:0;min-width:0;overflow-y:auto;overflow-x:hidden;
+    padding:16px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px));
+    overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scroll-padding-block:16px;
+  }
+  #overlays .panel-ft{
+    position:relative;flex:0 0 auto;min-width:0;gap:8px;
+    padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
+    box-shadow:0 -8px 24px #1c0d0908;
+  }
+  #overlays .panel-ft .btn{
+    width:100%;min-width:0;min-height:48px;height:auto;
+    padding:12px 14px;font-size:16px;line-height:1.4;
+    white-space:normal;text-align:center;text-transform:none;letter-spacing:0;
+  }
+  #overlays .panel .note,#overlays .panel .eyebrow,
+  #overlays .panel .callout,#overlays .panel .lnk,
+  #overlays .panel .spec,#overlays .panel .field-error{
+    font-size:14px;line-height:1.5;
+  }
+  #overlays .panel .spec li{gap:16px;align-items:start}
+  #overlays .panel .spec li>span{min-width:0;overflow-wrap:anywhere}
+  #overlays .panel-bd .btn{min-height:44px;height:auto;font-size:14px;line-height:1.5;white-space:normal}
+
+  /* Une photo entière et un aperçu de la suivante ; les choix ne sont pas
+     repoussés par une galerie plus haute que le téléphone. */
+  #overlays .panel.plein .panel-bd{display:block}
+  #overlays .sheet-media,#overlays .sheet-details{min-width:0}
+  #overlays .panel.plein .sheet-media .galerie{gap:8px;scroll-padding-inline:0}
+  #overlays .panel.plein .sheet-media .galerie .sheet-art,
+  #overlays .panel.plein .sheet-media .galerie .sheet-art:only-child{
+    height:clamp(210px,38svh,320px);min-height:0;max-width:none;
+    width:90%;flex-basis:90%;aspect-ratio:auto;
+  }
+  #overlays .panel.plein .sheet-media .galerie .sheet-art:only-child{width:100%;flex-basis:100%}
+  #overlays .panel.plein .sheet-media .galerie .sheet-art .pv{object-fit:contain!important}
+  #overlays .gallery-controls{min-height:60px;gap:12px;font-size:14px;line-height:1.4}
+  #overlays .gallery-controls button{width:44px;height:44px;min-width:44px;min-height:44px}
+  #overlays .product-360 summary{min-height:48px;gap:12px;font-size:14px}
+  #overlays .rotor-aide{font-size:14px;letter-spacing:0;white-space:nowrap}
+  #overlays .sheet-details{display:flex;flex-direction:column;margin-top:20px}
+  #overlays .sheet-details>.eyebrow{order:0}
+  #overlays .sheet-details>.sheet-top{order:1}
+  #overlays .sheet-details>.fld{order:2}
+  #overlays .sheet-details>.serif{order:3;margin-top:22px}
+  #overlays .sheet-details>.sheet-offer{order:4}
+  #overlays .sheet-details>.tabs{order:5}
+  #overlays .sheet-details>.tabpane{order:6}
+  #overlays .sheet-details>.eyebrow{font-size:14px;line-height:1.5;letter-spacing:.04em;margin-bottom:10px}
+  #overlays .sheet-top{gap:12px;align-items:baseline;flex-wrap:wrap}
+  #overlays .sheet-details .sheet-top h2{min-width:0;font-size:32px;line-height:1.1}
+  #overlays .sheet-price{font-size:20px}
+  #overlays .sheet-details>.serif,#overlays .tabpane .serif{font-size:16px;line-height:1.6}
+  #overlays .sheet-offer{padding:14px;margin-top:18px}
+  #overlays .sheet-offer>b,#overlays .sheet-offer>span,#overlays .sheet-offer small{font-size:14px;line-height:1.5;letter-spacing:0}
+  #overlays .sheet-pack-step{flex:0 0 auto;padding:10px 16px;font-size:14px;line-height:1.4}
+  #overlays .sheet-pack-step>span{display:block}
+  #overlays .fld{margin-top:22px}
+  #overlays .fld-lab{flex-wrap:wrap;gap:4px 12px}
+  #overlays .fld-lab .t,#overlays .fld-lab .v{font-size:14px;line-height:1.4;letter-spacing:0;text-transform:none}
+  #overlays .colrow{gap:8px}
+  #overlays .colopt{min-width:44px;min-height:44px;height:auto;padding:10px 12px;font-size:14px;line-height:1.4}
+  #overlays .colopt i{flex:none}
+  #overlays .sizegrid{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+  #overlays .sizebtn{min-width:44px;min-height:58px;height:auto;padding:8px 2px;font-size:16px;line-height:1.1;align-content:center;gap:4px}
+  #overlays .sizebtn small{position:static;font-size:14px;line-height:1;letter-spacing:0}
+  #overlays .fld .note a{display:inline-flex;align-items:center;min-height:44px}
+  #overlays .tabs{gap:0;margin-top:18px}
+  #overlays .tabs button{flex:1 1 0;min-width:0;min-height:48px;padding:10px 6px;font-size:14px;line-height:1.4}
+  #overlays .panel.plein .panel-ft{flex-direction:column;gap:6px}
+  #overlays .panel.plein .panel-ft>.btn{order:0}
+  #overlays .panel.plein .panel-ft>.note{font-size:14px;line-height:1.4;margin:0}
+
+  /* Deux colonnes laissent au nom et au coloris une vraie largeur. Le prix
+     et « Retirer » occupent une ligne dédiée, sans écraser les quantités. */
+  #overlays .panel.left .panel-bd:has(.citem){display:flex;flex-direction:column}
+  #overlays .panel.left .panel-bd>.steps{order:0;flex:none}
+  #overlays .panel.left .panel-bd>.citem{order:1;flex:none}
+  #overlays .panel.left .panel-bd>.bf-cart-offer{order:2;flex:none;margin:16px 0}
+  #overlays .panel.left .panel-bd>.continue-shopping{order:3;flex:none}
+  #overlays .panel.left .panel-bd>.note{order:4;flex:none}
+  #overlays .citem{grid-template-columns:64px minmax(0,1fr);gap:8px 14px;padding-block:18px}
+  #overlays .cthumb{grid-column:1;grid-row:1/3;width:64px;min-width:0}
+  #overlays .citem>div:nth-child(2){grid-column:2;min-width:0}
+  #overlays .citem h4{font-size:17px;line-height:1.25;overflow-wrap:anywhere;margin-bottom:5px}
+  #overlays .citem .meta{font-size:14px;line-height:1.5;letter-spacing:0}
+  #overlays .qty{margin-top:10px;max-width:100%;min-height:46px}
+  #overlays .qty button{flex:0 0 44px;width:44px;height:44px;font-size:20px}
+  #overlays .qty span{min-width:34px;font-size:16px}
+  #overlays .citem .right{grid-column:2;flex-direction:row;align-items:center;justify-content:space-between;gap:10px;text-align:left}
+  #overlays .citem .right b{font-size:16px;white-space:nowrap}
+  #overlays .citem .lnk{min-height:44px;min-width:44px;padding:8px 0 8px 8px;font-size:14px}
+  #overlays .continue-shopping{min-height:48px;font-size:14px;line-height:1.5;gap:14px}
+  #overlays .continue-shopping>span{flex:none}
+  #overlays .steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;font-size:14px;line-height:1.4;letter-spacing:0;text-transform:none}
+  #overlays .steps i{display:none}
+  #overlays .steps b{min-width:0;text-align:center;overflow-wrap:anywhere}
+  #overlays .panel .bf-cart-offer{padding:14px;margin-bottom:18px}
+  #overlays .panel .bf-cart-offer>b,#overlays .panel .bf-cart-offer p,
+  #overlays .panel .bf-cart-offer small,#overlays .bf-cart-saved{font-size:14px;line-height:1.5;letter-spacing:0}
+  #overlays .panel .bf-cart-offer small{display:block;margin-top:8px}
+  #overlays .totals{font-size:14px;line-height:1.4;gap:5px}
+  #overlays .totals>div{gap:12px;align-items:start}
+  #overlays .totals>div>span:first-child{min-width:0;overflow-wrap:anywhere}
+  #overlays .totals>div>span:last-child{flex:none;white-space:nowrap}
+  #overlays .totals .grand{font-size:20px;line-height:1.3;padding-top:8px;margin-top:3px}
+  #overlays .empty{padding:28px 0}
+  #overlays .empty h4{font-size:22px;line-height:1.3}
+  #overlays .empty p{font-size:16px;line-height:1.6}
+  #overlays .empty .btn{font-size:14px;min-height:48px;padding:12px 16px}
+
+  /* 16 px sur les champs évite le zoom automatique des formulaires iOS. */
+  #overlays .form{grid-template-columns:minmax(0,1fr);gap:18px}
+  #overlays .form .full{grid-column:1}
+  #overlays label.f{font-size:14px;line-height:1.4;letter-spacing:0;gap:7px}
+  #overlays label.f input,#overlays label.f select,#overlays label.f textarea{
+    width:100%;max-width:100%;min-width:0;min-height:48px;
+    font-size:16px;line-height:1.5;padding:11px 12px;border-radius:6px;
+    scroll-margin-block:16px;
+  }
+  #overlays label.f textarea{min-height:100px;height:100px}
+  #overlays .checkout-intro{font-size:20px;line-height:1.4;margin-bottom:20px}
+  #overlays .checkout-error,#overlays .checkout-privacy,#overlays .checkout-international{font-size:14px;line-height:1.6}
+  #overlays #summ{font-size:16px!important;line-height:1.5}
+  #overlays .ordref{font-size:24px;line-height:1.25;overflow-wrap:anywhere}
+  /* Le clavier réduit le panneau, pas toujours la hauteur des media queries.
+     La requête de conteneur conserve alors le total et l'action en bas,
+     sans déplacer un bouton uniquement parce qu'il reçoit le focus. */
+  @container benka-achat (max-height:440px){
+    #overlays .panel-hd{min-height:56px;padding-block:6px}
+    #overlays .panel-ft{padding-top:8px;padding-bottom:calc(8px + env(safe-area-inset-bottom,0px));gap:6px}
+    #overlays .panel-ft .totals>div:not(.grand),
+    #overlays .panel-ft [data-act="back"],
+    #overlays .panel-ft>.note{display:none}
+    #overlays .totals .grand{margin:0;padding:0;border:0}
+    #overlays .sheet-pack-step>span{display:none}
+  }
+}
