@@ -14,9 +14,31 @@ function renderStatic(){
     ${SHOP.whatsapp?`<a class="btn btn-ghost btn-sm" href="https://wa.me/${esc(SHOP.whatsapp)}" target="_blank" rel="noopener" style="width:100%;justify-content:center">Écrire sur WhatsApp</a>`:''}
     <p class="note" style="color:var(--band-soft);margin-top:9px">Atelier ouvert du lundi au vendredi, 9 h – 18 h.</p>`;
   const copyright=$('#ftrcopy');if(copyright)copyright.textContent=`© ${new Date().getFullYear()} Benkashoes — ${SHOP.site}`;
+  initCollectionNav();
   renderFAQ();
   const sizes=$('#sizebody');if(sizes)sizes.innerHTML=SIZES.map((s,i)=>{const mm=MM[s],fin=i<SIZES.length-1?MM[SIZES[i+1]]-1:mm+6;
     return `<tr><td style="font-weight:700" class="num">${s}</td><td class="num">${mm} – ${fin}</td><td class="num">${mm+13} mm</td><td class="num">${Math.round(mm*.372)} mm</td><td class="num">${Math.round(mm*.405)} mm</td></tr>`;}).join('');
+}
+/* Navigation locale au catalogue mobile : le repère suit la section lue,
+   y compris après un lien profond ou un retour navigateur. */
+function initCollectionNav(){
+  const nav=$('.shop-mobile-nav');if(!nav||nav.dataset.ready)return;
+  const items=[...nav.querySelectorAll('a[href^="#"]')].map(link=>({link,section:document.getElementById(link.getAttribute('href').slice(1))})).filter(item=>item.section);
+  if(!items.length)return;
+  nav.dataset.ready='1';let frame=0;
+  const update=()=>{
+    frame=0;if(!matchMedia('(max-width:700px)').matches)return;
+    const edge=nav.getBoundingClientRect().bottom+40;
+    let active=items[0];
+    for(const item of items)if(item.section.getBoundingClientRect().top<=edge)active=item;
+    for(const item of items){if(item===active)item.link.setAttribute('aria-current','location');else item.link.removeAttribute('aria-current');}
+  };
+  const schedule=()=>{if(!frame)frame=requestAnimationFrame(update);};
+  addEventListener('scroll',schedule,{passive:true});
+  addEventListener('resize',schedule,{passive:true});
+  addEventListener('hashchange',schedule);
+  addEventListener('pageshow',schedule);
+  update();
 }
 function renderFAQ(){
   const el=$('#faqlist'); if(!el)return;

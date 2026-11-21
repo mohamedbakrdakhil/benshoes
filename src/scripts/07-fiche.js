@@ -124,14 +124,15 @@ function majRotor(){
 }
 function galerie(p,c){
   const n=nbPhotos(p.id,c);
+  const sizes='(max-width:700px) 90vw, (max-width:899px) 85vw, 48vw';
   // Le tourne-disque n'est plus DANS la galerie. Sur téléphone celle-ci se
   // parcourt au doigt horizontalement, et le tourne-disque tourne au doigt
   // horizontalement : les deux se disputaient le même geste, et le premier
   // qui l'attrapait empêchait l'autre d'exister. Il est posé au-dessus,
   // dans sheetHTML — un geste chacun.
-  if(n<=1) return `<div class="galerie" tabindex="0" role="group" aria-label="Photos du produit"><div class="sheet-art">${visuel(p,c)}</div></div>`;
+  if(n<=1) return `<div class="galerie" tabindex="0" role="group" aria-label="Photos du produit"><div class="sheet-art">${visuel(p,c,false,0,sizes)}</div></div>`;
   let h='';
-  for(let i=0;i<n;i++) h+=`<div class="sheet-art">${visuel(p,c,false,i)}</div>`;
+  for(let i=0;i<n;i++) h+=`<div class="sheet-art">${visuel(p,c,false,i,sizes)}</div>`;
   return `<div class="galerie" tabindex="0" role="group" aria-label="Photos du produit">${h}</div>`;
 }
 

@@ -18,11 +18,30 @@
       <button class="icbtn" id="themebtn" title="Changer le thème" aria-label="Changer le thème">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
       </button>
-      <button class="cartbtn" id="cartbtn">Panier <b id="cartcount">0</b></button>
+      <button class="mobile-search-trigger" id="searchbtn" aria-label="Rechercher un modèle ou un coloris" aria-controls="navmob" aria-expanded="false"><i class="search-symbol" aria-hidden="true"></i></button>
+      <button class="cartbtn" id="cartbtn" aria-label="Panier"><i class="bag-symbol" aria-hidden="true"></i><span class="cart-label">Panier</span> <b id="cartcount">0</b></button>
     </div>
   </div>
   <nav class="navmob" id="navmob" aria-label="Navigation mobile" hidden>
-    <a href="/">Accueil <span>L’UNIVERS BENKA</span></a><a href="/collection/">Collection <span>AS &amp; OPUS</span></a><a href="/collection/#packs">Packs Black Friday <span>DÈS 699 DH</span></a><a href="/showroom/">Showroom <span>LE RIAD BENKA</span></a><a href="/maison/">La maison <span>LE SAVOIR-FAIRE</span></a><a href="/aide/">Aide &amp; contact <span>À VOS CÔTÉS</span></a>
+    <div class="menu-search" role="search">
+      <label for="menu-query"><i class="search-symbol" aria-hidden="true"></i></label>
+      <input type="search" id="menu-query" aria-label="Rechercher un modèle ou un coloris" placeholder="Rechercher un modèle, un coloris…" autocomplete="off" spellcheck="false">
+    </div>
+    <p id="menu-search-status" role="status"></p>
+    <div id="menu-results" hidden></div>
+    <div id="menu-destinations">
+      <a class="nav-feature" href="/collection/">La collection <i aria-hidden="true">↗</i></a>
+      <div class="menu-models">
+        <a href="/collection/#as-by-benka"><img src="/assets/as-by-benka/cognac-480.webp" width="480" height="640" loading="lazy" alt=""><strong>AS by BENKA</strong></a>
+        <a href="/collection/#modeles"><img src="/assets/produits/opus-tabac-1-480.webp" width="480" height="634" loading="lazy" alt=""><strong>Opus</strong></a>
+      </div>
+      <a class="nav-offer" href="/collection/#packs">Les trios Black Friday <small>dès 699 DH</small></a>
+      <a href="/showroom/">Le showroom <i aria-hidden="true">↗</i></a>
+      <a href="/maison/">La maison <i aria-hidden="true">↗</i></a>
+      <a href="/aide/">Aide &amp; contact <i aria-hidden="true">↗</i></a>
+      <a href="/">Accueil <i aria-hidden="true">↗</i></a>
+      <button class="menu-theme" data-theme-toggle>Changer le thème</button>
+    </div>
   </nav>
 </header>
 
