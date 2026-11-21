@@ -84,7 +84,7 @@ test('récepteur à jour : lignes de quantité originale et total attendu transm
   const source=fs.readFileSync('src/scripts/08-panier.js','utf8');
   let sent;
   const env=vm.createContext({SHOP:{tableur:'https://example.invalid'},AbortController,setTimeout,clearTimeout,fetch:async(u,opt)=>{
-    if(opt.method==='GET')return {ok:true,json:async()=>({promotion:{version:'bf-exact3-699-v2'}})};
+    if(opt.method==='GET')return {ok:true,json:async()=>({promotion:{version:'bf-exact3-699-v2',packsVersion:'bf-trios-opus-as-mixte-v3'}})};
     sent=JSON.parse(opt.body);return {ok:true,json:async()=>({ok:true,ref:'TEST',total:699})};
   }});
   vm.runInContext(source,env);
@@ -113,4 +113,78 @@ test('le panier de quatre annonce le tarif normal, sans inviter à acheter un au
   env.pricing=prixBlackFriday([row(4)]);
   const html=vm.runInContext('blackFridayCartNote(pricing)',env);
   assert.match(html,/Tarif normal appliqué/);assert.doesNotMatch(html,/Encore/);
+});
+
+function asRow(q,colorKey='camel',size=38){return {id:'as',colorKey,size,q,unit:299};}
+for(const [label,items,total,kind] of [
+  ['trois AS identiques',[asRow(3)],799,'as'],
+  ['trois AS distincts',[asRow(1,'camel',37),asRow(1,'noir',39),asRow(1,'chocolat',41)],799,'as'],
+  ['deux Opus et un AS',[row(2),asRow(1)],749,'mixte'],
+  ['un Opus et deux AS',[row(1),asRow(2)],749,'mixte'],
+  ['trois Opus',[row(3)],699,'opus'],
+]) test(`${label} : frontend, Apps Script et lignes facturées = ${total} DH`,()=>{
+  const original=JSON.stringify(items),p=prixBlackFriday(items);
+  assert.equal(p.pack,kind);assert.equal(p.sub,total);assert.equal(p.packs,1);
+  assert.equal(JSON.stringify(items),original);
+  assert.equal(p.items.reduce((n,i)=>n+i.unit*i.q,0),total);
+  assert.equal(p.items.reduce((n,i)=>n+i.q,0),3);
+  assert.ok(p.items.every(i=>Number.isInteger(i.unit)&&i.unit>0));
+  for(const original of items) assert.equal(p.items.filter(i=>i.id===original.id&&i.colorKey===original.colorKey&&i.size===original.size).reduce((n,i)=>n+i.q,0),original.q);
+  const o=scriptOrder(items.map(i=>({...i,unit:1})),{expectedTotal:total}).commande;
+  assert.equal(o.total,total);assert.equal(o.livraison,0);assert.equal(o.paires,3);
+  assert.equal(o.lignes.reduce((n,i)=>n+i.prix*i.q,0),total);
+  assert.ok(scriptOrder(items,{expectedTotal:total+1}).erreur);
+});
+test('les deux compositions mixtes et leurs permutations gardent les mêmes tarifs nets',()=>{
+  for(const items of [[row(2),asRow(1)],[row(1),asRow(2)]]) {
+    const forward=prixBlackFriday(items),reverse=prixBlackFriday([...items].reverse());
+    assert.deepEqual(forward.items.map(i=>[i.id,i.unit,i.q]).sort(),reverse.items.map(i=>[i.id,i.unit,i.q]).sort());
+  }
+});
+test('AS : 1, 2, 4, 5, 6 paires et packs désactivés restent au tarif normal',()=>{
+  for(const q of [1,2,4,5,6]) {
+    assert.equal(prixBlackFriday([asRow(q)]).sub,299*q);
+    assert.equal(scriptOrder([asRow(q)]).commande.total,299*q);
+  }
+  assert.equal(prixBlackFriday([asRow(3)],false).sub,897);
+  assert.equal(prixBlackFriday([row(1),asRow(2)],false).sub,877);
+  assert.equal(prixBlackFriday([row(3),asRow(3)]).sub,1734);
+  assert.equal(scriptOrder([row(3),asRow(3)]).commande.total,1734);
+  assert.equal(prixBlackFriday([{...asRow(3),unit:300}]).sub,900);
+});
+test('stock Apps Script : les prix arrondis du trio AS retirent exactement trois paires une seule fois',()=>{
+  const env=vm.createContext({});vm.runInContext(apps,env);
+  let stock=5,writes=0;
+  env.feuilleStock=()=>({getRange:()=>({getValue:()=>stock,setValue:n=>{stock=n;writes++;}})});
+  env.caseStock=()=>({rangee:1,colonne:1});env.CacheService={getScriptCache:()=>({remove(){}})};
+  env.lines=scriptOrder([asRow(3)]).commande.lignes;
+  assert.equal(vm.runInContext('retirerDuStock(lines)',env),null);assert.equal(stock,2);assert.equal(writes,1);
+  assert.match(vm.runInContext('retirerDuStock(lines)',env),/reste/);assert.equal(stock,2);assert.equal(writes,1);
+});
+test('serveur Node : chaque pack applique le même total et conserve les quantités de stock',()=>{
+  for(const items of [[asRow(3)],[row(2),asRow(1)],[row(1),asRow(2)]]) {
+    const total=prixBlackFriday(items).sub;
+    const env=vm.createContext({prixBlackFriday,SEED:{opus:{name:'Opus',price:279,colors:['noir'],stock:[10,10,10,10,10]},as:{name:'AS',price:299,colors:['camel'],stock:[10,10,10,10,10]}},COLORS:['noir','camel'],SIZES:[37,38,39,40,41],db:{catalog:{prices:{},stock:{opus:{noir:[10,10,10,10,10]},as:{camel:[10,10,10,10,10]}}}},SHIP_FREE:0,SHIP_COST:0,str:(v,n)=>String(v||'').slice(0,n),newRef:()=> 'TEST',customer});
+    vm.runInContext('function grille(id){return db.catalog.stock[id]}\n'+build,env);env.input={items,customer,expectedTotal:total};
+    const o=vm.runInContext('buildOrder(input,"boutique")',env).order;
+    assert.equal(o.total,total);assert.equal(o.items.reduce((n,i)=>n+i.q*i.unit,0),total);
+    assert.equal(env.db.catalog.stock.opus.noir[1]+env.db.catalog.stock.as.camel[1],17);
+  }
+});
+test('ancien récepteur Opus seul : les nouveaux packs ne sont pas envoyés',async()=>{
+  const calls=[],env=vm.createContext({SHOP:{tableur:'https://example.invalid'},AbortController,setTimeout,clearTimeout,fetch:async(u,opt)=>{calls.push(opt.method);return {ok:true,json:async()=>({promotion:{version:'bf-exact3-699-v2'}})};}});
+  vm.runInContext(fs.readFileSync('src/scripts/08-panier.js','utf8'),env);
+  env.order={discount:98,requestItems:[asRow(3)],items:prixBlackFriday([asRow(3)]).items,customer,total:799};
+  assert.equal((await vm.runInContext('envoyerAuTableur(order,"test","")',env)).refus,true);
+  assert.deepEqual(calls,['GET']);
+});
+test('trio AS : le reçu réparti en deux prix transmet toujours une seule ligne de stock originale',async()=>{
+  let sent;const env=vm.createContext({SHOP:{tableur:'https://example.invalid'},AbortController,setTimeout,clearTimeout,fetch:async(u,opt)=>{
+    if(opt.method==='GET')return {ok:true,json:async()=>({promotion:{packsVersion:'bf-trios-opus-as-mixte-v3'}})};
+    sent=JSON.parse(opt.body);return {ok:true,json:async()=>({ok:true,ref:'TEST'})};
+  }});
+  vm.runInContext(fs.readFileSync('src/scripts/08-panier.js','utf8'),env);
+  env.order={discount:98,items:prixBlackFriday([asRow(3)]).items,requestItems:[asRow(3)],customer,total:799};
+  assert.equal((await vm.runInContext('envoyerAuTableur(order,"test","")',env)).ok,true);
+  assert.equal(sent.items.length,1);assert.equal(sent.items[0].q,3);assert.equal(sent.expectedTotal,799);assert.equal(sent.pricingVersion,'bf-trios-opus-as-mixte-v3');
 });

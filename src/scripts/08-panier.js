@@ -40,7 +40,7 @@ function cartHTML(){
       </div>
       <p class="checkout-privacy">Vos coordonnées servent à préparer votre commande et à vous contacter pour sa livraison.</p>
       <div class="callout" style="margin-top:18px"><b>Aucun paiement maintenant.</b> L'atelier vérifie la disponibilité, vous recevez la confirmation, puis vous réglez à la livraison ou par virement.</div>`;
-    foot=`<div class="totals"><div><span>Sous-total</span><span class="num">${fmt(pricing.gross)}</span></div>${pricing.discount?`<div class="bf-discount"><span>Black Friday · Trio de 3 paires</span><span class="num">−${fmt(pricing.discount)}</span></div>`:''}
+    foot=`<div class="totals"><div><span>Sous-total</span><span class="num">${fmt(pricing.gross)}</span></div>${pricing.discount?`<div class="bf-discount"><span>Black Friday · ${blackFridayPackLabel(pricing.pack)}</span><span class="num">−${fmt(pricing.discount)}</span></div>`:''}
       <div><span>Livraison</span><span class="num">${ship?fmt(ship):'Offerte'}</span></div>
       <div class="grand"><span>Total</span><span class="num">${fmt(sub+ship)}</span></div></div>
       <button class="btn btn-pri" data-act="place" style="justify-content:center">Valider la commande</button>
@@ -50,14 +50,14 @@ function cartHTML(){
       <a class="btn btn-out btn-sm" href="#modeles" data-act="closep" style="margin-top:18px">Voir la collection</a></div>`;
     foot='';
   } else {
-    body=(S.cart.some(i=>i.id==='opus')?blackFridayCartNote(pricing):'')+`<div class="steps" style="margin-bottom:16px"><b data-on="1">Panier</b><i></i><b>Livraison</b><i></i><b>Confirmation</b></div>`
+    body=(S.cart.some(i=>i.id==='opus'||i.id==='as')?blackFridayCartNote(pricing):'')+`<div class="steps" style="margin-bottom:16px"><b data-on="1">Panier</b><i></i><b>Livraison</b><i></i><b>Confirmation</b></div>`
       +S.cart.map((it,n)=>{const p=prod(it.id);return `<div class="citem">
         <div class="cthumb">${visuel(p,it.c)}</div>
         <div><h4>${p.name}</h4><div class="meta">${COLORS[it.c].n} · Pointure ${it.s}</div>
           <div class="qty"><button data-act="qty" data-n="${n}" data-d="-1" aria-label="Retirer un">−</button><span class="num">${it.q}</span><button data-act="qty" data-n="${n}" data-d="1" aria-label="Ajouter un">+</button></div></div>
         <div class="right"><b class="num">${fmt(priceOf(p)*it.q)}</b><button class="lnk" data-act="rm" data-n="${n}">Retirer</button></div></div>`;}).join('')
       +`<button class="continue-shopping" data-act="closep">Continuer à choisir mes paires <span aria-hidden="true">↗</span></button><p class="note" style="margin-top:16px">${SHIPFREE===0||SHIPCOST===0?'Livraison offerte, partout au Maroc.':(sub>=SHIPFREE?'Livraison offerte sur cette commande.':`Encore ${fmt(SHIPFREE-sub)} pour la livraison offerte.`)}</p>`;
-    foot=`<div class="totals"><div><span>Sous-total</span><span class="num">${fmt(pricing.gross)}</span></div>${pricing.discount?`<div class="bf-discount"><span>Black Friday · Trio de 3 paires</span><span class="num">−${fmt(pricing.discount)}</span></div>`:''}
+    foot=`<div class="totals"><div><span>Sous-total</span><span class="num">${fmt(pricing.gross)}</span></div>${pricing.discount?`<div class="bf-discount"><span>Black Friday · ${blackFridayPackLabel(pricing.pack)}</span><span class="num">−${fmt(pricing.discount)}</span></div>`:''}
       <div><span>Livraison</span><span class="num">${ship?fmt(ship):'Offerte'}</span></div>
       <div class="grand"><span>Total</span><span class="num">${fmt(sub+ship)}</span></div></div>
       <button class="btn btn-pri" data-act="next" style="justify-content:center">Passer à la livraison</button>`;
@@ -67,17 +67,19 @@ function cartHTML(){
       <button class="close" data-act="closep" aria-label="Fermer">✕</button></div>
     <div class="panel-bd">${body}</div>${foot?`<div class="panel-ft">${foot}</div>`:''}</div>`;
 }
+function blackFridayPackLabel(pack){return {opus:'Trio Opus',as:'Trio AS by BENKA',mixte:'Trio mixte'}[pack]||'Votre trio';}
 function blackFridayCartNote(pricing){
   const missing=3-pricing.quantity;
   const message=pricing.packs
-    ? `Offre appliquée : vous économisez ${fmt(pricing.discount)}.`
+    ? `Offre appliquée : ${fmt(pricing.discount)} économisés. Livraison offerte.`
     : pricing.quantity<3 && pricing.count===pricing.quantity
-      ? `Encore ${missing} paire${missing>1?'s':''} pour votre trio à 699 DH.`
-      : 'Tarif normal appliqué : cette offre est réservée à un panier d’exactement 3 paires Opus.';
-  return `<div class="bf-cart-offer"><b>BLACK FRIDAY · 3 PAIRES = 699 DH</b>
+      ? `Encore ${missing} paire${missing>1?'s':''} pour composer votre trio. Le prix s’adapte aux modèles choisis.`
+      : 'Tarif normal appliqué : ces offres sont réservées à un panier d’exactement 3 paires.';
+  const title=pricing.packs ? `${blackFridayPackLabel(pricing.pack)} · ${fmt(pricing.sub)}` : 'BLACK FRIDAY · VOTRE PACK DE 3';
+  return `<div class="bf-cart-offer"><b>${title}</b>
     <p>${message}</p>
-    <small>Couleurs et pointures au choix · Livraison offerte au Maroc</small>
-    <small>Uniquement pour un panier d’exactement 3 paires Opus. Offre non cumulable.</small></div>`;
+    <small>3 Opus : 699 DH · Mixte Opus + AS : 749 DH · 3 AS : 799 DH</small>
+    <small>Couleurs et pointures au choix · Exactement 3 paires · Non cumulable</small></div>`;
 }
 function waLink(o){return SHOP.whatsapp?`https://wa.me/${SHOP.whatsapp}?text=${encodeURIComponent(orderText(o))}`:'';}
 function mailLink(o){return `mailto:${SHOP.email}?subject=${encodeURIComponent('Commande '+o.ref)}&body=${encodeURIComponent(orderText(o))}`;}
@@ -115,13 +117,13 @@ async function envoyerAuTableur(o,cle,leurre){
     try{
       const check=await fetch(SHOP.tableur,{method:'GET',signal:controller.signal});
       const data=await check.json();
-      if(!check.ok||data?.promotion?.version!=='bf-exact3-699-v2')throw new Error('offre indisponible');
+      if(!check.ok||data?.promotion?.packsVersion!=='bf-trios-opus-as-mixte-v3')throw new Error('offre indisponible');
     }catch(e){return {ok:false,refus:true,message:'L’offre Black Friday est momentanément indisponible. Votre panier est conservé ; réessayez dans un moment.'};}
     finally{clearTimeout(timeout);}
   }
   const charge=JSON.stringify({cle,
     items:o.requestItems||o.items.map(i=>({id:i.id,colorKey:i.colorKey,size:i.size,q:i.q})),
-    customer:o.customer,note:o.note,expectedTotal:o.total,pricingVersion:'bf-exact3-699-v2',site:leurre||''});
+    customer:o.customer,note:o.note,expectedTotal:o.total,pricingVersion:'bf-trios-opus-as-mixte-v3',site:leurre||''});
   const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),25000);
   try{
     const r=await fetch(SHOP.tableur,{method:'POST',mode:'cors',signal:controller.signal,

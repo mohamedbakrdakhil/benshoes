@@ -149,7 +149,7 @@ function sheetHTML(){
       </div>
       <div class="sheet-details"><span class="eyebrow">${p.id==='as'?'Mule à boucle · Clous argentés':'Daim de veau · Atelier de Fès'}</span>
       <div class="sheet-top"><h2>${p.name}</h2><span class="sheet-price num">${fmt(priceOf(p))}</span></div>
-      <p class="serif">${p.blurb}</p>${p.id==='opus'?`<div class="sheet-offer"><b>Le trio Black Friday</b><span>3 paires à <strong>699 DH</strong> · Livraison offerte</span><small>Composez votre lot avec les couleurs et pointures de votre choix.</small></div>`:''}
+      <p class="serif">${p.blurb}</p>${p.id==='opus'||p.id==='as'?`<div class="sheet-offer"><b>Le trio Black Friday · ${p.id==='as'?'AS by BENKA':'Opus'}</b><span>3 ${p.id==='as'?'AS':'Opus'} à <strong>${p.id==='as'?'799':'699'} DH</strong> · Livraison offerte</span><small>Ou composez un trio mixte Opus + AS à <strong>749 DH</strong>. Couleurs et pointures au choix, pour un panier d’exactement 3 paires.</small></div>`:''}
       <div class="fld"><div class="fld-lab"><span class="t">Coloris</span><span class="v">${COLORS[c].n}</span></div>
         <div class="colrow">${p.colors.map(k=>`<button class="colopt" data-act="setcol" data-k="${k}" aria-pressed="${k===c}"><i style="background:linear-gradient(135deg,${COLORS[k].c},${COLORS[k].d})"></i>${COLORS[k].n}</button>`).join('')}</div></div>
       <div class="fld"><div class="fld-lab"><span class="t">Pointure EU</span><span class="v">${si?`${si} · ${st>0?st+' en stock':'épuisé'}`:'Choisissez votre pointure'}</span></div>

@@ -1,4 +1,4 @@
-/* Le modèle AS dispose de sa propre vitrine, distincte de l'offre Opus. */
+/* Le modèle AS dispose de sa propre vitrine, avec son offre trio dédiée. */
 .as-collection{background:var(--bg);border-block:1px solid var(--line);scroll-margin-top:90px}
 .as-heading{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:end;margin-bottom:40px}
 .as-heading h2{font-family:var(--fb);font-size:clamp(4rem,8vw,7rem);font-weight:400;line-height:1;margin-top:20px;letter-spacing:-.05em}

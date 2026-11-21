@@ -21,7 +21,7 @@ set -e
 cd "$(dirname "$0")"
 URL="${SITE_URL:-https://www.benkashoes.ma/}"
 TITRE="Black Friday — Benka Shoes | Mocassins en daim"
-DESC="Benkashoes — la mule Opus en daim de veau, première en mousse estampée, doublure cuir pleine fleur. Black Friday : 3 paires à 699 DH. Huit coloris, pointures 37 à 41. Livraison offerte partout au Maroc."
+DESC="Black Friday Benka Shoes : 3 Opus à 699 DH, 3 AS by BENKA à 799 DH ou un trio mixte à 749 DH. Couleurs et pointures 37 à 41 au choix. Livraison offerte au Maroc."
 PARTAGE="assets/marque/partage-1200x630.jpg"
 # L'icône d'onglet : l'empreinte de la marque, relevée sur le fichier de logo
 # par logo.py, encodée en adresse de données. Le dessin au jugé qu'elle

@@ -1,20 +1,20 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 function client(){const e=vm.createContext({document:{querySelector:()=>null}});for(const f of ['02-catalogue.js','02b-black-friday-prix.js','04-outils.js','07-fiche.js','06-collection.js'])vm.runInContext(fs.readFileSync('src/scripts/'+f,'utf8'),e);return e;}
 function apps(){const e=vm.createContext({console});vm.runInContext(fs.readFileSync('integrations/tableur.gs','utf8'),e);return e;}
-test('AS : quatre coloris, stock total 120, fiche à 299 sans offre Opus ni rotor d’un autre modèle',()=>{
+test('AS : quatre coloris, stock total 120, fiche à 299 avec trio AS à 799, mixte à 749 et sans rotor d’un autre modèle',()=>{
  const e=client();assert.equal(vm.runInContext('totStock(prod("as"))',e),120);
  e.visuel=()=>'<img>';e.nbPhotos=()=>1;
  vm.runInContext('S.sheet={id:"as",c:"camel",s:39};S.tab="fiche"',e);
- const html=vm.runInContext('sheetHTML()',e);assert.match(html,/Ajouter au panier — 299 DH/);assert.match(html,/AS by BENKA/);assert.doesNotMatch(html,/Le trio Black Friday|product-360/);
+ const html=vm.runInContext('sheetHTML()',e);assert.match(html,/Ajouter au panier — 299 DH/);assert.match(html,/AS by BENKA/);assert.match(html,/799 DH/);assert.match(html,/749 DH/);assert.doesNotMatch(html,/product-360/);
  assert.equal((html.match(/data-act="setcol"/g)||[]).length,4);
  assert.equal((html.match(/data-act="setsize"/g)||[]).length,5);
  vm.runInContext('S.ov.stock.as={camel:[0,7,5,5,3],cognac:[10,7,5,5,3],noir:[10,7,5,5,3],chocolat:[10,7,5,5,3]};S.sheet.s=37',e);
  assert.match(vm.runInContext('sheetHTML()',e),/Pointure épuisée/);
 });
-test('panier mixte : prix AS intact et aucune remise Opus sur un panier mixte',()=>{
+test('panier mixte à 749, trois AS à 799',()=>{
  const e=client();vm.runInContext('S.cart=[{id:"as",c:"camel",s:39,q:1},{id:"opus",c:"noir",s:39,q:2}]',e);
- assert.equal(vm.runInContext('cartSub()',e),857);assert.equal(vm.runInContext('cartPricing().discount',e),0);
- vm.runInContext('S.cart=[{id:"as",c:"noir",s:41,q:3}]',e);assert.equal(vm.runInContext('cartSub()',e),897);
+ assert.equal(vm.runInContext('cartSub()',e),749);assert.equal(vm.runInContext('cartPricing().discount',e),108);
+ vm.runInContext('S.cart=[{id:"as",c:"noir",s:41,q:3}]',e);assert.equal(vm.runInContext('cartSub()',e),799);
 });
 test('Apps Script : AS accepté à 299, prix client falsifié ignoré, total incohérent refusé',()=>{
  const e=apps();e.input={items:[{id:'as',colorKey:'chocolat',size:39,q:2,unit:1}],customer:{name:'Test local',phone:'0600000000',email:'test@example.invalid',addr:'Adresse test',city:'Fès',country:'Maroc'},expectedTotal:598};
