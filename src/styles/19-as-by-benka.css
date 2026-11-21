@@ -1,0 +1,24 @@
+/* Le modèle AS dispose de sa propre vitrine, distincte de l'offre Opus. */
+.as-collection{background:var(--bg);border-block:1px solid var(--line);scroll-margin-top:90px}
+.as-heading{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:end;margin-bottom:40px}
+.as-heading h2{font-family:var(--fb);font-size:clamp(4rem,8vw,7rem);font-weight:400;line-height:1;margin-top:20px;letter-spacing:-.05em}
+.as-heading h2 span{display:block;font-family:var(--fu);font-size:1rem;line-height:1.5;font-weight:600;letter-spacing:.22em;margin-top:12px}
+.as-intro p:first-child{font-family:var(--fb);font-size:clamp(1.65rem,3vw,2.4rem);line-height:1.2;margin-bottom:16px}
+.as-intro p:last-child{font-size:1rem;line-height:1.7;color:var(--fg-soft);max-width:440px}
+.as-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px 24px}
+.as-card{display:block;min-width:0;color:var(--fg);text-decoration:none}
+.as-photo{position:relative;overflow:hidden;background:var(--surface-2);aspect-ratio:4/3;border-radius:6px}
+.as-photo img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 55%;transition:transform .45s ease}
+.as-photo>span{position:absolute;right:16px;bottom:16px;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--bg);color:var(--fg);font-size:1.5rem;box-shadow:0 2px 10px #0002}
+.as-caption{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px}
+.as-caption h3{font-family:var(--fb);font-weight:400;font-size:1.65rem}
+.as-caption>span{font-size:.875rem;color:var(--fg-soft)}
+.as-card:focus-visible{outline:2px solid var(--accent-text);outline-offset:6px;border-radius:4px}
+.as-contact{display:flex;align-items:center;justify-content:space-between;gap:24px;border-top:1px solid var(--line);padding-top:26px;margin-top:36px}
+.as-contact>span{font-size:.875rem;color:var(--fg-soft)}
+.as-contact .btn{min-height:48px;font-size:.875rem;text-align:center}
+@media(hover:hover){.as-card:hover .as-photo img{transform:scale(1.035)}.as-card:hover h3{color:var(--accent-text)}}
+@media(min-width:861px) and (max-width:1200px){.hdr .nav{gap:10px;font-size:.7rem}.hdr-in{gap:12px}}
+@media(max-width:640px){.as-heading{grid-template-columns:1fr;gap:26px;margin-bottom:28px}.as-grid{gap:24px 14px}.as-photo{aspect-ratio:1/1}.as-caption{align-items:flex-start;flex-direction:column;gap:5px}.as-caption h3{font-size:1.4rem}.as-caption>span{font-size:.875rem}.as-photo>span{right:10px;bottom:10px;width:32px;height:32px}.as-contact{align-items:stretch;flex-direction:column;gap:18px}.as-contact .btn{width:100%}}
+@media(max-width:380px){.as-grid{grid-template-columns:1fr}.as-photo{aspect-ratio:4/3}.as-caption{flex-direction:row;align-items:center}}
+@media(prefers-reduced-motion:reduce){.as-photo img{transition:none}.as-card:hover .as-photo img{transform:none}}
