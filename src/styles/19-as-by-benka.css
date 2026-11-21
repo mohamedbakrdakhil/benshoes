@@ -14,7 +14,16 @@
 .as-caption h3{font-family:var(--fb);font-weight:400;font-size:1.65rem}
 .as-caption>span{font-size:.875rem;color:var(--fg-soft)}
 .as-card:focus-visible{outline:2px solid var(--accent-text);outline-offset:6px;border-radius:4px}
-.as-contact{display:flex;align-items:center;justify-content:space-between;gap:24px;border-top:1px solid var(--line);padding-top:26px;margin-top:36px}
+.as-contact{display:flex;align-items:start;justify-content:space-between;gap:24px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:26px;margin-top:36px}
+.as-contact h3{font-family:var(--fb);font-size:1.65rem;font-weight:400;margin-bottom:10px}
+.as-contact p{font-size:1rem;line-height:1.7;color:var(--fg-soft);max-width:400px}
+.as-selection{display:grid;grid-template-columns:1fr 1fr;gap:16px;flex:1;max-width:600px;min-width:0}
+.as-selection label{display:flex;flex-direction:column;gap:10px;font-size:1rem}
+.as-selection select{width:100%;min-height:48px;padding:10px 34px 10px 12px;border:1px solid var(--line-2);border-radius:4px;background-color:var(--bg);color:var(--fg);font:inherit}
+.as-selection .btn{grid-column:1/-1}
+.as-selection :focus-visible{outline:2px solid var(--accent-text);outline-offset:3px}
+@media(max-width:900px){.as-contact>div,.as-selection{flex-basis:100%;width:100%;max-width:none}}
+@media(max-width:440px){.as-selection{grid-template-columns:1fr}}
 .as-contact>span{font-size:.875rem;color:var(--fg-soft)}
 .as-contact .btn{min-height:48px;font-size:.875rem;text-align:center}
 @media(hover:hover){.as-card:hover .as-photo img{transform:scale(1.035)}.as-card:hover h3{color:var(--accent-text)}}
