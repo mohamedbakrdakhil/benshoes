@@ -1,5 +1,5 @@
 
-<div id="shopview" class="black-friday">
+<div id="shopview" class="black-friday bf-paused">
 <a class="skip-link" href="#modeles">Aller à la collection</a>
 <div class="prog" id="prog" aria-hidden="true"></div>
 
@@ -96,8 +96,12 @@
   <div class="bf-benefit"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m12 3 8 4v5c0 4-4 7-8 9-4-2-8-5-8-9V7zM8 12l3 3 5-6"/></svg><span>Confectionné dans notre atelier à Fès</span></div>
 </div>
 <main>
-<section class="visite visite-fetes visite-riad" id="visite" aria-label="Le riad Benka, showroom virtuel inspiré de Fès, édition Black Friday et Noël" data-bf-scene>
-  <div class="visite-stage">
+<section class="visite visite-fetes visite-riad visite-preview" id="visite" aria-label="Le riad Benka, showroom virtuel inspiré de Fès, édition Black Friday et Noël" data-bf-scene data-showroom-active="false">
+  <div class="showroom-cover">
+    <div class="showroom-cover-art" aria-hidden="true"></div>
+    <div class="showroom-cover-copy"><span class="k">Le showroom Benka · Fès</span><h2>Un riad pour<br>les fêtes.</h2><p>Zellige émeraude, cèdre sculpté et lumière dorée : entrez dans notre maison et découvrez la collection.</p><div class="showroom-cover-actions"><button class="btn" id="showroom-start" aria-controls="showroom-stage" aria-expanded="false" hidden>Visiter le showroom</button><a class="showroom-collection" href="#modeles">Voir les modèles <span aria-hidden="true">↗</span></a></div><p id="showroom-status" role="status"></p></div>
+  </div>
+  <div class="visite-stage" id="showroom-stage" hidden>
     <div class="world" id="world" aria-hidden="true"></div>
     <div class="fete-frame" aria-hidden="true" data-bf-motion>
       <div class="fete-lights"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
@@ -139,6 +143,7 @@
     </div>
     <div class="fete-tour-nav" hidden><label for="fete-chapter">Explorer la visite</label><select id="fete-chapter"><option value="0.04">01 · La médina illuminée</option><option value="0.18">02 · Sous l’arche</option><option value="0.31">03 · Les tanneries</option><option value="0.42">04 · La rue Benka</option><option value="0.49">05 · La vitrine de Noël</option><option value="0.60">06 · Entrez chez Benka</option><option value="0.69">07 · Les arches du riad</option><option value="0.94">08 · La galerie du riad</option><option value="0.98">09 · Le mur de la collection</option></select></div>
     <button class="vskip" data-act="skipvisite">Passer la visite</button>
+    <button class="showroom-close" id="showroom-close">Fermer la visite</button>
     <div class="vprog" aria-hidden="true"><i id="vprogbar"></i></div>
   </div>
 </section>

@@ -1,6 +1,6 @@
 /* ======================= démarrage ======================= */
 function degrader(raison){
-  MODE2D=true; construirePlans();
+  if(typeof construirePlans==='function'){MODE2D=true;construirePlans();}
   document.documentElement.classList.add('degrade');
   MOTEUR.taches.length=0;
   document.querySelectorAll('[data-rv]').forEach(el=>{el.style.opacity='';el.style.transform='';});
@@ -8,7 +8,7 @@ function degrader(raison){
 }
 try{
   renderStatic();
-  initMotion();initVisite();initAtelier();initNav();initCounters();initProgress();
+  initMotion();initShowroomDemande();initAtelier();initNav();initCounters();initProgress();
   fondVideo();
   avancer(tacheRevelations);revelations();
 }catch(err){ degrader(err&&err.message||err); }
@@ -19,7 +19,7 @@ addEventListener('load',()=>{
   // hauteur, et replier ici viderait le moteur pour le retour à la boutique.
   if(location.hash==='#admin') return;
   const st=$('.visite-stage');
-  if(st && st.getBoundingClientRect().height<Math.min(260,innerHeight-80)) degrader('scène sans hauteur');
+  if(st && !st.hidden && st.getBoundingClientRect().height<Math.min(260,innerHeight-80)) degrader('scène sans hauteur');
 });
 mesurer();
 addEventListener('scroll',reveiller,{passive:true});

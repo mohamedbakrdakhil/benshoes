@@ -67,12 +67,12 @@ function visite({motion=true,width=1440}={}){
   const zones=Object.fromEntries(['fes','seuil','allee','salle'].map(k=>[k,{style:{}}]));
   const world={style:{},querySelector:selector=>zones[selector.match(/"(.+)"/)[1]],querySelectorAll:()=>[]};
   const caps=[{dataset:{a:'0',b:'.5'},style:{}},{dataset:{a:'.5',b:'1.01'},style:{}}];
-  const section={querySelectorAll:()=>caps,addEventListener:(name,fn)=>events[name]=fn};
+  const section={querySelectorAll:()=>caps,addEventListener:(name,fn)=>events[name]=fn,removeEventListener:name=>delete events[name]};
   class IO{constructor(fn){this.fn=fn;observers.push(this);}observe(){}disconnect(){this.disconnected=true;}}
   const ctx=vm.createContext({innerWidth:width,CATALOG:[],MOTION:motion,sessionStorage:{getItem:()=>0,setItem(){}},
     setTimeout(){},console,IntersectionObserver:IO,scrollY:0,GEO:{vTop:0,vSpan:1000,vh:900},
     $:selector=>selector==='#visite'?section:selector==='#world'?world:null,
-    mesurer(){},reveiller(){},degrader(e){throw Error(e);},avancer:fn=>tasks.push(fn),borne:(v,a,b)=>Math.max(a,Math.min(b,v))});
+    mesurer(){},reveiller(){},degrader(e){throw Error(e);},avancer:fn=>{tasks.push(fn);return ()=>tasks.splice(tasks.indexOf(fn),1);},borne:(v,a,b)=>Math.max(a,Math.min(b,v))});
   ctx.self=ctx;
   vm.runInContext(code('12-visite.js'),ctx);
   ctx.recordBuild=()=>builds++;
@@ -80,12 +80,13 @@ function visite({motion=true,width=1440}={}){
   return {ctx,tasks,observers,section,world,zones,events,get builds(){return builds;}};
 }
 
-test('la 3D est construite une fois à proximité, jamais pour le mouvement réduit',()=>{
-  const h=visite();vm.runInContext('initVisite()',h.ctx);
+test('le module 3D ne construit rien avant son démarrage explicite; la fermeture retire sa caméra',()=>{
+  const h=visite();
   assert.equal(h.builds,0);
-  h.observers[0].fn([{isIntersecting:false}]);assert.equal(h.builds,0);
-  h.observers[0].fn([{isIntersecting:true}]);assert.equal(h.builds,1);
-  h.observers[0].fn([{isIntersecting:true}]);assert.equal(h.builds,1);
+  vm.runInContext('const fermer=initVisite()',h.ctx);
+  assert.equal(h.builds,1);assert.equal(h.tasks.length,1);
+  vm.runInContext('fermer()',h.ctx);assert.equal(h.tasks.length,0);
+  assert.equal(h.events['benka:visitejump'],undefined);
   const reduced=visite({motion:false});vm.runInContext('initVisite()',reduced.ctx);
   assert.equal(reduced.builds,0);assert.equal(reduced.observers.length,0);
 });

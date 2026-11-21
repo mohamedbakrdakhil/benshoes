@@ -65,7 +65,7 @@ cat src/styles/*.css  > .build/site.css
 if command -v python3 >/dev/null 2>&1; then
   python3 -c "import images,sys;n=images.manifeste();sys.stderr.write('  %-18s %d visuel(s) depuis assets/produits/\n'%('photos',n))" 2>&1 >/dev/null || true
 fi
-cat .build/photos.js src/scripts/*.js > .build/site.js 2>/dev/null || cat src/scripts/*.js > .build/site.js
+python3 tools/preparer-showroom.py
 printf '  %-18s %s modules, %s Ko\n' "styles" "$(ls src/styles | wc -l | tr -d ' ')" "$(( $(wc -c < .build/site.css) / 1024 ))"
 printf '  %-18s %s modules, %s Ko\n' "scripts" "$(ls src/scripts | wc -l | tr -d ' ')" "$(( $(wc -c < .build/site.js) / 1024 ))"
 

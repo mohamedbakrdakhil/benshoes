@@ -122,6 +122,7 @@ document.addEventListener('click',async e=>{
   if(S.envoi&&['add','qty','rm','next','place'].includes(a)){toast('Votre commande est en cours d’envoi.');return;}
   if(a==='skipvisite'){
     e.preventDefault();
+    document.getElementById('visite')?.dispatchEvent(new Event('benka:showroomclose'));
     const m=$('#modeles');
     if(m){
       // La collection possède désormais son propre cadre positionné :

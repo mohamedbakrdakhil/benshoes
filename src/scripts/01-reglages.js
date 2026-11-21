@@ -63,7 +63,10 @@ function visuel(p,c,lite,i){
   const ph=photoDe(p.id,c);
   if(!ph) return sandal(p.style,c,p.platform,lite);
   const alt=att(`${p.name} — ${(COLORS[c]||{}).n||''}`);
-  if(ph.brut) return `<img class="pv" width="960" height="1280" src="${ph.brut}" alt="${alt}" loading="lazy" decoding="async">`;
+  if(ph.brut){
+    const responsive=p.id==='as'?` srcset="${jeuSrc(ph.brut.replace(/\.jpg$/,''),[480,640,960],'webp')}" sizes="(max-width:700px) 46vw, ${lite?'300px':'480px'}"`:'';
+    return `<img class="pv" width="960" height="1280" src="${ph.brut}"${responsive} alt="${alt}" loading="lazy" decoding="async">`;
+  }
   const B=basePhoto(ph,i);
   // « sizes » dit au navigateur la place réelle de l'image AVANT de la
   // choisir : sans lui il prend la plus large et télécharge pour rien.
@@ -74,7 +77,7 @@ function visuel(p,c,lite,i){
   // La grille et la galerie de fiche passent à deux colonnes sous 700 px :
     // sans ce palier, le navigateur y chargeait une image prévue pour 92 % de
     // la largeur, soit quatre fois les pixels nécessaires.
-    const places=lite?'(max-width:860px) 80vw, 300px'
+    const places=lite?'(max-width:700px) 46vw, (max-width:860px) 80vw, 300px'
                      :'(max-width:700px) 46vw, (max-width:860px) 92vw, 480px';
   /* Un <img> seul, jamais un <picture>.
 

@@ -237,14 +237,14 @@ function passant(cls,w,ht,x,y,z0,z1,vitesse,phase,ry,type){
 function photoNiche(p,col){
   // Les découpes Opus ne conviennent ni aux couleurs ni à la forme des autres modèles.
   const jeux={opus:{base:'assets/visite/niche-',largeurs:[190,380]},
-              as:{base:'assets/visite/niche-as-',largeurs:[960]}};
+              as:{base:'assets/visite/niche-as-',largeurs:[190,380],ext:'webp'}};
   const jeu=jeux[p.id];
   // Un nouveau modèle sans découpe dédiée garde sa vraie photo produit.
   if(!jeu)return visuel(p,col,true).replace('loading="lazy"','loading="eager"');
   const b=jeu.base+col,largeur=jeu.largeurs[jeu.largeurs.length-1];
-  const hauteur=p.id==='opus'?258:640;
-  return `<img class="pv pv-decoupe" src="${b}-${largeur}.png"`
-    +` srcset="${jeu.largeurs.map(w=>b+'-'+w+'.png '+w+'w').join(', ')}"`
+  const hauteur=p.id==='opus'?258:253,ext=jeu.ext||'png';
+  return `<img class="pv pv-decoupe" src="${b}-${largeur}.${ext}"`
+    +` srcset="${jeu.largeurs.map(w=>b+'-'+w+'.'+ext+' '+w+'w').join(', ')}"`
     +` sizes="(max-width:700px) 95px, 230px" width="${largeur}" height="${hauteur}"`
     +` alt="${att(p.name+' — '+((COLORS[col]||{}).n||col))}"`
     // Chargement immédiat sur téléphone, et c'est la correction du défaut
@@ -562,16 +562,16 @@ function animerPassants(world){
   if(!gens.length)return;
   const sec=world.closest('.visite')||world.parentElement;
   const boutique=world.closest('#shopview');
-  let visible=!self.IntersectionObserver,horloge=0,attente=0;
+  let visible=!self.IntersectionObserver,horloge=0,attente=0,observer;
   const cadence=PETIT?50:1000/30;
   if(self.IntersectionObserver&&sec){
-    new IntersectionObserver(entries=>{
+    observer=new IntersectionObserver(entries=>{
       visible=entries[0].isIntersecting;
       world.classList.toggle('vit',visible);
       if(visible)reveiller();
-    }).observe(sec);
+    });observer.observe(sec);
   }else world.classList.add('vit');
-  avancer((dt,sy)=>{
+  const arreter=avancer((dt,sy)=>{
     if(!visible||boutique?.classList.contains('bf-paused')
       ||(typeof S!=='undefined'&&S.panel)
       ||sy<GEO.vTop-GEO.vh||sy>GEO.vTop+GEO.vSpan+GEO.vh*.6)return false;
@@ -592,6 +592,7 @@ function animerPassants(world){
     // Le décor de fond n'a pas besoin de la cadence de la caméra au scroll.
     return anime?cadence:false;
   });
+  return ()=>{arreter();observer?.disconnect();world.classList.remove('vit');};
 }
 
 function cr(a,b,c,d,t){const t2=t*t,t3=t2*t;
@@ -605,23 +606,10 @@ function echantillon(p){
 }
 function initVisite(){
   const sec=$('#visite'),world=$('#world'); if(!sec||!world||!MOTION)return;
-  let construit=false;
-  function preparer(){
-    if(construit)return;
-    construit=true;
-    try{
-      buildWorld();mesurer();installerVisite(sec,world);reveiller();
-    }catch(err){degrader(err&&err.message||err);}
-  }
-  // Le premier écran et les commandes ne paient pas la construction du riad.
-  // Une entrée directe par #visite est également couverte par l'observateur.
-  if(self.IntersectionObserver){
-    const io=new IntersectionObserver(entries=>{
-      if(!entries.some(e=>e.isIntersecting))return;
-      io.disconnect();preparer();
-    },{rootMargin:'350px 0px'});
-    io.observe(sec);
-  }else preparer();
+  // Appelé uniquement après une demande explicite de visite.
+  buildWorld();mesurer();
+  const arreter=installerVisite(sec,world);reveiller();
+  return arreter;
 }
 function installerVisite(sec,world){
   const caps=[...sec.querySelectorAll('.vcap')].map(el=>({el,a:+el.dataset.a,b:+el.dataset.b}));
@@ -633,7 +621,7 @@ function installerVisite(sec,world){
     // légendes : les cinq premières bornes laissaient la fin sans image.
     const bornes=plans.map((_,i)=>[i/plans.length,(i+1)/plans.length]);
     let capPrec=-1,progression=-1;
-    avancer((dt,sy)=>{
+    return avancer((dt,sy)=>{
       const p=borne((sy-GEO.vTop)/GEO.vSpan,0,1);
       if(p===progression)return false;
       progression=p;
@@ -650,7 +638,6 @@ function installerVisite(sec,world){
       if(hint){hint.style.opacity=p>.03?'0':'1';hint.style.visibility=p>.12?'hidden':'visible';}
       return false;
     });
-    return;
   }
   // Un quartier hors de portée est retiré du document : plus de calque, plus
   // de mémoire. Le masque ne change qu'aux frontières — quelques écritures
@@ -666,12 +653,13 @@ function installerVisite(sec,world){
   }
   const debut=borne((scrollY-GEO.vTop)/GEO.vSpan,0,1);
   majZones(debut);
-  animerPassants(world);
+  const arreterPassants=animerPassants(world);
   const cam=echantillon(debut);
   let roll=0,prevYaw=cam.yaw,capPrec=-1,hintPrec=-1,progression=-1,saut=false;
   cam.pit=cam.pit||0;
-  sec.addEventListener('benka:visitejump',()=>{saut=true;});
-  avancer((dt,sy)=>{
+  const sauter=()=>{saut=true;};
+  sec.addEventListener('benka:visitejump',sauter);
+  const arreterCamera=avancer((dt,sy)=>{
     const p=borne((sy-GEO.vTop)/GEO.vSpan,0,1);
     const proche=sy>GEO.vTop-GEO.vh*1.4 && sy<GEO.vTop+GEO.vSpan+GEO.vh*0.6;
     majZones(proche?p:-1);
@@ -701,5 +689,6 @@ function installerVisite(sec,world){
     if(hint&&hv!==hintPrec){hintPrec=hv;hint.style.opacity=hv;hint.style.visibility=p>.12?'hidden':'visible';}
     return proche&&(erreur()>=.15||Math.abs(roll)>=.02);
   });
+  return ()=>{arreterCamera();arreterPassants?.();sec.removeEventListener('benka:visitejump',sauter);};
 }
 
