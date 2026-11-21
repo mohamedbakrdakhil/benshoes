@@ -17,13 +17,6 @@
 .as-contact{display:flex;align-items:start;justify-content:space-between;gap:24px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:26px;margin-top:36px}
 .as-contact h3{font-family:var(--fb);font-size:1.65rem;font-weight:400;margin-bottom:10px}
 .as-contact p{font-size:1rem;line-height:1.7;color:var(--fg-soft);max-width:400px}
-.as-selection{display:grid;grid-template-columns:1fr 1fr;gap:16px;flex:1;max-width:600px;min-width:0}
-.as-selection label{display:flex;flex-direction:column;gap:10px;font-size:1rem}
-.as-selection select{width:100%;min-height:48px;padding:10px 34px 10px 12px;border:1px solid var(--line-2);border-radius:4px;background-color:var(--bg);color:var(--fg);font:inherit}
-.as-selection .btn{grid-column:1/-1}
-.as-selection :focus-visible{outline:2px solid var(--accent-text);outline-offset:3px}
-@media(max-width:900px){.as-contact>div,.as-selection{flex-basis:100%;width:100%;max-width:none}}
-@media(max-width:440px){.as-selection{grid-template-columns:1fr}}
 .as-contact>span{font-size:.875rem;color:var(--fg-soft)}
 .as-contact .btn{min-height:48px;font-size:.875rem;text-align:center}
 @media(hover:hover){.as-card:hover .as-photo img{transform:scale(1.035)}.as-card:hover h3{color:var(--accent-text)}}
@@ -31,3 +24,15 @@
 @media(max-width:640px){.as-heading{grid-template-columns:1fr;gap:26px;margin-bottom:28px}.as-grid{gap:24px 14px}.as-photo{aspect-ratio:1/1}.as-caption{align-items:flex-start;flex-direction:column;gap:5px}.as-caption h3{font-size:1.4rem}.as-caption>span{font-size:.875rem}.as-photo>span{right:10px;bottom:10px;width:32px;height:32px}.as-contact{align-items:stretch;flex-direction:column;gap:18px}.as-contact .btn{width:100%}}
 @media(max-width:380px){.as-grid{grid-template-columns:1fr}.as-photo{aspect-ratio:4/3}.as-caption{flex-direction:row;align-items:center}}
 @media(prefers-reduced-motion:reduce){.as-photo img{transition:none}.as-card:hover .as-photo img{transform:none}}
+
+.as-grid .card{border:0;padding:0;text-align:left;background:transparent;color:var(--fg)}
+.as-grid .card-art{aspect-ratio:4/3;border-radius:6px;overflow:hidden;background:var(--surface-2)}
+.as-grid .card-art .pv{width:100%;height:100%;max-width:none;object-fit:cover;object-position:center 55%}
+.as-grid .card-name{padding-top:14px;gap:12px;align-items:start}
+.as-grid .card-name h3{font-size:1.65rem;line-height:1.25}
+.as-grid .card-name h3 span{display:block;font-family:var(--fu);font-size:1rem;margin-top:6px}
+.as-grid .card-meta{font-size:.875rem;margin-top:12px}
+.as-grid .p{font-size:1rem;white-space:nowrap}
+@media(max-width:640px){.as-grid .card-art{aspect-ratio:1}.as-grid .card-name{flex-direction:column}.as-grid .card-name h3{font-size:1.35rem}.as-grid .card-meta{font-size:.8rem}}
+
+.panel[data-product="as"] .sheet-art .pv{object-fit:cover!important;object-position:center 55%}

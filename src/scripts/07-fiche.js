@@ -138,19 +138,19 @@ function galerie(p,c){
 function sheetHTML(){
   const p=prod(S.sheet.id),c=S.sheet.c,si=S.sheet.s;
   const st=si==null?null:stockCol(p,c,SIZES.indexOf(si));
-  return `<div class="panel plein" role="dialog" aria-modal="true" aria-label="${p.name}">
-    <div class="panel-hd"><span class="eyebrow">BENKA · LA COLLECTION OPUS</span>
+  return `<div class="panel plein" data-product="${p.id}" role="dialog" aria-modal="true" aria-label="${p.name}">
+    <div class="panel-hd"><span class="eyebrow">${p.id==='as'?'AS by BENKA · LA COLLECTION':'BENKA · LA COLLECTION OPUS'}</span>
       <button class="close" data-act="closep" style="margin-left:auto" aria-label="Fermer">✕</button></div>
     <div class="panel-bd">
       <div class="sheet-media">
         ${galerie(p,c)}
-        <div class="gallery-controls"><span>${nbPhotos(p.id,c)} vues · ${COLORS[c].n}</span><div><button data-act="photos" data-d="-1" aria-label="Photo précédente">←</button><button data-act="photos" data-d="1" aria-label="Photo suivante">→</button></div></div>
-        <details class="product-360"><summary>Explorer la vue à 360° <span aria-hidden="true">＋</span></summary>${rotorHTML(p,c)}</details>
+        <div class="gallery-controls"><span>${nbPhotos(p.id,c)} ${nbPhotos(p.id,c)>1?'vues':'vue'} · ${COLORS[c].n}</span>${nbPhotos(p.id,c)>1?`<div><button data-act="photos" data-d="-1" aria-label="Photo précédente">←</button><button data-act="photos" data-d="1" aria-label="Photo suivante">→</button></div>`:''}</div>
+        ${p.id==='opus'?`<details class="product-360"><summary>Explorer la vue à 360° <span aria-hidden="true">＋</span></summary>${rotorHTML(p,c)}</details>`:''}
       </div>
-      <div class="sheet-details"><span class="eyebrow">Daim de veau · Atelier de Fès</span>
+      <div class="sheet-details"><span class="eyebrow">${p.id==='as'?'Mule à boucle · Clous argentés':'Daim de veau · Atelier de Fès'}</span>
       <div class="sheet-top"><h2>${p.name}</h2><span class="sheet-price num">${fmt(priceOf(p))}</span></div>
-      <p class="serif">${p.blurb}</p><div class="sheet-offer"><b>Le trio Black Friday</b><span>3 paires à <strong>699 DH</strong> · Livraison offerte</span><small>Composez votre lot avec les couleurs et pointures de votre choix.</small></div>
-      <div class="fld"><div class="fld-lab"><span class="t">Cuir</span><span class="v">${COLORS[c].n}</span></div>
+      <p class="serif">${p.blurb}</p>${p.id==='opus'?`<div class="sheet-offer"><b>Le trio Black Friday</b><span>3 paires à <strong>699 DH</strong> · Livraison offerte</span><small>Composez votre lot avec les couleurs et pointures de votre choix.</small></div>`:''}
+      <div class="fld"><div class="fld-lab"><span class="t">Coloris</span><span class="v">${COLORS[c].n}</span></div>
         <div class="colrow">${p.colors.map(k=>`<button class="colopt" data-act="setcol" data-k="${k}" aria-pressed="${k===c}"><i style="background:linear-gradient(135deg,${COLORS[k].c},${COLORS[k].d})"></i>${COLORS[k].n}</button>`).join('')}</div></div>
       <div class="fld"><div class="fld-lab"><span class="t">Pointure EU</span><span class="v">${si?`${si} · ${st>0?st+' en stock':'épuisé'}`:'Choisissez votre pointure'}</span></div>
         <div class="sizegrid">${SIZES.map((s,i)=>{const k=stockCol(p,c,i);
@@ -180,8 +180,8 @@ function sheetTab(p){
     <li><span>Frais de port</span><span>${SHIPCOST===0||SHIPFREE===0?'offerts':`${fmt(SHIPCOST)}, offerts dès ${fmt(SHIPFREE)}`}</span></li>
     <li><span>Paiement</span><span>À la livraison ou par virement</span></li></ul>`;
   return `<ul class="spec" style="border-top:0">${p.spec.map(r=>`<li><span>${r[0]}</span><span>${r[1]}</span></li>`).join('')}
-    <li><span>Montage</span><span>Sur forme</span></li>
-    <li><span>Travail</span><span>${p.hold} sur 5 — ${p.use.toLowerCase()}</span></li>
+    ${p.id==='opus'?'<li><span>Montage</span><span>Sur forme</span></li>':''}
+    ${p.id==='opus'?`<li><span>Travail</span><span>${p.hold} sur 5 — ${p.use.toLowerCase()}</span></li>`:''}
     <li><span>Pointures</span><span>37 à 41</span></li></ul>`;
 }
 

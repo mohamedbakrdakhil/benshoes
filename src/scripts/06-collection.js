@@ -13,9 +13,8 @@ function renderStatic(){
   poserLogo();
   $('#anatfig').innerHTML=anatomySVG();
   $('#filters').innerHTML=`<div class="color-filters" role="group" aria-label="Couleur"><button class="color-chip" data-act="filters-reset" aria-pressed="true">Tous les coloris</button>`
-    +Object.entries(COLORS).map(([k,c])=>`<button class="color-chip" data-act="col" data-k="${k}" aria-pressed="false"><i style="background:linear-gradient(135deg,${c.c},${c.d})" aria-hidden="true"></i>${c.n}</button>`).join('')+`</div>`;
-  $('#ftrmodels').innerHTML=CATALOG.map(p=>`<li><a href="#modeles" data-act="open" data-id="${p.id}">${p.name} — ${fmt(priceOf(p))}</a></li>`).join('')
-    +'<li><a href="#as-by-benka">AS by BENKA</a></li>';
+    +Object.entries(COLORS).filter(([k])=>prod('opus').colors.includes(k)).map(([k,c])=>`<button class="color-chip" data-act="col" data-k="${k}" aria-pressed="false"><i style="background:linear-gradient(135deg,${c.c},${c.d})" aria-hidden="true"></i>${c.n}</button>`).join('')+`</div>`;
+  $('#ftrmodels').innerHTML=CATALOG.map(p=>`<li><a href="#modeles" data-act="open" data-id="${p.id}">${p.name} — ${fmt(priceOf(p))}</a></li>`).join('');
   $('#ftrcontact').innerHTML=`<h5>Nous écrire</h5>
     <div class="copybox"><code id="mailtxt">${esc(SHOP.email)}</code><button class="btn btn-sm btn-ghost" data-copy="mailtxt" style="margin-left:auto">Copier</button></div>
     ${SHOP.phone?`<div class="copybox"><code id="teltxt">${esc(SHOP.phone)}</code><button class="btn btn-sm btn-ghost" data-copy="teltxt" style="margin-left:auto">Copier</button></div>`:''}
@@ -40,8 +39,9 @@ function renderFAQ(){
    coloris. */
 let grilleRendue=null;
 function renderGrid(){
+  const asChange=renderASGrid();
   const paires=[];
-  CATALOG.filter(p=>S.filter==='tous'||p.fam===S.filter).forEach(p=>
+  CATALOG.filter(p=>p.id!=='as'&&(S.filter==='tous'||p.fam===S.filter)).forEach(p=>
     p.colors.filter(c=>(!S.colorFilter||c===S.colorFilter)&&(!S.sizeFilter||stockCol(p,c,SIZES.indexOf(S.sizeFilter))>0)).forEach(c=>paires.push([p,c])));
   $('#filters').querySelectorAll('[data-act="fam"]').forEach(b=>b.setAttribute('aria-pressed',S.filter===b.dataset.k));
   $('#filters').querySelectorAll('[data-act="col"]').forEach(b=>b.setAttribute('aria-pressed',S.colorFilter===b.dataset.k));
@@ -52,7 +52,12 @@ function renderGrid(){
   // changement se produit en silence.
   const compte=$('#collection-count');
   if(compte) compte.textContent=paires.length+' coloris'+(S.sizeFilter?' en pointure '+S.sizeFilter:'');
-  const html=!paires.length?`<div class="empty" style="grid-column:1/-1;background:var(--surface)"><h4>Aucune paire disponible avec ces filtres</h4><p>Essayez une autre pointure ou découvrez les autres coloris.</p><button class="btn btn-out" data-act="filters-reset">Réinitialiser les filtres</button></div>`:paires.map(([p,c],i)=>{
+  const html=!paires.length?`<div class="empty" style="grid-column:1/-1;background:var(--surface)"><h4>Aucune paire disponible avec ces filtres</h4><p>Essayez une autre pointure ou découvrez les autres coloris.</p><button class="btn btn-out" data-act="filters-reset">Réinitialiser les filtres</button></div>`:paires.map(([p,c],i)=>productCard(p,c,i)).join('');
+  // Une quantité du panier ou une pointure ne doit pas reconstruire la collection.
+  if(html===grilleRendue)return asChange;
+  $('#grid').innerHTML=html;grilleRendue=html;return true;
+}
+function productCard(p,c,i){
     const out=totStockCol(p,c)===0;
     // Le bandeau du modèle ne se répète pas sur chaque coloris.
     const ruban=out?`<span class="card-flag out">Épuisé</span>`
@@ -63,10 +68,13 @@ function renderGrid(){
       <div class="card-art">${ruban}${visuel(p,c)}${ticket}<span class="card-discover">Découvrir</span></div>
       <div><div class="card-name"><h3>${p.name} <span>${COLORS[c].n}</span></h3><span class="p num">${fmt(priceOf(p))}</span></div>
       <div class="card-meta"><span>${out?'Actuellement épuisé':SIZES.filter((s,i)=>stockCol(p,c,i)>0).join(' · ')+' EU'}</span><span class="dots"><i style="background:linear-gradient(135deg,${COLORS[c].c},${COLORS[c].d})"></i></span></div></div>
-    </button>`;}).join('');
-  // Une quantité du panier ou une pointure ne doit pas reconstruire la collection.
-  if(html===grilleRendue)return false;
-  $('#grid').innerHTML=html;grilleRendue=html;return true;
+    </button>`;}
+let asGrilleRendue=null;
+function renderASGrid(){
+  const el=$('#as-grid'),p=prod('as');if(!el||!p)return false;
+  const html=p.colors.map((c,i)=>productCard(p,c,i)).join('');
+  if(html===asGrilleRendue)return false;
+  el.innerHTML=html;asGrilleRendue=html;return true;
 }
 function cartCount(){return S.cart.reduce((a,i)=>a+i.q,0);}
 function cartPricing(){

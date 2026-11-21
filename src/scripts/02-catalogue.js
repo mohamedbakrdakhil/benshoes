@@ -2,6 +2,9 @@
 const SIZES=[37,38,39,40,41];
 const MM={37:238,38:245,39:251,40:258,41:264};
 const COLORS={
+  camel:{n:'Camel',c:'#a17a40',d:'#79582d'},
+  cognac:{n:'Cognac',c:'#824a2a',d:'#582e19'},
+  chocolat:{n:'Chocolat',c:'#47302c',d:'#291b19'},
   noir:{n:'Noir',c:'#272421',d:'#131211'},
   beige:{n:'Beige',c:'#cdb595',d:'#a48c6c'},
   marron:{n:'Marron',c:'#6b4529',d:'#45290f'},
@@ -46,7 +49,13 @@ const CATALOG=[
       premier coloris listé — un hasard d'ordre, pas une information. */
    vedette:'tabac',
    blurb:"La bride penny ajourée, posée sur un daim souple monté à la main sur forme. Talon ouvert : on l’enfile d’un geste, il tient par le cou-de-pied. Huit daims au choix, du beige au noir, c’est le modèle sur lequel l’atelier a bâti sa réputation.",
-   spec:[['Tige','Daim de veau, monté sur forme'],['Bride','Penny ajourée, surpiquée main'],['Semelle','EVA souple']]}
+   spec:[['Tige','Daim de veau, monté sur forme'],['Bride','Penny ajourée, surpiquée main'],['Semelle','EVA souple']]},
+  {id:'as',hold:4,use:'Tous les jours',name:'AS by BENKA',sub:'Mule à boucle et clous argentés',fam:'boucle',style:'boucle',price:299,
+   colors:['camel','cognac','noir','chocolat'],
+   // PDF du 21 novembre : les deux lignes 5 × 37 sont additionnées.
+   stock:{camel:[10,7,5,5,3],cognac:[10,7,5,5,3],noir:[10,7,5,5,3],chocolat:[10,7,5,5,3]},
+   blurb:"Une boucle affirmée, une bride ponctuée de clous argentés et un bout fermé aux lignes arrondies. AS by BENKA se décline en quatre teintes : Camel, Cognac, Noir et Chocolat.",
+   spec:[['Modèle','Mule à bout fermé'],['Bride','Boucle et clous argentés'],['Coloris','Camel, Cognac, Noir et Chocolat']]}
 ];
 const FAQ=[
  ['Comment choisir ma pointure ?',

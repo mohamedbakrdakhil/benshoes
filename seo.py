@@ -155,7 +155,7 @@ def graphe(produits, faq, tailles, liv, email, tel, reseaux, desc):
     for p in produits:
         offre = {
             '@type': 'Offer', '@id': URL + '#offre-' + p['id'],
-            'url': URL + '#modeles',
+            'url': URL + ('#as-by-benka' if p['id'] == 'as' else '#modeles'),
             'priceCurrency': 'MAD', 'price': p['prix'],
             'priceValidUntil': fin,
             'itemCondition': 'https://schema.org/NewCondition',
@@ -173,9 +173,9 @@ def graphe(produits, faq, tailles, liv, email, tel, reseaux, desc):
             'brand': {'@type': 'Brand', 'name': 'Benkashoes'},
             'manufacturer': {'@id': ORG},
             'category': 'Chaussures > Mocassins-mules',
-            'material': 'Daim de veau, première en mousse, semelle EVA',
+            **({'material': 'Daim de veau, première en mousse, semelle EVA'} if p['id'] == 'opus' else {}),
             'color': p['coloris'], 'size': tailles,
-            'image': URL + 'assets/marque/partage-1200x630.jpg',
+            'image': URL + ('assets/as-by-benka/camel.jpg' if p['id'] == 'as' else 'assets/marque/partage-1200x630.jpg'),
             'offers': offre,
         })
 
