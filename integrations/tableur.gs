@@ -65,7 +65,10 @@ var ONGLET_STOCK = 'Stock';
    le réécrit pas depuis le code, sinon la moindre republication du script
    effacerait les corrections de l'atelier.
 
-   Inventaire de référence 920, 202 paires. Ordre des colonnes : POINTURES. */
+   Opus : inventaire de référence 920, 202 paires.
+   AS : stock initial corrigé le 22 novembre 2026, avant déduction des commandes,
+   12 par pointure en Noir et 6 dans chacun des trois autres coloris (150 paires).
+   Ordre des colonnes : POINTURES. */
 var STOCK_DEPART = {
   opus: { noir:     [6,6,6,6,4],
           marron:   [6,6,6,6,4],
@@ -75,7 +78,7 @@ var STOCK_DEPART = {
           taupe:    [5,5,5,5,2],
           beige:    [5,0,5,6,2],   // 38 déclaré épuisé par l'atelier
           tabac:    [5,5,6,5,2] },
-  as: {camel:[10,7,5,5,3],cognac:[10,7,5,5,3],noir:[10,7,5,5,3],chocolat:[10,7,5,5,3]}
+  as: {camel:[6,6,6,6,6],cognac:[6,6,6,6,6],noir:[12,12,12,12,12],chocolat:[6,6,6,6,6]}
 };
 
 

@@ -28,7 +28,8 @@ const SESSION_DAYS = 14;
 const SIZES = [37, 38, 39, 40, 41];
 const COLORS = ['camel','cognac','chocolat','noir','beige','marron','taupe','tabac','burgundy','gris','marine'];
 const SEED = {
-  as: {price:299,colors:['camel','cognac','noir','chocolat'],stock:[10,7,5,5,3]},
+  // Référence initiale AS du 22 novembre 2026, avant déduction des commandes.
+  as: {price:299,colors:['camel','cognac','noir','chocolat'],stock:{camel:[6,6,6,6,6],cognac:[6,6,6,6,6],noir:[12,12,12,12,12],chocolat:[6,6,6,6,6]}},
   opus:    { price: 279, colors: ['burgundy','noir','beige','marron','taupe','tabac','gris','marine'], stock: [9,16,21,18,11] },
   stepy:   { price: 259, colors: ['beige','noir','marron','gris','marine'],                            stock: [7,13,17,14,8] },
   western: { price: 359, colors: ['noir'],                                                             stock: [4,7,9,8,5] },
@@ -40,13 +41,16 @@ const STATUSES = ['nouvelle','confirmee','expediee','livree','annulee'];
 let db = { orders: [], catalog: null, seq: 0 };
 let writing = Promise.resolve();
 
-/* Le stock vit en grille « coloris -> une valeur par pointure ». SEED ne
-   garde qu'une ligne par modèle : une valeur de départ, dépliée ici sur
-   chaque coloris. Les vrais chiffres de l'atelier vivent dans
-   src/scripts/02-catalogue.js — ce serveur-ci n'est pas déployé. */
+/* Le stock vit en grille « coloris -> une valeur par pointure ». SEED accepte
+   une grille par coloris, ou une ancienne ligne commune à tous les coloris.
+   Chaque ligne est copiée : une vente ne doit jamais modifier la référence
+   initiale ni le stock d'un autre coloris. Les valeurs déjà en base priment. */
 function grilleSeed(id) {
   const p = SEED[id], g = {};
-  for (const c of p.colors) g[c] = p.stock.slice();
+  for (const c of p.colors) {
+    const ligne = Array.isArray(p.stock) ? p.stock : p.stock[c];
+    g[c] = Array.isArray(ligne) ? ligne.slice() : SIZES.map(() => 0);
+  }
   return g;
 }
 /* La grille en vigueur pour un modèle, quelle que soit la forme trouvée en
@@ -218,7 +222,11 @@ function buildOrder(input, source) {
   for (const [k, q] of Object.entries(need)) {
     const [id, colorKey, size] = k.split(':');
     const g = grille(id), n = {};
-    for (const c of SEED[id].colors) n[c] = (g[c] || SEED[id].stock).slice();
+    for (const c of SEED[id].colors) {
+      const initial = SEED[id].stock;
+      const repli = Array.isArray(initial) ? initial : initial[c];
+      n[c] = (Array.isArray(g[c]) ? g[c] : Array.isArray(repli) ? repli : SIZES.map(() => 0)).slice();
+    }
     const ix = SIZES.indexOf(Number(size));
     n[colorKey][ix] = Math.max(0, (n[colorKey][ix] ?? 0) - q);
     db.catalog.stock[id] = n;
