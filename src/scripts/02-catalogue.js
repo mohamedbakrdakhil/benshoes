@@ -52,8 +52,9 @@ const CATALOG=[
    spec:[['Tige','Daim de veau, monté sur forme'],['Bride','Penny ajourée, surpiquée main'],['Semelle','EVA souple']]},
   {id:'as',hold:4,use:'Tous les jours',name:'AS by BENKA',sub:'Mule à boucle et clous argentés',fam:'boucle',style:'boucle',price:299,
    colors:['camel','cognac','noir','chocolat'],
-   // PDF du 21 novembre : les deux lignes 5 × 37 sont additionnées.
-   stock:{camel:[10,7,5,5,3],cognac:[10,7,5,5,3],noir:[10,7,5,5,3],chocolat:[10,7,5,5,3]},
+   // Stock initial corrigé le 22 novembre 2026, avant déduction des commandes.
+   // Pointures 37 à 41 : 12 par pointure en Noir, 6 pour les trois autres coloris.
+   stock:{camel:[6,6,6,6,6],cognac:[6,6,6,6,6],noir:[12,12,12,12,12],chocolat:[6,6,6,6,6]},
    blurb:"Une boucle affirmée, une bride ponctuée de clous argentés et un bout fermé aux lignes arrondies. AS by BENKA se décline en quatre teintes : Camel, Cognac, Noir et Chocolat.",
    spec:[['Modèle','Mule à bout fermé'],['Bride','Boucle et clous argentés'],['Coloris','Camel, Cognac, Noir et Chocolat']]}
 ];
