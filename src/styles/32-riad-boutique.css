@@ -1,0 +1,44 @@
+/* La façade sert de vitrine, y compris lorsque la visite animée est fermée. */
+.riad-facade .riad-side{
+  z-index:4;align-content:end;justify-content:stretch;justify-items:center;
+  gap:2px;padding:10px 3px 9px;text-decoration:none;color:#f9ebd0;
+}
+.riad-facade .riad-side img{height:clamp(44px,5.2vw,74px);object-fit:contain}
+.riad-facade .riad-side span{font:600 clamp(.67rem,1vw,.93rem)/1.12 var(--fu);letter-spacing:.015em;color:inherit}
+.riad-facade .riad-side i{font-size:.72em;font-style:normal;color:#edca91}
+.riad-facade .riad-side small{font:.67rem/1.1 var(--fu);color:#e8d4ac}
+.riad-facade .riad-side:is(:hover,:focus-visible){border-color:#ffda94;background:#1c513e}
+.riad-facade .riad-side:focus-visible,.visite .riad-picker :focus-visible{outline:2px solid #fff0bd;outline-offset:3px}
+.showroom-cover-copy .showroom-cover-actions{margin-block-start:24px}
+.visite-stage .world{pointer-events:none}
+.visite-stage.riad-gallery-active .riad-wall-piece{pointer-events:auto;cursor:pointer}
+.visite-stage.riad-gallery-active .riad-wall-piece:hover .pv{outline:1px solid #f1d69f;outline-offset:2px}
+.visite .riad-picker{
+  max-width:100%;width:fit-content;margin:16px auto 0;pointer-events:auto;
+  display:flex;align-items:stretch;background:#13382f;color:#f8e9cb;
+  border:1px solid #b99d69;border-radius:3px;text-shadow:none;
+}
+.visite .riad-picker[hidden]{display:none}
+.riad-picker label{display:flex;min-width:0}
+.riad-picker select,.riad-picker a{
+  font:500 .82rem/1.2 var(--fu);color:inherit;min-height:44px;
+}
+.riad-picker select{width:100%;background:#13382f;border:0;border-radius:0;padding:0 8px;cursor:pointer;color-scheme:dark}
+.riad-picker a{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:0 12px;border-left:1px solid #b99d6970;color:#fff1d8;white-space:nowrap;
+}
+.riad-picker a:hover{background:#224a3c}
+@media(max-width:700px){
+  .riad-facade .riad-side img{height:52px}
+  .visite .riad-picker{margin-top:10px}
+  .visite .riad-picker select{font-size:16px}
+  .visite .vcap:has(.riad-picker:not([hidden])){bottom:74px;padding-bottom:0}
+  .visite .vcap:has(.riad-picker:not([hidden])) p{margin-block:8px 0}
+}
+@media(max-height:510px){
+  .visite .vcap:has(.riad-picker:not([hidden])){bottom:64px;padding-bottom:0}
+  .visite .vcap:has(.riad-picker:not([hidden])) p{display:none}
+}
+.repli-catalogue [id]{scroll-margin-top:100px}
+.repli-catalogue :target{background-color:#efd29d;color:#281e13}

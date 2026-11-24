@@ -1,6 +1,11 @@
 /* ======================= données ======================= */
 const SIZES=[37,38,39,40,41];
 const MM={37:238,38:245,39:251,40:258,41:264};
+function footRangeMM(size){
+  const index=SIZES.indexOf(size);
+  const next=SIZES[index+1];
+  return [MM[size],next?MM[next]-1:MM[size]+6];
+}
 const COLORS={
   camel:{n:'Camel',c:'#a17a40',d:'#79582d'},
   cognac:{n:'Cognac',c:'#824a2a',d:'#582e19'},
@@ -60,7 +65,7 @@ const CATALOG=[
 ];
 const FAQ=[
  ['Comment choisir ma pointure ?',
-  "Posez le talon contre un mur, marquez le bout du gros orteil, mesurez en millimètres et comparez au guide. Une mule ne tient que par le cou-de-pied : elle doit envelopper sans serrer. Entre deux pointures, prenez la plus petite \u2014 le daim se détend d\u2019un demi-point après quelques ports."],
+  "Mesurez les deux pieds debout, du talon à l’orteil le plus long. Comparez la plus grande mesure au guide des pointures de la fiche produit. Si vous hésitez, écrivez à l’atelier en précisant le modèle et la longueur mesurée."],
  ['La mule tient-elle vraiment au pied ?',
   "Oui, parce que la tige est montée sur forme : elle épouse le cou-de-pied au lieu de pincer les orteils. Les premiers jours on a le réflexe de crisper le pied, puis le daim se fait et la mule suit la marche toute seule. Ce n\u2019est pas une chaussure de course, c\u2019est une chaussure de journée."],
  ['Comment entretenir le daim ?',

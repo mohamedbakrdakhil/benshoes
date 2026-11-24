@@ -53,12 +53,14 @@ def lire_catalogue(p='src/scripts/02-catalogue.js'):
             # annoncée à Google est un total, elle ne distingue pas les cuirs.
             r"colors:\[([^\]]*)\],.*?stock:\{(.*?)\}.*?blurb:\"(.*?)\",\s*\n?\s*spec:",
             s, re.S):
+        cles = re.findall(r"'(\w+)'", m.group(5))
         produits.append({
             'id':   m.group(1),
             'nom':  m.group(2),
             'sous': m.group(3),
             'prix': int(m.group(4)),
-            'coloris': [couleurs.get(c, c) for c in re.findall(r"'(\w+)'", m.group(5))],
+            'cles_coloris': cles,
+            'coloris': [couleurs.get(c, c) for c in cles],
             'stock': sum(int(x) for x in re.findall(r'\d+', m.group(6))),
             'texte': deslash(m.group(7)),
         })
@@ -203,6 +205,8 @@ def repli_html(produits, tailles, liv):
     """
     li = []
     for p in produits:
+        coloris = ', '.join('<span id="%s-%s">%s</span>' % (echap(p['id']), echap(cle), echap(nom))
+                            for cle, nom in zip(p['cles_coloris'], p['coloris']))
         li.append(
             '<li><h3>Benkashoes %s — %s</h3>'
             '<p><strong>%d DH</strong> · pointures %s · %s</p>'
@@ -211,9 +215,11 @@ def repli_html(produits, tailles, liv):
                 echap(p['nom']), echap(p['sous'].lower()), p['prix'],
                 '%s à %s' % (tailles[0], tailles[-1]) if tailles else '37 à 41',
                 'en stock' if p['stock'] > 0 else 'momentanément épuisé',
-                echap(p['texte']), echap(', '.join(p['coloris']))))
+                echap(p['texte']), coloris))
     port = ''
-    if liv:
+    if liv == (0, 0):
+        port = '<p>Livraison offerte au Maroc.</p>'
+    elif liv:
         port = ('<p>Livraison au Maroc %d DH, offerte à partir de %d DH '
                 'd\'achat.</p>' % (liv[1], liv[0]))
     return ('<noscript><div class="repli-catalogue">'

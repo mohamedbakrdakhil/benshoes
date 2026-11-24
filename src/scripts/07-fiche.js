@@ -136,6 +136,19 @@ function galerie(p,c){
   return `<div class="galerie" tabindex="0" role="group" aria-label="Photos du produit">${h}</div>`;
 }
 
+function fitGuideHTML(selected){
+  const rows=SIZES.map(size=>{
+    const [min,max]=footRangeMM(size);
+    return `<tr${size===selected?' class="fit-selected"':''}><th scope="row">${size} EU</th><td>${min} à ${max} mm</td></tr>`;
+  }).join('');
+  return `<details class="fit-guide"><summary>Quelle pointure choisir&nbsp;?</summary>
+    <div class="fit-body"><p>Debout, talon contre un mur, mesurez chaque pied jusqu’à l’orteil le plus long. Utilisez la plus grande des deux mesures.</p>
+    <table><caption class="sr-only">Correspondance entre la pointure Benka et la longueur du pied</caption>
+      <thead><tr><th scope="col">Pointure</th><th scope="col">Longueur du pied</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table><a href="/aide/#tailles">Voir aussi les largeurs</a></div></details>`;
+}
+
 function sheetHTML(){
   const p=prod(S.sheet.id),c=S.sheet.c,si=S.sheet.s;
   const st=si==null?null:stockCol(p,c,SIZES.indexOf(si));
@@ -157,7 +170,8 @@ function sheetHTML(){
       <div class="fld"><div class="fld-lab"><span class="t">Pointure EU</span><span class="v">${si?`${si} · ${st>0?st+' en stock':'épuisé'}`:'Choisissez votre pointure'}</span></div>
         <div class="sizegrid">${SIZES.map((s,i)=>{const k=stockCol(p,c,i);
           return `<button class="sizebtn" data-act="setsize" data-s="${s}" aria-pressed="${si===s}" ${k?'':'disabled'}>${s}${k&&k<=3?`<small>${k} rest.</small>`:''}</button>`;}).join('')}</div>
-        <p class="note" style="margin-top:9px">Entre deux pointures, prenez la plus petite : <a href="/aide/#tailles" data-act="closep" style="color:var(--accent-text)">voir le guide</a>.</p></div>
+        ${typeof restockLink==='function'?restockLink(p,c):''}
+        ${fitGuideHTML(si)}</div>
       <div class="tabs" role="tablist">
         ${[['fiche','Fiche technique'],['entretien','Entretien'],['livraison','Livraison']].map(([k,l])=>
           `<button role="tab" id="tab-${k}" aria-controls="product-tab" tabindex="${(S.tab||'fiche')===k?0:-1}" data-act="tab" data-k="${k}" aria-selected="${(S.tab||'fiche')===k}">${l}</button>`).join('')}

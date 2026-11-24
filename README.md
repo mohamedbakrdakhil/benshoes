@@ -30,6 +30,7 @@ Ouvrir `http://127.0.0.1:8766/`. Le serveur local sert la version statique ; ses
 - `11-moteur.js`, `12-visite.js` et les modules associés : showroom traditionnel, visibilité, mouvement et décor de fête.
 - `src/styles/` : styles ordonnés ; `18-finitions.css` harmonise les composants et les adaptations mobiles.
 - `integrations/tableur.gs` : réception Apps Script, prix, stock, dédoublonnage, export et mise en forme du classeur.
+- [Alertes de réassort](integrations/REASSORT.md) par modèle, coloris et pointure, avec demande par messagerie et option de notification automatique.
 - `tests/` : règles de prix, sécurité de réception, intégrité du panier, animations et chargement différé.
 
 `build.sh` produit les cinq pages (accueil `/`, `/collection/`, `/showroom/`, `/maison/`, `/aide/`) à la racine pour GitHub Pages et dans `public/` pour le serveur Node, ainsi que les images dérivées, le flux catalogue et les données structurées. Le cadre commun se trouve dans `src/page.html` et le contenu de chaque page dans `src/pages/`. `tools/preparer-pages.py` génère les titres, canoniques, ressources absolues et empreintes CSP de chaque page. Les anciennes ancres produit sont redirigées vers la Collection en conservant les paramètres de campagne ; le panier reste partagé entre les pages. Modifier les sources, puis reconstruire ; ne pas modifier uniquement les fichiers générés.

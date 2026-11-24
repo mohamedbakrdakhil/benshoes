@@ -1,14 +1,14 @@
 <section class="visite visite-fetes visite-riad visite-preview" id="visite" aria-label="Le riad Benka, showroom virtuel inspiré de Fès, édition Black Friday et Noël" data-bf-scene data-showroom-active="false">
   <div class="showroom-cover">
-    <div class="riad-facade" aria-hidden="true">
-      <div class="riad-facade-top">FÈS · LA MAISON BENKA · EST. AU MAROC</div>
-      <div class="riad-side riad-side-left"><img src="assets/visite/niche-as-camel-380.webp" width="190" height="190" alt="" loading="lazy"><span>AS</span></div>
-      <div class="showroom-cover-art"></div>
-      <div class="riad-side riad-side-right"><img src="assets/visite/niche-as-noir-380.webp" width="190" height="190" alt="" loading="lazy"><span>BENKA</span></div>
-      <span class="riad-lantern riad-lantern-left"></span><span class="riad-lantern riad-lantern-right"></span>
-      <div class="riad-floor"></div><span class="riad-facade-caption">Une invitation à ralentir.</span>
+    <div class="riad-facade" role="group" aria-label="Les paires exposées à l’entrée">
+      <span class="riad-facade-top" aria-hidden="true">FÈS · LA MAISON BENKA</span>
+      <a class="riad-side riad-side-left" href="/collection/#opus-tabac" data-act="open" data-id="opus" data-c="tabac" aria-label="Voir la fiche de l’Opus Tabac"><img src="assets/visite/niche-tabac-190.png" width="190" height="129" alt="" decoding="async"><span>Opus <i aria-hidden="true">↗</i></span><small>Tabac</small></a>
+      <div class="showroom-cover-art" aria-hidden="true"><img class="riad-svg" src="assets/visite/riad/portail.6a4e2420bd8e.svg" width="1000" height="1200" alt="" decoding="async"></div>
+      <a class="riad-side riad-side-right" href="/collection/#as-camel" data-act="open" data-id="as" data-c="camel" aria-label="Voir la fiche de l’AS by BENKA Camel"><img src="assets/visite/niche-as-camel-190.webp" width="190" height="127" alt="" decoding="async"><span>AS <i aria-hidden="true">↗</i></span><small>Camel</small></a>
+      <span class="riad-lantern riad-lantern-left" aria-hidden="true"></span><span class="riad-lantern riad-lantern-right" aria-hidden="true"></span>
+      <div class="riad-floor" aria-hidden="true"></div>
     </div>
-    <div class="showroom-cover-copy"><span class="k">Une autre façon de découvrir Benka</span><h1>Au cœur <br>du <em>riad.</em></h1><p>Franchissez l’arche. Suivez la lumière. De la médina aux alcôves de la collection, notre maison de Fès s’habille pour les fêtes.</p><div class="riad-materials"><span>01 / Zellige</span><span>02 / Cèdre</span><span>03 / Lumière</span></div><div class="showroom-cover-actions"><button class="btn" id="showroom-start" aria-controls="showroom-stage" aria-expanded="false" hidden>Entrer dans le showroom <span aria-hidden="true">↗</span></button><a class="showroom-collection" href="/collection/#as-by-benka">Aller à la collection</a></div><p class="showroom-helper">Une visite immersive, à explorer à votre rythme.</p><p id="showroom-status" role="status"></p></div>
+    <div class="showroom-cover-copy"><span class="k">Le showroom Benka · Fès</span><h1>Au cœur <br>du <em>riad.</em></h1><p>Suivez les lanternes de la médina jusqu’aux alcôves du riad. Au fil de la visite, ouvrez la fiche des paires exposées pour découvrir leur couleur et choisir votre pointure.</p><div class="showroom-cover-actions"><button class="btn" id="showroom-start" aria-controls="showroom-stage" aria-expanded="false" hidden>Entrer dans le showroom <span aria-hidden="true">↗</span></button><a class="showroom-collection" href="/collection/">Aller à la collection</a></div><p id="showroom-status" role="status"></p></div>
   </div>
   <div class="visite-stage" id="showroom-stage" hidden>
     <div class="world" id="world" aria-hidden="true"></div>
@@ -43,11 +43,15 @@
         <p>Tadelakt chaleureux, alcôves émeraude et boiseries sculptées : chaque passage révèle une nouvelle perspective.</p></div>
       <div class="vcap" data-a=".75" data-b=".95"><span class="k">08 — La galerie du riad</span>
         <h3>Deux signatures.<br>Douze nuances.</h3>
-        <p>Moucharabiehs de cèdre, fontaine en zellige et alcôves bordées d’or. Opus et AS by BENKA prennent place dans une maison imaginée pour les fêtes.</p></div>
+        <p>Dans les alcôves de cèdre, choisissez la paire qui attire votre regard.</p></div>
       <div class="vcap" data-a=".95" data-b="1.01"><span class="k">09 — Le mur de la collection</span>
         <h3>Votre trio<br>pour les fêtes.</h3>
-        <p>Trois offres, trois paires : Opus à 699 DH, mixte Opus + AS à 749 DH, AS by BENKA à 799 DH. Livraison offerte au Maroc, du 37 au 41.</p>
-        <a class="btn btn-hero" href="/collection/#modeles" data-act="skipvisite">Voir la collection</a></div>
+        <p>Trois Opus à 699 DH, trois AS à 799 DH ou un trio mixte à 749 DH. Livraison offerte au Maroc.</p>
+      </div>
+      <div class="riad-picker" id="riad-picker" hidden>
+        <label><span class="sr-only">Modèle et coloris exposés</span><select id="riad-variant"></select></label>
+        <a href="/collection/#opus-tabac" id="riad-open-piece" data-act="open" data-id="opus" data-c="tabac">Voir la fiche <span aria-hidden="true">↗</span></a>
+      </div>
       <div class="vhint" id="vhint">Faites défiler pour entrer dans Fès<i></i></div>
     </div>
     <div class="fete-tour-nav" hidden><label for="fete-chapter">Explorer la visite</label><select id="fete-chapter"><option value="0.04">01 · La médina illuminée</option><option value="0.18">02 · Sous l’arche</option><option value="0.31">03 · Les tanneries</option><option value="0.42">04 · La rue Benka</option><option value="0.49">05 · La vitrine de Noël</option><option value="0.60">06 · Entrez chez Benka</option><option value="0.69">07 · Les arches du riad</option><option value="0.94">08 · La galerie du riad</option><option value="0.98">09 · Le mur de la collection</option></select></div>

@@ -5,12 +5,55 @@
   const select=document.getElementById('fete-chapter');
   const nav=section?.querySelector('.fete-tour-nav');
   if(!section||!stage||!select||!nav)return;
-  const art=section.querySelector('.showroom-cover-art');
-  if(art&&typeof riadPortalSVG==='function')art.innerHTML=riadPortalSVG().replace('decoding="async"','decoding="async" loading="lazy"');
   nav.hidden=false;
   const caps=[...section.querySelectorAll('.vcap')];
   const prev=document.getElementById('tour-prev'),next=document.getElementById('tour-next'),position=document.getElementById('tour-position');
-  const sync=()=>{if(prev)prev.disabled=select.selectedIndex===0;if(next)next.disabled=select.selectedIndex===select.options.length-1;if(position)position.textContent=String(select.selectedIndex+1).padStart(2,'0')+' / '+String(select.options.length).padStart(2,'0');};
+  const picker=section.querySelector('#riad-picker'),variant=section.querySelector('#riad-variant'),openPiece=section.querySelector('#riad-open-piece');
+  function selectPiece(){
+    const option=variant.selectedOptions[0];
+    if(!option)return;
+    const id=option.dataset.id,c=option.value;
+    openPiece.dataset.id=id;openPiece.dataset.c=c;
+    openPiece.href='/collection/#'+id+'-'+c;
+    openPiece.setAttribute('aria-label','Voir la fiche de '+option.textContent);
+  }
+  function populatePieces(){
+    for(const product of CATALOG){
+      const group=document.createElement('optgroup');group.label=product.name;
+      for(const color of product.colors){
+        const option=document.createElement('option');
+        option.value=color;option.dataset.id=product.id;
+        option.textContent=product.name+' · '+COLORS[color].n;
+        option.selected=product.id==='opus'&&color==='tabac';
+        group.append(option);
+      }
+      variant.append(group);
+    }
+    selectPiece();
+  }
+  variant.addEventListener('change',selectPiece);
+  stage.addEventListener('click',event=>{
+    const piece=event.target.closest('.riad-wall-piece');
+    if(!piece||picker.hidden)return;
+    const option=Array.from(variant.options).find(item=>item.dataset.id===piece.dataset.id&&item.value===piece.dataset.c);
+    if(option){
+      option.selected=true;selectPiece();
+      openPiece.focus({preventScroll:true});
+    }
+  });
+  const sync=()=>{
+    const index=select.selectedIndex;
+    if(prev)prev.disabled=index===0;
+    if(next)next.disabled=index===select.options.length-1;
+    if(position)position.textContent=String(index+1).padStart(2,'0')+' / '+String(select.options.length).padStart(2,'0');
+    const inGallery=index>=7;
+    stage.classList.toggle('riad-gallery-active',inGallery);
+    if(inGallery){
+      if(!variant.options.length)populatePieces();
+      if(picker.parentElement!==caps[index])caps[index].append(picker);
+    }
+    picker.hidden=!inGallery;
+  };
   const jump=()=>{
     const offset=parseFloat(getComputedStyle(stage).top)||0;
     const start=section.getBoundingClientRect().top+scrollY-offset;
