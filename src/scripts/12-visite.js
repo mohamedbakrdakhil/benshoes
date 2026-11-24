@@ -262,8 +262,9 @@ function niche(p,left,w,ht,top,plate,col){
   if(K!==1){left*=K;w*=K;ht*=K;top*=K;}
   const c=col||p.colors[0];
   const corps=`<div class="riad-niche-art" aria-hidden="true">${riadNicheSVG()}</div>${photoNiche(p,c)}<b>${p.name}</b><span>${(COLORS[c]||{}).n||''}</span>`;
-  if(!RICHE) return `<div class="niche" style="left:${left}px;top:${top}px;width:${w}px;height:${ht}px">${corps}</div>`;
-  return `<div class="n3${plate?' plate':''}" style="left:${left}px;top:${top}px;width:${w}px;height:${ht}px">
+  const choix=`data-act="open" data-id="${att(p.id)}" data-c="${att(c)}"`;
+  if(!RICHE) return `<div class="niche riad-wall-piece" ${choix} style="left:${left}px;top:${top}px;width:${w}px;height:${ht}px">${corps}</div>`;
+  return `<div ${choix} class="riad-wall-piece n3${plate?' plate':''}" style="left:${left}px;top:${top}px;width:${w}px;height:${ht}px">
       <div class="nb">${corps}</div><div class="ns nl"></div><div class="ns nr"></div>
       <div class="nt"></div><div class="nf"></div></div>`;}
 

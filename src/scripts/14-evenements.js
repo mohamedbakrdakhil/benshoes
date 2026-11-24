@@ -151,7 +151,9 @@ document.addEventListener('click',async e=>{
   else if(a==='filters-reset'){S.colorFilter=null;S.sizeFilter=null;S.filter='tous';draw();}
   else if(a==='photos'){const g=$('#overlays .galerie');if(g)g.scrollBy({left:+d.d*g.clientWidth,behavior:MOTION?'smooth':'auto'});}
   else if(a==='open'){const p=prod(d.id),c=d.c||p.colors[0];
+    if(t.tagName==='A'&&(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey))return;
     e.preventDefault();
+    if(t.closest('#visite')&&t.tagName==='A')t.focus({preventScroll:true});
     S.sheet={id:p.id,c:c,s:S.sizeFilter&&stockCol(p,c,SIZES.indexOf(S.sizeFilter))>0?S.sizeFilter:null};S.tab='fiche';S.panel='sheet';draw();
     poserLien('#'+p.id+'-'+c);
     mesure('ViewContent',{content_type:'product',content_ids:[refMeta(p.id,c)],
@@ -380,6 +382,7 @@ function fermerPanneau(){
 function depuisLien(){
   let h;try{h=decodeURIComponent(location.hash||'').replace(/^#/,'');}catch(e){return null;}
   if(!h||h==='admin')return null;
+  if(h.startsWith('riad-')&&dansLeRiad())h=h.slice(5);
   const t=h.split('-');
   if(t.length<2)return null;
   const c=t.pop(),p=prod(t.join('-'));
@@ -388,7 +391,25 @@ function depuisLien(){
 /* Nos propres écritures ne doivent pas déclencher le gestionnaire ci-dessous,
    sinon ouvrir une fiche la refermerait aussitôt. */
 let lienInterne=false;
+function dansLeRiad(){
+  return /^\/showroom(?:\/index\.html|\/)?$/.test(location.pathname||'');
+}
 function poserLien(h){
+  if(dansLeRiad()){
+    // Un seul cran d’historique pour toute la fiche et ses changements de couleur.
+    // pushState conserve le défilement de la caméra, y compris en plein chapitre.
+    if(h){
+      const cible='#riad-'+h.slice(1);
+      if(location.hash===cible)return;
+      if(location.hash.startsWith('#riad-'))history.replaceState(history.state,'',cible);
+      else history.pushState({benkaPieceDuRiad:true},'',cible);
+    }else if(history.state?.benkaPieceDuRiad){
+      history.back();
+    }else{
+      history.replaceState(null,'',location.pathname+location.search);
+    }
+    return;
+  }
   if((location.hash||'')===h)return;
   lienInterne=true;
   if(h)location.hash=h;

@@ -16,7 +16,7 @@ function renderStatic(){
   const copyright=$('#ftrcopy');if(copyright)copyright.textContent=`© ${new Date().getFullYear()} Benkashoes — ${SHOP.site}`;
   initCollectionNav();
   renderFAQ();
-  const sizes=$('#sizebody');if(sizes)sizes.innerHTML=SIZES.map((s,i)=>{const mm=MM[s],fin=i<SIZES.length-1?MM[SIZES[i+1]]-1:mm+6;
+  const sizes=$('#sizebody');if(sizes)sizes.innerHTML=SIZES.map(s=>{const [mm,fin]=footRangeMM(s);
     return `<tr><td style="font-weight:700" class="num">${s}</td><td class="num">${mm} – ${fin}</td><td class="num">${mm+13} mm</td><td class="num">${Math.round(mm*.372)} mm</td><td class="num">${Math.round(mm*.405)} mm</td></tr>`;}).join('');
 }
 /* Navigation locale au catalogue mobile : le repère suit la section lue,
@@ -57,6 +57,11 @@ function renderGrid(){
   const asChange=renderASGrid(),grid=$('#grid');
   // Les pages de marque et de visite partagent le panier, pas les grilles.
   if(!grid)return asChange;
+  for(const product of CATALOG){
+    const node=$('#look-'+product.id+'-price');
+    const value=fmt(priceOf(product));
+    if(node&&node.textContent!==value)node.textContent=value;
+  }
   const paires=[];
   CATALOG.filter(p=>p.id!=='as'&&(S.filter==='tous'||p.fam===S.filter)).forEach(p=>
     p.colors.filter(c=>(!S.colorFilter||c===S.colorFilter)&&(!S.sizeFilter||stockCol(p,c,SIZES.indexOf(S.sizeFilter))>0)).forEach(c=>paires.push([p,c])));

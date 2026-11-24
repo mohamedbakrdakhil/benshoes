@@ -30,3 +30,11 @@ test('migration AS : conserve les lignes existantes et les ventes, deuxième pas
  for(const color of ['cognac','chocolat'])assert.deepEqual(Array.from(rows.find(row=>row[2]===color).slice(3,8)),[6,6,6,6,6]);
  assert.equal(vm.runInContext('installerCollectionAS()',e),0);assert.equal(writes,3);assert.equal(released,2);
 });
+
+test('le guide de la fiche couvre les cinq pointures et suit le choix de la cliente',()=>{
+  const context=client();
+  const guide=vm.runInContext('fitGuideHTML(39)',context);
+  assert.deepEqual(Array.from(guide.matchAll(/<th scope="row">(\d+) EU<\/th>/g),match=>+match[1]),[37,38,39,40,41]);
+  assert.match(guide,/<tr class="fit-selected"><th scope="row">39 EU<\/th><td>251 à 257 mm<\/td><\/tr>/);
+  assert.doesNotMatch(vm.runInContext('fitGuideHTML(null)',context),/class="fit-selected"/);
+});

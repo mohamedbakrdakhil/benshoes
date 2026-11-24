@@ -24,6 +24,7 @@ function startPack(mode){
   draw();goPackCollection();
 }
 function renderPackGuide(){
+  afficherTrioPartage();
   const el=document.getElementById('pack-guide');if(!el)return;
   const on=!!S.packMode&&location.hash!=='#admin';
   document.body.classList.toggle('pack-guiding',on);
